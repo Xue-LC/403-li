@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://403.li/sitemap.xml
+
+# 允许所有爬虫访问
+# 工具站不需要限制
