@@ -14,14 +14,14 @@
     </header>
 
     <!-- Search -->
-    <label class="search">
-      <span class="search-prefix">搜索&gt;</span>
+    <div class="command">
+      <span class="prompt">user@403:~$</span>
       <input 
         v-model="searchQuery" 
         placeholder="搜索工具，比如：JSON、Base64、二维码、时间戳"
         @keyup.enter="handleSearch"
       />
-    </label>
+    </div>
 
     <!-- 工具列表 -->
     <section class="pane">
