@@ -1,4 +1,6 @@
-/* 403.li - 简洁终端风格 */
+/* 403.li - 帅气终端风格 */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
   --bg: #0a0c0f;
   --panel: #12161b;
@@ -8,7 +10,9 @@
   --muted: #a6afba;
   --dim: #717a87;
   --green: #9dff6b;
-  --green-soft: rgba(157,255,107,0.12);
+  --green-glow: rgba(157, 255, 107, 0.15);
+  --green-soft: rgba(157, 255, 107, 0.08);
+  --cyan: #00f0ff;
   --shadow: 0 16px 38px rgba(0,0,0,0.34);
   --mono: "JetBrains Mono", Consolas, monospace;
   --sans: "Inter", system-ui, sans-serif;
@@ -24,161 +28,260 @@
   --muted: #64748b;
   --dim: #94a3b8;
   --green: #16a34a;
-  --green-soft: rgba(22,163,74,0.08);
+  --green-glow: rgba(22, 163, 74, 0.1);
+  --green-soft: rgba(22, 163, 74, 0.06);
   --shadow: 0 16px 38px rgba(0,0,0,0.1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body {
-  background: var(--bg);
-  color: var(--text);
+html, body { min-height: 100vh; }
+
+body {
   font-family: var(--sans);
   font-size: 14px;
   line-height: 1.6;
-  min-height: 100vh;
+  color: var(--text);
+  background:
+    linear-gradient(rgba(157, 255, 107, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(157, 255, 107, 0.03) 1px, transparent 1px),
+    var(--bg);
+  background-size: 24px 24px, 24px 24px, auto;
+  position: relative;
+}
+
+/* 扫描线 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(157, 255, 107, 0.015) 0px, rgba(157, 255, 107, 0.015) 1px, transparent 1px, transparent 2px);
+  opacity: 0.6;
+  z-index: 9999;
+}
+
+/* 光晕背景 */
+body::after {
+  content: "";
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 20% 80%, var(--green-glow) 0%, transparent 40%), radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
+  animation: pulse 8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
 }
 
 .app {
-  width: min(var(--max), calc(100vw - 16px));
+  width: min(var(--max), calc(100vw - 24px));
   margin: 0 auto;
-  padding: 16px 0 24px;
+  padding: 20px 0 32px;
+  position: relative;
+  z-index: 1;
 }
 
-/* === 顶部导航 === */
+/* 顶部导航 */
 .topbar {
   border: 1px solid var(--line);
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  background: rgba(18, 22, 27, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.topbar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0.5;
 }
 
 .brand {
   font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--text);
   text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.brand span {
+  color: var(--green);
+  text-shadow: 0 0 20px var(--green-glow);
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
 }
 
 .nav-link {
   color: var(--muted);
   text-decoration: none;
   font-size: 13px;
-  transition: color 0.15s;
+  font-weight: 500;
+  transition: all 0.2s;
+  position: relative;
 }
 
 .nav-link:hover {
-  color: var(--text);
+  color: var(--green);
+  text-shadow: 0 0 10px var(--green-glow);
 }
 
 .theme-toggle {
   background: transparent;
   border: 1px solid var(--line);
   color: var(--muted);
-  padding: 4px 10px;
-  font-size: 12px;
+  padding: 6px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 
 .theme-toggle:hover {
-  color: var(--text);
-  border-color: var(--line-strong);
+  color: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 15px var(--green-glow);
 }
 
-/* === 工具面板 === */
+/* 工具面板 */
 .tool-panel {
   border: 1px solid var(--line);
-  background: var(--panel);
+  background: rgba(18, 22, 27, 0.95);
+  backdrop-filter: blur(10px);
   box-shadow: var(--shadow);
+  position: relative;
+}
+
+.tool-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--green), var(--cyan), var(--green));
+  opacity: 0.6;
 }
 
 .panel-head {
-  padding: 12px 16px;
+  padding: 14px 20px;
   border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   text-transform: uppercase;
 }
 
 .panel-body {
-  padding: 16px;
+  padding: 20px;
 }
 
-/* === 分类标签 === */
+/* 分类标签 */
 .tabs {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .tab {
-  border: 1px solid var(--line-strong);
-  background: transparent;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
 }
 
 .tab:hover {
   color: var(--text);
-  border-color: var(--line);
+  border-color: var(--line-strong);
 }
 
 .tab.active {
-  color: var(--text);
+  color: var(--green);
   border-color: var(--green);
   background: var(--green-soft);
+  box-shadow: 0 0 15px var(--green-glow);
 }
 
-/* === 工具网格 === */
+/* 工具网格 */
 .tool-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  gap: 16px;
 }
 
 .tool-item {
   border: 1px solid var(--line);
-  padding: 16px;
+  background: rgba(255,255,255,0.02);
+  padding: 20px;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.tool-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--green), transparent, var(--cyan));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .tool-item:hover {
-  border-color: var(--line-strong);
-  background: rgba(255,255,255,0.02);
+  border-color: transparent;
+  background: rgba(157, 255, 107, 0.03);
+  box-shadow: 0 0 30px var(--green-glow);
+  transform: translateY(-2px);
+}
+
+.tool-item:hover::before {
+  opacity: 0.5;
 }
 
 .tool-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-family: var(--mono);
   font-size: 11px;
-  color: var(--dim);
 }
 
 .tool-id {
   color: var(--green);
+  font-weight: 600;
+  text-shadow: 0 0 10px var(--green-glow);
 }
 
 .tool-path {
@@ -198,32 +301,48 @@ html, body {
   line-height: 1.5;
 }
 
-/* === 页脚 === */
+/* 页脚 */
 .footer {
-  margin-top: 16px;
+  margin-top: 20px;
   border: 1px solid var(--line);
-  background: var(--panel);
-  padding: 12px 16px;
+  background: rgba(18, 22, 27, 0.95);
+  padding: 14px 20px;
   display: flex;
   justify-content: space-between;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--dim);
+  position: relative;
 }
 
-/* === 响应式 === */
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0.3;
+}
+
+/* 响应式 */
 @media (max-width: 640px) {
   .app {
-    width: calc(100vw - 24px);
-    padding: 12px 0;
+    width: calc(100vw - 20px);
+    padding: 12px 0 20px;
   }
   
   .topbar {
-    padding: 10px 12px;
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
   }
   
   .nav {
-    gap: 12px;
+    width: 100%;
+    justify-content: space-between;
   }
   
   .tool-grid {
@@ -231,11 +350,15 @@ html, body {
   }
   
   .tabs {
-    gap: 6px;
+    gap: 8px;
   }
   
   .tab {
-    padding: 5px 10px;
+    padding: 6px 12px;
     font-size: 11px;
+  }
+  
+  .panel-body {
+    padding: 16px;
   }
 }
