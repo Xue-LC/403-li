@@ -74,7 +74,7 @@
             <h3>{{ tool.name }}</h3>
             <p>{{ tool.description }}</p>
             <div class="tool-foot">
-              <span class="tag">{{ tool.tag }}</span>
+              <span class="tag"><span style="color: var(--green); font-size: 11px;">{{ tool.statusText }}</span></span>
               <span>{{ tool.features }}</span>
             </div>
           </article>
@@ -103,7 +103,7 @@ export default {
           path: '/tools/json', 
           name: 'JSON 格式化', 
           description: '用于格式化、压缩和校验 JSON 数据',
-          tag: '已完成',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: '格式化 / 校验',
           category: 'encoding' 
         },
@@ -112,7 +112,7 @@ export default {
           path: '/tools/base64', 
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
-          tag: '已完成',
+          status: 'error', statusText: '异常', statusColor: '#ff6b7d',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -121,7 +121,7 @@ export default {
           path: '/tools/qrcode', 
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
-          tag: '已完成',
+          status: 'maintenance', statusText: '维护中', statusColor: '#ffd866',
           features: '生成 / 导出',
           category: 'image' 
         },
@@ -130,7 +130,7 @@ export default {
           path: '/tools/timestamp', 
           name: '时间戳转换', 
           description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
-          tag: '已完成',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: 'Unix / ISO',
           category: 'time' 
         },
@@ -139,7 +139,7 @@ export default {
           path: '/tools/url', 
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
-          tag: '已完成',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -148,7 +148,7 @@ export default {
           path: '/tools/hash', 
           name: '哈希计算', 
           description: '计算 MD5、SHA1、SHA256 等哈希值',
-          tag: '已完成',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: 'MD5 / SHA',
           category: 'text' 
         },
@@ -157,7 +157,7 @@ export default {
           path: '/tools/password', 
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
-          tag: '已完成',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: '生成 / 复制',
           category: 'text' 
         },
@@ -166,7 +166,7 @@ export default {
           path: '/tools/color', 
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
-          tag: '已完成',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: 'HEX / RGB',
           category: 'image' 
         }
