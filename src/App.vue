@@ -134,7 +134,7 @@ export default {
           name: '时间戳转换', 
           description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
           status: 'pending',
-          statusText: '待上线', statusColor: '#8b949e', textColor: '#c8d8f0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: 'Unix / ISO',
           category: 'time' 
         },
@@ -144,7 +144,7 @@ export default {
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8b949e', textColor: '#c8d8f0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -154,7 +154,7 @@ export default {
           name: '哈希计算', 
           description: '计算 MD5、SHA1、SHA256 等哈希值',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8b949e', textColor: '#c8d8f0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: 'MD5 / SHA',
           category: 'text' 
         },
@@ -164,7 +164,7 @@ export default {
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8b949e', textColor: '#c8d8f0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: '生成 / 复制',
           category: 'text' 
         },
