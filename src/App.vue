@@ -173,8 +173,8 @@ export default {
           path: '/tools/color', 
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
-          status: 'normal',
-          statusText: '正常',
+          status: 'pending',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: 'HEX / RGB',
           category: 'image' 
         }
