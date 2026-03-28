@@ -104,7 +104,7 @@ export default {
           name: 'JSON 格式化', 
           description: '用于格式化、压缩和校验 JSON 数据',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常', statusColor: '#c0ff8b',
           features: '格式化 / 校验',
           category: 'encoding' 
         },
@@ -114,7 +114,7 @@ export default {
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
           status: 'error',
-          statusText: '异常', statusColor: '#ff8a8a',
+          statusText: '异常', statusColor: '#ffb3b3',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -124,7 +124,7 @@ export default {
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
           status: 'maintenance',
-          statusText: '维护中', statusColor: '#fff3b3',
+          statusText: '维护中', statusColor: '#fff9d9',
           features: '生成 / 导出',
           category: 'image' 
         },
@@ -134,7 +134,7 @@ export default {
           name: '时间戳转换', 
           description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
           status: 'pending',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '待上线', statusColor: '#a8b8d8',
           features: 'Unix / ISO',
           category: 'time' 
         },
@@ -144,7 +144,7 @@ export default {
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '待上线', statusColor: '#a8b8d8',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -154,7 +154,7 @@ export default {
           name: '哈希计算', 
           description: '计算 MD5、SHA1、SHA256 等哈希值',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '待上线', statusColor: '#a8b8d8',
           features: 'MD5 / SHA',
           category: 'text' 
         },
@@ -164,7 +164,7 @@ export default {
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '待上线', statusColor: '#a8b8d8',
           features: '生成 / 复制',
           category: 'text' 
         },
@@ -228,28 +228,28 @@ export default {
 
 /* 正常状态 - 绿色 */
 .status-badge.normal {
-  color: #9dff6b;
+  color: #c0ff8b;
   border-color: rgba(157,255,107,0.4);
   background: rgba(157,255,107,0.1);
 }
 
 /* 异常状态 - 红色 */
 .status-badge.error {
-  color: #ff8a8a;
+  color: #ffb3b3;
   border-color: rgba(255,107,125,0.4);
   background: rgba(255,107,125,0.1);
 }
 
 /* 维护中状态 - 黄色 */
 .status-badge.maintenance {
-  color: #fff3b3;
+  color: #fff9d9;
   border-color: rgba(255,216,102,0.4);
   background: rgba(255,216,102,0.1);
 }
 
 /* 待上线状态 - 灰色 */
 .status-badge.pending {
-  color: #8a9bb8;
+  color: #a8b8d8;
   border-color: rgba(139,148,158,0.4);
   background: rgba(139,148,158,0.1);
 }
