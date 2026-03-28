@@ -74,7 +74,7 @@
             <h3>{{ tool.name }}</h3>
             <p>{{ tool.description }}</p>
             <div class="tool-foot">
-              <span class="tag"><span :style="{ color: tool.statusColor, fontSize: '11px' }">{{ tool.statusText }}</span></span>
+              <span class="tag"><span :style="{ color: tool.statusColor, fontSize: '11px' }"></span></span>
               <span>{{ tool.features }}</span>
             </div>
           </article>
@@ -103,7 +103,7 @@ export default {
           path: '/tools/json', 
           name: 'JSON 格式化', 
           description: '用于格式化、压缩和校验 JSON 数据',
-          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: '格式化 / 校验',
           category: 'encoding' 
         },
@@ -112,7 +112,7 @@ export default {
           path: '/tools/base64', 
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
-          status: 'error', statusText: '异常', statusColor: '#ff6b7d',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -121,7 +121,7 @@ export default {
           path: '/tools/qrcode', 
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
-          status: 'maintenance', statusText: '维护中', statusColor: '#ffd866',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: '生成 / 导出',
           category: 'image' 
         },
@@ -139,7 +139,7 @@ export default {
           path: '/tools/url', 
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
-          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -148,7 +148,7 @@ export default {
           path: '/tools/hash', 
           name: '哈希计算', 
           description: '计算 MD5、SHA1、SHA256 等哈希值',
-          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: 'MD5 / SHA',
           category: 'text' 
         },
@@ -157,7 +157,7 @@ export default {
           path: '/tools/password', 
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
-          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: '生成 / 复制',
           category: 'text' 
         },
@@ -166,7 +166,7 @@ export default {
           path: '/tools/color', 
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
-          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
+          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
           features: 'HEX / RGB',
           category: 'image' 
         }
