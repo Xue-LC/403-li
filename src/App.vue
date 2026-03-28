@@ -74,7 +74,7 @@
             <h3>{{ tool.name }}</h3>
             <p>{{ tool.description }}</p>
             <div class="tool-foot">
-              <span class="tag"><span :style="{ color: tool.statusColor, fontSize: '11px', borderColor: tool.statusColor }">{{ tool.statusText }}</span></span>
+              <span class="tag"><span :style="{ color: tool.statusColor, fontSize: '11px', borderColor: tool.statusColor, backgroundColor: tool.statusColor + '20' }">{{ tool.statusText }}</span></span>
               <span>{{ tool.features }}</span>
             </div>
           </article>
