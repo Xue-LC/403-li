@@ -104,7 +104,7 @@ export default {
           name: 'JSON 格式化', 
           description: '用于格式化、压缩和校验 JSON 数据',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b', textColor: '#e0ffb0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: '格式化 / 校验',
           category: 'encoding' 
         },
@@ -114,7 +114,7 @@ export default {
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
           status: 'error',
-          statusText: '异常', statusColor: '#ff6b7d', textColor: '#ffd0d0',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -124,7 +124,7 @@ export default {
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
           status: 'maintenance',
-          statusText: '维护中', statusColor: '#ffd866', textColor: '#fffce6',
+          statusText: '待上线', statusColor: '#717a87', textColor: '#94a3b8',
           features: '生成 / 导出',
           category: 'image' 
         },
