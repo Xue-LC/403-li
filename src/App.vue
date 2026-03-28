@@ -103,7 +103,7 @@ export default {
           path: '/tools/json', 
           name: 'JSON 格式化', 
           description: '用于格式化、压缩和校验 JSON 数据',
-          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
+          status: 'normal', statusText: '正常', statusColor: '#9dff6b',
           features: '格式化 / 校验',
           category: 'encoding' 
         },
@@ -112,7 +112,7 @@ export default {
           path: '/tools/base64', 
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
-          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
+          status: 'error', statusText: '异常', statusColor: '#ff6b7d',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -121,7 +121,7 @@ export default {
           path: '/tools/qrcode', 
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
-          status: 'pending', statusText: '待上线', statusColor: '#8b949e',
+          status: 'maintenance', statusText: '维护中', statusColor: '#ffd866',
           features: '生成 / 导出',
           category: 'image' 
         },
