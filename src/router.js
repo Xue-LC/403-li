@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Tools from '../views/Tools.vue'
-import JsonFormatter from '../tools/JsonFormatter.vue'
-import Icons from '../views/Icons.vue'
+import Home from './views/Home.vue'
+import Tools from './views/Tools.vue'
+import JsonFormatter from './tools/JsonFormatter.vue'
+import Icons from './views/Icons.vue'
 
 const routes = [
   {
