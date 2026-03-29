@@ -3,6 +3,7 @@ import Home from './views/Home.vue'
 import Tools from './views/Tools.vue'
 import JsonFormatter from './tools/JsonFormatter.vue'
 import Icons from './views/Icons.vue'
+import NotFound from './views/NotFound.vue'
 
 const routes = [
   {
@@ -29,6 +30,11 @@ const routes = [
     path: '/icons',
     name: 'Icons',
     component: Icons
+  },
+  {
+    path: '/:pathMatch(.*)',
+    name: 'NotFound',
+    component: NotFound
   }
 ]
 
