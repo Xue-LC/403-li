@@ -484,8 +484,8 @@ body::after {
   padding: 10px 12px;
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-wrap: nowrap;
   font-family: var(--mono);
   font-size: 13px; /* 底栏 13px */
   color: var(--dim);
@@ -536,6 +536,10 @@ body::after {
   
   .footer {
     font-size: 12px; /* 移动端底栏 12px */
+    flex-direction: column;
+    gap: 6px;
+    text-align: center;
+    padding: 12px;
   }
 }
 
