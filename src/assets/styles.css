@@ -38,22 +38,30 @@
 }
 
 :root {
-  --bg: #0a0c0f;
-  --panel: #12161b;
+  --bg: #0d1117;
+  --panel: #161b22;
   --panel-2: #0f1317;
-  --line: #2a3139;
+  --card: #21262d;
+  --border: #30363d;
+  --line: #30363d;
   --line-strong: #39424d;
-  --text: #eef3f7;
-  --muted: #a6afba;
+  --text: #c9d1d9;
+  --text-dim: #8b949e;
+  --text-muted: #484f58;
+  --muted: #8b949e;
   --dim: #717a87;
+  --accent: #9dff6b;
+  --accent-rgb: 157, 255, 107;
   --green: #9dff6b;
   --green-soft: rgba(157,255,107,0.12);
   --green-glow: rgba(157,255,107,0.15);
-  --red: #ff6b7d;
+  --error: #ff8a8a;
+  --red: #ff8a8a;
+  --warning: #fff3b3;
   --amber: #ffd866;
   --cyan: #00f0ff;
   --shadow: 0 16px 38px rgba(0,0,0,0.34);
-  --mono: "Maple Mono NF CN", "Fira Code", "SF Mono", "JetBrains Mono", Consolas, monospace;
+  --mono: 'Maple Mono NF CN', 'Monaco', 'Consolas', monospace;
   --sans: "Maple Mono NF CN", "Inter", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
   --max: 980px;
 }
@@ -75,9 +83,14 @@
   --shadow: 0 16px 38px rgba(0,0,0,0.1);
 }
 
+/* 基础重置 */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* 字体渲染优化 */
 html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   background:
     linear-gradient(rgba(157,255,107,0.02) 1px, transparent 1px),
     linear-gradient(90deg, rgba(157,255,107,0.02) 1px, transparent 1px),
@@ -89,6 +102,10 @@ html, body {
   line-height: 1.6;
   min-height: 100vh;
 }
+
+/* 响应式断点 */
+/* 移动端：@media (max-width: 640px) */
+/* 桌面端：@media (min-width: 641px) */
 
 body::before {
   content: "";

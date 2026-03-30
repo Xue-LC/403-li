@@ -300,7 +300,7 @@ export default {
 .tool-card {
   border: 1px solid var(--line);
   background: rgba(255,255,255,0.02);
-  padding: 12px;
+  padding: 16px;
   cursor: pointer;
   transition: all 0.3s;
   position: relative;
@@ -353,7 +353,7 @@ export default {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.35;
   color: var(--text);
 }
@@ -362,7 +362,7 @@ export default {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .tool-foot {
@@ -429,8 +429,8 @@ export default {
   }
   
   .tab {
-    padding: 8px 10px; /* 触摸目标至少 44px 高度 */
-    font-size: 10px;
+    padding: 10px 12px; /* 触摸目标至少 44px 高度 */
+    font-size: 11px;
     min-height: 44px;
     display: inline-flex;
     align-items: center;
@@ -442,24 +442,24 @@ export default {
   }
   
   .tool-card {
-    padding: 12px 10px; /* 减小左右留白 */
+    padding: 12px; /* 移动端 padding */
     min-height: auto;
   }
   
   .tool-card h3 {
-    font-size: 15px;
+    font-size: 15px; /* 移动端标题 15px */
   }
   
   .tool-card p {
-    font-size: 12px;
+    font-size: 13px; /* 移动端描述 13px */
   }
   
   .tool-top, .tool-foot {
-    font-size: 10px;
+    font-size: 11px; /* 移动端标签 11px */
   }
   
   .pane-body {
-    padding: 10px;
+    padding: 12px;
   }
   
   .footer {
@@ -479,12 +479,12 @@ export default {
   }
   
   .tool-card p {
-    font-size: 11px;
+    font-size: 12px;
   }
   
   .tab {
-    font-size: 9px;
-    padding: 8px 8px;
+    font-size: 10px;
+    padding: 10px 10px;
   }
 }
 

@@ -11,6 +11,9 @@ export default {
 </script>
 
 <style>
+/* 导入全局样式 */
+@import './assets/styles.css';
+
 /* 全局样式 */
 * {
   margin: 0;
@@ -19,9 +22,9 @@ export default {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #0d1117;
-  color: #c9d1d9;
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
 }
 
 .app {

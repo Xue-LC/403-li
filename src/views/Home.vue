@@ -1,17 +1,7 @@
 <template>
   <div class="app">
     <!-- Topbar -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="leds">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <span class="brand-text">403.li / 中文工具站</span>
-      </div>
-      <div class="status">{{ filteredTools.length }} 个工具可用</div>
-    </header>
+    <Topbar :toolCount="filteredTools.length" />
 
     <!-- Search -->
     <div class="command">
@@ -91,8 +81,13 @@
 </template>
 
 <script>
+import Topbar from '../components/Topbar.vue'
+
 export default {
   name: 'App',
+  components: {
+    Topbar
+  },
   data() {
     return {
       searchQuery: '',

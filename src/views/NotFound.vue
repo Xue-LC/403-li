@@ -82,10 +82,10 @@ export default {
 }
 
 .error-code {
-  font-size: 8rem;
+  font-size: 6rem;
   font-family: var(--mono);
-  color: var(--red);
-  text-shadow: 0 0 30px rgba(255,107,125,0.6);
+  color: var(--error);
+  text-shadow: 0 0 30px rgba(255,138,138,0.6);
   display: inline-block;
   margin: 0;
   line-height: 1;
@@ -103,14 +103,14 @@ export default {
 }
 
 h2 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   margin: 1.5rem 0 0.5rem;
   color: var(--text);
   font-family: var(--mono);
 }
 
 p {
-  color: var(--muted);
+  color: var(--text-dim);
   margin: 0.5rem 0 2rem;
   font-size: 14px;
 }
@@ -119,13 +119,14 @@ p {
   display: inline-block;
   border: 1px solid var(--line-strong);
   background: rgba(255,255,255,0.02);
-  color: var(--green);
+  color: var(--accent);
   padding: 12px 24px;
   font-family: var(--mono);
   font-size: 13px;
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.2s;
+  min-height: 44px;
 }
 
 .home-btn:hover {
@@ -154,11 +155,11 @@ p {
 /* === Responsive === */
 @media (max-width: 640px) {
   .error-code {
-    font-size: 4rem; /* 移动端缩小字号 */
+    font-size: 4rem; /* 移动端 4rem */
   }
   
   h2 {
-    font-size: 1.3rem;
+    font-size: 1.25rem; /* 移动端 1.25rem */
     margin: 1rem 0 0.5rem;
   }
   
@@ -168,7 +169,7 @@ p {
   }
   
   .pane-body {
-    padding: 1rem; /* 减小内边距 */
+    padding: 1rem;
   }
   
   .pane {
@@ -178,9 +179,9 @@ p {
   
   .home-btn {
     display: block;
-    width: 100%;
+    width: 100%; /* 移动端全宽 */
     max-width: 100%;
-    padding: 14px 20px; /* 触摸目标至少 44px 高度 */
+    padding: 14px 24px; /* 触摸目标至少 44px 高度 */
     min-height: 44px;
     text-align: center;
     font-size: 14px;

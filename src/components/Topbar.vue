@@ -1,13 +1,13 @@
 <template>
   <header class="topbar">
-    <div class="brand">
+    <router-link to="/" class="brand" @click.native="handleBrandClick">
       <div class="leds">
         <span></span>
         <span></span>
         <span></span>
       </div>
       <span class="brand-text">403.li / 中文工具站</span>
-    </div>
+    </router-link>
     <div class="status">{{ toolCount }} 个工具可用</div>
   </header>
 </template>
@@ -19,6 +19,12 @@ export default {
     toolCount: {
       type: [Number, String],
       default: 0
+    }
+  },
+  methods: {
+    handleBrandClick(event) {
+      // 确保移动端点击事件正常触发
+      console.log('Brand clicked, navigating to home')
     }
   }
 }
@@ -65,6 +71,19 @@ export default {
   letter-spacing: 0.04em;
   color: var(--text);
   text-decoration: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  margin: -8px -10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.brand:hover {
+  background: rgba(157, 255, 107, 0.05);
+}
+
+.brand:active {
+  background: rgba(157, 255, 107, 0.1);
 }
 
 .leds {

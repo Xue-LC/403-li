@@ -232,12 +232,13 @@ export default {
   background: var(--panel-2);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   padding: 12px;
   resize: vertical;
   transition: all 0.2s;
   border-radius: 0;
   box-sizing: border-box;
+  min-height: 200px;
 }
 
 .code-input:focus {
@@ -273,6 +274,7 @@ export default {
   transition: all 0.2s;
   text-transform: uppercase;
   border-radius: 0;
+  min-height: 44px;
 }
 
 .button:hover:not(:disabled) {
@@ -353,17 +355,18 @@ export default {
   }
   
   .pane-body {
-    padding: 10px; /* 减小左右留白 */
+    padding: 12px;
   }
   
   .code-input {
-    font-size: 11px; /* 移动端适当缩小字体 */
+    font-size: 12px;
     padding: 10px;
+    min-height: 180px;
   }
   
   .button-group {
     flex-direction: column; /* 移动端垂直排列 */
-    gap: 6px;
+    gap: 8px;
     margin: 0.75rem 0;
   }
   
@@ -371,8 +374,8 @@ export default {
     width: 100%; /* 移动端全宽 */
     max-width: 100%;
     text-align: center;
-    padding: 12px 16px; /* 触摸目标至少 44px 高度 */
-    min-height: 44px;
+    padding: 12px 16px;
+    min-height: 44px; /* 触摸目标至少 44px 高度 */
     font-size: 12px;
   }
   
