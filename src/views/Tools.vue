@@ -293,6 +293,7 @@ export default {
 /* === Tool List === */
 .tool-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 10px;
 }
 
@@ -304,6 +305,8 @@ export default {
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
+  max-width: 100%;
+  min-height: 44px; /* 触摸目标最小高度 */
 }
 
 .tool-card::before {
@@ -403,20 +406,85 @@ export default {
 /* === Responsive === */
 @media (max-width: 640px) {
   .tools {
-    width: min(var(--max), calc(100vw - 12px));
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+  
+  .command {
+    padding: 8px 10px;
+  }
+  
+  .prompt {
+    font-size: 11px;
+  }
+  
+  .command input {
+    font-size: 11px;
   }
   
   .group-tabs {
     gap: 6px;
+    margin-bottom: 10px;
   }
   
   .tab {
-    padding: 6px 8px;
+    padding: 8px 10px; /* 触摸目标至少 44px 高度 */
     font-size: 10px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .tool-list {
+    grid-template-columns: 1fr; /* 移动端单列 */
+    gap: 8px;
+  }
+  
+  .tool-card {
+    padding: 12px 10px; /* 减小左右留白 */
+    min-height: auto;
   }
   
   .tool-card h3 {
     font-size: 15px;
+  }
+  
+  .tool-card p {
+    font-size: 12px;
+  }
+  
+  .tool-top, .tool-foot {
+    font-size: 10px;
+  }
+  
+  .pane-body {
+    padding: 10px;
+  }
+  
+  .footer {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+}
+
+/* 超小屏幕 (iPhone SE 等) */
+@media (max-width: 375px) {
+  .tools {
+    padding: 6px 0 14px;
+  }
+  
+  .tool-card h3 {
+    font-size: 14px;
+  }
+  
+  .tool-card p {
+    font-size: 11px;
+  }
+  
+  .tab {
+    font-size: 9px;
+    padding: 8px 8px;
   }
 }
 

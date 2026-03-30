@@ -73,10 +73,12 @@ export default {
 .pane-body {
   padding: 2rem;
   width: 100%;
+  max-width: 100%;
 }
 
 .content {
   text-align: center;
+  padding: 0 1rem;
 }
 
 .error-code {
@@ -88,6 +90,8 @@ export default {
   margin: 0;
   line-height: 1;
   animation: glitch 2s infinite;
+  max-width: 100%;
+  word-break: break-word;
 }
 
 @keyframes glitch {
@@ -150,19 +154,59 @@ p {
 /* === Responsive === */
 @media (max-width: 640px) {
   .error-code {
-    font-size: 5rem;
+    font-size: 4rem; /* 移动端缩小字号 */
   }
   
   h2 {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+    margin: 1rem 0 0.5rem;
+  }
+  
+  p {
+    font-size: 13px;
+    margin: 0.5rem 0 1.5rem;
   }
   
   .pane-body {
-    padding: 1.5rem;
+    padding: 1rem; /* 减小内边距 */
   }
   
   .pane {
-    min-height: 300px;
+    min-height: auto;
+    margin-top: 8px;
+  }
+  
+  .home-btn {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 14px 20px; /* 触摸目标至少 44px 高度 */
+    min-height: 44px;
+    text-align: center;
+    font-size: 14px;
+  }
+  
+  .content {
+    padding: 0;
+  }
+}
+
+/* 超小屏幕 */
+@media (max-width: 375px) {
+  .error-code {
+    font-size: 3.5rem;
+  }
+  
+  h2 {
+    font-size: 1.2rem;
+  }
+  
+  p {
+    font-size: 12px;
+  }
+  
+  .pane-body {
+    padding: 0.75rem;
   }
 }
 </style>

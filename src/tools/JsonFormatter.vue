@@ -227,6 +227,7 @@ export default {
 
 .code-input {
   width: 100%;
+  max-width: 100%;
   border: 1px solid var(--line);
   background: var(--panel-2);
   color: var(--text);
@@ -236,6 +237,7 @@ export default {
   resize: vertical;
   transition: all 0.2s;
   border-radius: 0;
+  box-sizing: border-box;
 }
 
 .code-input:focus {
@@ -345,16 +347,70 @@ export default {
 /* === Responsive === */
 @media (max-width: 640px) {
   .json-formatter {
-    width: min(var(--max), calc(100vw - 12px));
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+  
+  .pane-body {
+    padding: 10px; /* 减小左右留白 */
+  }
+  
+  .code-input {
+    font-size: 11px; /* 移动端适当缩小字体 */
+    padding: 10px;
   }
   
   .button-group {
-    flex-direction: column;
+    flex-direction: column; /* 移动端垂直排列 */
+    gap: 6px;
+    margin: 0.75rem 0;
   }
   
   .button {
-    width: 100%;
+    width: 100%; /* 移动端全宽 */
+    max-width: 100%;
     text-align: center;
+    padding: 12px 16px; /* 触摸目标至少 44px 高度 */
+    min-height: 44px;
+    font-size: 12px;
+  }
+  
+  .input-label {
+    font-size: 11px;
+    margin-bottom: 0.4rem;
+  }
+  
+  .status-error, .status-success {
+    font-size: 11px;
+    padding: 8px 10px;
+    margin-top: 0.75rem;
+  }
+  
+  .footer {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+}
+
+/* 超小屏幕 */
+@media (max-width: 375px) {
+  .json-formatter {
+    padding: 6px 0 14px;
+  }
+  
+  .pane-body {
+    padding: 8px;
+  }
+  
+  .code-input {
+    font-size: 10px;
+    padding: 8px;
+  }
+  
+  .button {
+    padding: 11px 14px;
+    font-size: 11px;
   }
 }
 </style>
