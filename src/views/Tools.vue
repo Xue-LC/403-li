@@ -222,8 +222,8 @@ export default {
 .pane {
   margin-top: 12px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
-  box-shadow: var(--shadow);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
   position: relative;
 }
 
@@ -234,8 +234,8 @@ export default {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--green), var(--cyan), var(--green));
-  opacity: 0.4;
+  background: var(--card-top-line);
+  opacity: 0.5;
 }
 
 .pane-head {
@@ -299,7 +299,8 @@ export default {
 
 .tool-card {
   border: 1px solid var(--line);
-  background: rgba(255,255,255,0.02);
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
   padding: 16px;
   cursor: pointer;
   transition: all 0.3s;
@@ -322,14 +323,30 @@ export default {
   transition: opacity 0.3s;
 }
 
+.tool-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
 .tool-card:hover {
   border-color: transparent;
-  background: rgba(157,255,107,0.03);
-  box-shadow: 0 0 30px var(--green-glow);
+  background: rgba(18,22,27,0.98);
+  box-shadow: 0 0 30px var(--green-glow), inset 0 1px 0 rgba(255,255,255,0.05);
   transform: translateY(-2px);
 }
 
 .tool-card:hover::before {
+  opacity: 0.5;
+}
+
+.tool-card:hover::after {
   opacity: 0.5;
 }
 

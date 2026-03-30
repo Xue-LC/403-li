@@ -210,6 +210,8 @@ export default {
 </script>
 
 <style scoped>
+@import '../assets/styles.css';
+
 /* 状态标签 - 使用 CSS 类管理颜色 */
 .status-badge {
   display: inline-flex;

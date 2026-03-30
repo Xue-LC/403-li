@@ -178,8 +178,8 @@ export default {
 .pane {
   margin-top: 12px;
   border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
-  box-shadow: var(--shadow);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
   position: relative;
 }
 
@@ -190,8 +190,8 @@ export default {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, var(--green), var(--cyan), var(--green));
-  opacity: 0.4;
+  background: var(--card-top-line);
+  opacity: 0.5;
 }
 
 .pane-head {

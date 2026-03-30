@@ -88,6 +88,8 @@ export default {
 </script>
 
 <style scoped>
+@import '../assets/styles.css';
+
 .icons-demo {
   padding: 2rem;
 }
@@ -118,17 +120,30 @@ export default {
 }
 
 .icon-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  position: relative;
   padding: 1.5rem;
   text-align: center;
   transition: all 0.3s ease;
 }
 
+.icon-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
 .icon-card:hover {
-  border-color: var(--text-success);
-  box-shadow: 0 0 15px rgba(63, 185, 80, 0.2);
+  border-color: var(--green);
+  background: rgba(18,22,27,0.98);
+  box-shadow: 0 0 20px var(--green-glow), inset 0 1px 0 rgba(255,255,255,0.05);
   transform: translateY(-2px);
 }
 
@@ -147,12 +162,25 @@ export default {
 
 .icon-name {
   display: block;
-  background: var(--bg-primary);
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
   padding: 0.3rem 0.6rem;
-  border-radius: 4px;
   font-size: 0.85rem;
-  color: var(--text-warning);
+  color: var(--amber);
   margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.icon-name::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.3;
 }
 
 .icon-desc {
@@ -194,23 +222,47 @@ export default {
 }
 
 .ascii-art {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  position: relative;
   padding: 1.5rem;
-  color: var(--text-success);
+  color: var(--green);
   font-family: var(--font-mono);
   font-size: 0.9rem;
   overflow-x: auto;
   text-align: center;
 }
 
+.ascii-art::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
 .code-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--card-shadow);
+  position: relative;
   padding: 1.5rem;
   overflow-x: auto;
+}
+
+.code-block::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
 }
 
 .code-block pre {
