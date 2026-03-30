@@ -232,7 +232,7 @@ export default {
   background: var(--panel-2);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 16px;
+  font-size: 14px;
   padding: 12px;
   resize: vertical;
   transition: all 0.2s;
@@ -268,7 +268,7 @@ export default {
   background: rgba(255,255,255,0.02);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s;
@@ -314,7 +314,7 @@ export default {
   color: var(--red);
   margin-top: 1rem;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 10px 12px;
   border: 1px solid rgba(255,107,125,0.3);
   background: rgba(255,107,125,0.05);
@@ -324,7 +324,7 @@ export default {
   color: var(--green);
   margin-top: 1rem;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   padding: 10px 12px;
   border: 1px solid rgba(157,255,107,0.3);
   background: var(--green-soft);
@@ -341,7 +341,7 @@ export default {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -359,7 +359,7 @@ export default {
   }
   
   .code-input {
-    font-size: 16px;
+    font-size: 14px;
     padding: 10px;
     min-height: 180px;
   }
@@ -376,23 +376,23 @@ export default {
     text-align: center;
     padding: 12px 16px;
     min-height: 44px; /* 触摸目标至少 44px 高度 */
-    font-size: 11px;
+    font-size: 12px;
   }
   
   .input-label {
-    font-size: 11px;
+    font-size: 12px;
     margin-bottom: 0.4rem;
   }
   
   .status-error, .status-success {
-    font-size: 11px;
+    font-size: 12px;
     padding: 8px 10px;
     margin-top: 0.75rem;
   }
   
   .footer {
     padding: 8px 10px;
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 
@@ -407,17 +407,17 @@ export default {
   }
   
   .code-input {
-    font-size: 16px;
+    font-size: 14px;
     padding: 8px;
   }
   
   .button {
     padding: 11px 14px;
-    font-size: 10px;
+    font-size: 11px;
   }
   
   .footer {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 </style>
