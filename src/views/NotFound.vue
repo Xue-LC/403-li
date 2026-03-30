@@ -7,7 +7,7 @@
     <section class="pane">
       <div class="pane-body">
         <div class="content">
-          <h1 class="error-code glitch">404</h1>
+          <h1 class="error-code" data-text="404">404</h1>
           <h2>页面未找到</h2>
           <p>抱歉，你访问的页面不存在或已被移除</p>
           <router-link to="/" class="home-btn">
@@ -81,91 +81,98 @@ export default {
   padding: 0 1rem;
 }
 
+/* === 404 Glitch Effect === */
 .error-code {
   font-size: 6rem;
   font-family: var(--mono);
   color: var(--error);
-  text-shadow: 0 0 30px rgba(255,138,138,0.6);
+  position: relative;
   display: inline-block;
   margin: 0;
   line-height: 1;
-  position: relative;
-  animation: glitch 2s infinite;
-  max-width: 100%;
-  word-break: break-word;
+  font-weight: 700;
+  letter-spacing: 8px;
 }
 
-/* 故障特效 - 多层颜色偏移 */
-.error-code::before,
-.error-code::after {
-  content: "404";
+/* 红色层 */
+.error-code::before {
+  content: attr(data-text);
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
-}
-
-.error-code::before {
-  animation: glitch-before 2s infinite;
-  color: #00ffff;
-  text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+  color: #ff003c;
   opacity: 0.8;
-  z-index: -1;
-  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  overflow: hidden;
+  animation: glitch-1 2.5s infinite linear alternate-reverse;
 }
 
+/* 蓝色层 */
 .error-code::after {
-  animation: glitch-after 2s infinite;
-  color: #ff00ff;
-  text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff;
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  color: #00f0ff;
   opacity: 0.8;
-  z-index: -2;
-  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  overflow: hidden;
+  animation: glitch-2 3s infinite linear alternate-reverse;
 }
 
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-3px, 3px); }
-  40% { transform: translate(-3px, -3px); }
-  60% { transform: translate(3px, 3px); }
-  80% { transform: translate(3px, -3px); }
-  10% { transform: translate(2px, -2px) skewX(10deg); }
-  30% { transform: translate(-2px, 2px) skewX(-10deg); }
-  50% { transform: translate(2px, 2px) rotate(1deg); }
-  70% { transform: translate(-2px, -2px) rotate(-1deg); }
-  90% { transform: translate(0, 3px) scale(1.02); }
+/* 随机切片效果 */
+@keyframes glitch-1 {
+  0% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 1px); }
+  5% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -1px); }
+  10% { clip-path: inset(50% 0 30% 0); transform: translate(-1px, 2px); }
+  15% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); }
+  20% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, 1px); }
+  25% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 1px); }
+  30% { clip-path: inset(90% 0 0 0); transform: translate(-1px, -1px); }
+  35% { clip-path: inset(15% 0 70% 0); transform: translate(1px, 2px); }
+  40% { clip-path: inset(55% 0 25% 0); transform: translate(-2px, -1px); }
+  45% { clip-path: inset(5% 0 85% 0); transform: translate(2px, 2px); }
+  50% { clip-path: inset(75% 0 5% 0); transform: translate(-1px, 1px); }
+  55% { clip-path: inset(25% 0 60% 0); transform: translate(1px, -2px); }
+  60% { clip-path: inset(65% 0 20% 0); transform: translate(-2px, 2px); }
+  65% { clip-path: inset(0 0 90% 0); transform: translate(2px, -1px); }
+  70% { clip-path: inset(45% 0 40% 0); transform: translate(-1px, -2px); }
+  75% { clip-path: inset(85% 0 5% 0); transform: translate(1px, 1px); }
+  80% { clip-path: inset(35% 0 55% 0); transform: translate(-2px, -2px); }
+  85% { clip-path: inset(10% 0 75% 0); transform: translate(2px, 1px); }
+  90% { clip-path: inset(60% 0 30% 0); transform: translate(-1px, 2px); }
+  95% { clip-path: inset(20% 0 65% 0); transform: translate(1px, -1px); }
+  100% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, 1px); }
 }
 
-@keyframes glitch-before {
-  0%, 100% { transform: translate(0); clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
-  20% { transform: translate(-4px, 2px); clip-path: polygon(0 5%, 100% 5%, 100% 50%, 0 50%); }
-  40% { transform: translate(3px, -3px); clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%); }
-  60% { transform: translate(-2px, 4px); clip-path: polygon(0 10%, 100% 10%, 100% 55%, 0 55%); }
-  80% { transform: translate(4px, -2px); clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
-  10% { transform: translate(3px, 1px) skewX(15deg); }
-  30% { transform: translate(-3px, -1px) skewX(-15deg); }
-  50% { transform: translate(2px, 3px); }
-  70% { transform: translate(-2px, -3px); }
-  90% { transform: translate(1px, 2px) scale(1.05); }
-}
-
-@keyframes glitch-after {
-  0%, 100% { transform: translate(0); clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
-  20% { transform: translate(3px, -2px); clip-path: polygon(0 50%, 100% 50%, 100% 95%, 0 95%); }
-  40% { transform: translate(-4px, 3px); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); }
-  60% { transform: translate(2px, -4px); clip-path: polygon(0 45%, 100% 45%, 100% 90%, 0 90%); }
-  80% { transform: translate(-3px, 2px); clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
-  10% { transform: translate(-2px, -2px) skewX(-12deg); }
-  30% { transform: translate(2px, 2px) skewX(12deg); }
-  50% { transform: translate(-3px, 1px); }
-  70% { transform: translate(3px, -1px); }
-  90% { transform: translate(-1px, -3px) scale(0.98); }
+@keyframes glitch-2 {
+  0% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -1px); }
+  5% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 1px); }
+  10% { clip-path: inset(25% 0 65% 0); transform: translate(1px, 2px); }
+  15% { clip-path: inset(80% 0 10% 0); transform: translate(-1px, -2px); }
+  20% { clip-path: inset(5% 0 85% 0); transform: translate(2px, 2px); }
+  25% { clip-path: inset(50% 0 35% 0); transform: translate(-2px, -1px); }
+  30% { clip-path: inset(90% 0 0 0); transform: translate(1px, 1px); }
+  35% { clip-path: inset(15% 0 75% 0); transform: translate(-1px, -2px); }
+  40% { clip-path: inset(70% 0 15% 0); transform: translate(2px, -2px); }
+  45% { clip-path: inset(30% 0 55% 0); transform: translate(-2px, 1px); }
+  50% { clip-path: inset(85% 0 5% 0); transform: translate(1px, 2px); }
+  55% { clip-path: inset(0 0 95% 0); transform: translate(-1px, -1px); }
+  60% { clip-path: inset(45% 0 45% 0); transform: translate(2px, 1px); }
+  65% { clip-path: inset(20% 0 70% 0); transform: translate(-2px, -2px); }
+  70% { clip-path: inset(75% 0 10% 0); transform: translate(1px, 1px); }
+  75% { clip-path: inset(35% 0 50% 0); transform: translate(-1px, 2px); }
+  80% { clip-path: inset(95% 0 0 0); transform: translate(2px, -1px); }
+  85% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, -1px); }
+  90% { clip-path: inset(55% 0 35% 0); transform: translate(1px, -2px); }
+  95% { clip-path: inset(25% 0 60% 0); transform: translate(-1px, 1px); }
+  100% { clip-path: inset(65% 0 25% 0); transform: translate(2px, 2px); }
 }
 
 h2 {
-  font-size: 18px; /* 404 标题 18px */
+  font-size: 18px;
   margin: 1.5rem 0 0.5rem;
   color: var(--text);
   font-family: var(--mono);
@@ -174,7 +181,7 @@ h2 {
 p {
   color: var(--text-dim);
   margin: 0.5rem 0 2rem;
-  font-size: 15px; /* 404 描述 15px */
+  font-size: 15px;
 }
 
 .home-btn {
@@ -184,7 +191,7 @@ p {
   color: var(--accent);
   padding: 10px 20px;
   font-family: var(--mono);
-  font-size: 13px; /* 按钮 13px */
+  font-size: 13px;
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.2s;
@@ -209,7 +216,7 @@ p {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 13px; /* 与 styles.css 一致 */
+  font-size: 13px;
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -217,16 +224,17 @@ p {
 /* === Responsive === */
 @media (max-width: 640px) {
   .error-code {
-    font-size: 4rem; /* 移动端 4rem */
+    font-size: 4rem;
+    letter-spacing: 4px;
   }
   
   h2 {
-    font-size: 16px; /* 移动端 404 标题 16px */
+    font-size: 16px;
     margin: 1rem 0 0.5rem;
   }
   
   p {
-    font-size: 13px; /* 移动端 404 描述 13px */
+    font-size: 13px;
     margin: 0.5rem 0 1.5rem;
   }
   
@@ -241,12 +249,12 @@ p {
   
   .home-btn {
     display: block;
-    width: 100%; /* 移动端全宽 */
+    width: 100%;
     max-width: 100%;
-    padding: 14px 24px; /* 触摸目标至少 44px 高度 */
+    padding: 14px 24px;
     min-height: 44px;
     text-align: center;
-    font-size: 13px; /* 移动端按钮 13px */
+    font-size: 13px;
   }
   
   .content {
@@ -254,14 +262,14 @@ p {
   }
   
   .footer {
-    font-size: 12px; /* 移动端底栏 12px */
+    font-size: 12px;
   }
 }
 
-/* 超小屏幕 */
 @media (max-width: 375px) {
   .error-code {
     font-size: 3.5rem;
+    letter-spacing: 3px;
   }
   
   h2 {
@@ -277,11 +285,11 @@ p {
   }
   
   .home-btn {
-    font-size: 12px; /* 超小屏幕按钮 12px */
+    font-size: 12px;
   }
   
   .footer {
-    font-size: 11px; /* 超小屏幕底栏 11px */
+    font-size: 11px;
   }
 }
 </style>
