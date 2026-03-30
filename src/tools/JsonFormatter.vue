@@ -202,7 +202,7 @@ export default {
   align-items: center;
   gap: 10px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--muted);
   text-transform: uppercase;
   background: rgba(255,255,255,0.02);
@@ -221,7 +221,7 @@ export default {
   display: block;
   margin-bottom: 0.5rem;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 输入框标签 13px */
   text-transform: uppercase;
 }
 
@@ -232,7 +232,7 @@ export default {
   background: var(--panel-2);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 14px; /* 输入框 14px，舒适编辑 */
   padding: 12px;
   resize: vertical;
   transition: all 0.2s;
@@ -268,7 +268,7 @@ export default {
   background: rgba(255,255,255,0.02);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 按钮 13px */
   padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s;
@@ -314,7 +314,7 @@ export default {
   color: var(--red);
   margin-top: 1rem;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 状态提示 13px */
   padding: 10px 12px;
   border: 1px solid rgba(255,107,125,0.3);
   background: rgba(255,107,125,0.05);
@@ -324,7 +324,7 @@ export default {
   color: var(--green);
   margin-top: 1rem;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 状态提示 13px */
   padding: 10px 12px;
   border: 1px solid rgba(157,255,107,0.3);
   background: var(--green-soft);
@@ -341,7 +341,7 @@ export default {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -359,7 +359,7 @@ export default {
   }
   
   .code-input {
-    font-size: 14px;
+    font-size: 14px; /* 移动端输入框保持 14px */
     padding: 10px;
     min-height: 180px;
   }
@@ -376,23 +376,23 @@ export default {
     text-align: center;
     padding: 12px 16px;
     min-height: 44px; /* 触摸目标至少 44px 高度 */
-    font-size: 12px;
+    font-size: 13px; /* 移动端按钮 13px */
   }
   
   .input-label {
-    font-size: 12px;
+    font-size: 12px; /* 移动端输入框标签 12px */
     margin-bottom: 0.4rem;
   }
   
   .status-error, .status-success {
-    font-size: 12px;
+    font-size: 12px; /* 移动端状态提示 12px */
     padding: 8px 10px;
     margin-top: 0.75rem;
   }
   
   .footer {
     padding: 8px 10px;
-    font-size: 12px;
+    font-size: 12px; /* 移动端底栏 12px */
   }
 }
 
@@ -413,11 +413,11 @@ export default {
   
   .button {
     padding: 11px 14px;
-    font-size: 11px;
+    font-size: 12px; /* 超小屏幕按钮 12px */
   }
   
   .footer {
-    font-size: 11px;
+    font-size: 11px; /* 超小屏幕底栏 11px */
   }
 }
 </style>

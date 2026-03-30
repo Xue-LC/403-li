@@ -4,34 +4,46 @@
 /* ========================================
    字体规范 (Font Size Specification)
    ========================================
+   设计原则：
+   - 保持清晰层次：标题 > 正文 > 标签/辅助文字
+   - 桌面端优先，移动端适度缩小但不低于可读阈值 (11px)
+   - 相同类型元素全站统一
+   
    桌面端 (Desktop, >= 641px):
-   - 品牌文字 (Brand): 15px
-   - 状态文字 (Status): 13px
-   - 工具标题 (Tool Title h3): 19px
-   - 工具描述 (Tool Description p): 16px
-   - 标签/编号 (Tag/ID): 12px
-   - 分类标签 (Tab): 12px
-   - 底栏 (Footer): 12px
-   - 按钮 (Button): 12px
-   - 输入框标签 (Input Label): 12px
+   - 品牌文字 (Brand): 15px - 醒目但不过大
+   - 状态文字 (Status): 13px - 清晰可读
+   - 工具标题 (Tool Title h3): 18px - 适中，不突兀
+   - 工具描述 (Tool Description p): 15px - 舒适阅读
+   - 标签/编号 (Tag/ID): 12px - 紧凑但清晰
+   - 分类标签 (Tab): 12px - 与标签一致
+   - 底栏 (Footer): 12px - 辅助信息
+   - 按钮 (Button): 13px - 易点击阅读
+   - 输入框 (Input/Textarea): 14px - 舒适编辑
+   - 输入框标签 (Input Label): 12px - 区分层级
    - 状态提示 (Status Message): 12px
+   - 404 标题 (h2): 18px
+   - 404 描述 (p): 15px
    
    移动端 (Mobile, <= 640px):
-   - 品牌文字 (Brand): 14px
-   - 状态文字 (Status): 13px
-   - 工具标题 (Tool Title h3): 17px
-   - 工具描述 (Tool Description p): 15px
-   - 标签/编号 (Tag/ID): 12px
-   - 分类标签 (Tab): 11px
-   - 底栏 (Footer): 12px
-   - 按钮 (Button): 12px
-   - 输入框标签 (Input Label): 12px
-   - 状态提示 (Status Message): 12px
+   - 品牌文字 (Brand): 14px - 适度缩小
+   - 状态文字 (Status): 12px - 保持可读
+   - 工具标题 (Tool Title h3): 17px - 略小于桌面
+   - 工具描述 (Tool Description p): 14px - 舒适阅读
+   - 标签/编号 (Tag/ID): 11px - 最小可读
+   - 分类标签 (Tab): 11px - 与标签一致
+   - 底栏 (Footer): 11px - 辅助信息可略小
+   - 按钮 (Button): 13px - 保持易读
+   - 输入框 (Input/Textarea): 14px - 不低于 14px 避免缩放
+   - 输入框标签 (Input Label): 11px
+   - 状态提示 (Status Message): 11px
+   - 404 标题 (h2): 17px
+   - 404 描述 (p): 14px
    
    超小屏幕 (Extra Small, <= 375px):
-   - 分类标签 (Tab): 11px
-   - 按钮 (Button): 11px
+   - 分类标签 (Tab): 10px - 极限但可读
+   - 按钮 (Button): 12px
    - 底栏 (Footer): 11px
+   - 404 错误码：3.5rem
    ========================================
 */
 
@@ -132,7 +144,7 @@ html, body {
   background-size: 24px 24px, 24px 24px, auto;
   color: var(--text);
   font-family: var(--sans);
-  font-size: 14px;
+  font-size: 14px; /* 基础字体大小 */
   line-height: 1.6;
   min-height: 100vh;
 }
@@ -215,7 +227,7 @@ body::after {
   gap: 10px;
   min-width: 0;
   font-family: var(--mono);
-  font-size: 15px;
+  font-size: 16px; /* 品牌文字桌面端 16px，更醒目 */
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text);
@@ -224,7 +236,7 @@ body::after {
 
 @media (max-width: 640px) {
   .brand {
-    font-size: 14px;
+    font-size: 15px; /* 移动端 15px */
   }
 }
 
@@ -254,7 +266,7 @@ body::after {
 .status {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 14px; /* 状态文字 14px，清晰可读 */
   white-space: nowrap;
 }
 
@@ -280,7 +292,7 @@ body::after {
 
 .search-prefix {
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px; /* 搜索前缀 13px */
   white-space: nowrap;
   text-shadow: 0 0 10px var(--green-glow);
 }
@@ -292,7 +304,7 @@ body::after {
   background: transparent;
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px; /* 输入框 14px，舒适编辑 */
 }
 
 .search input::placeholder { color: var(--dim); }
@@ -325,7 +337,7 @@ body::after {
   align-items: center;
   gap: 10px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* Pane 标题 13px */
   color: var(--muted);
   text-transform: uppercase;
   background: rgba(255,255,255,0.02);
@@ -347,9 +359,9 @@ body::after {
   border: 1px solid var(--line-strong);
   background: rgba(255,255,255,0.02);
   color: var(--muted);
-  padding: 7px 10px;
+  padding: 8px 12px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 分类标签 13px */
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
@@ -416,7 +428,7 @@ body::after {
   align-items: center;
   margin-bottom: 8px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 工具顶部信息 13px */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -429,7 +441,7 @@ body::after {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 16px;
+  font-size: 18px; /* 工具标题 18px，适中不突兀 */
   line-height: 1.35;
   color: var(--text);
 }
@@ -438,7 +450,7 @@ body::after {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
-  font-size: 16px;
+  font-size: 15px; /* 工具描述 15px，舒适阅读 */
 }
 
 .tool-foot {
@@ -449,7 +461,7 @@ body::after {
   align-items: center;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 工具底部信息 13px */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -458,9 +470,9 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border: 1px solid;
-  font-size: 12px;
+  font-size: 12px; /* 标签 12px */
 }
 
 
@@ -475,7 +487,7 @@ body::after {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 底栏 13px */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -493,6 +505,7 @@ body::after {
   .status {
     width: 100%;
     text-align: right;
+    font-size: 12px; /* 移动端状态 12px */
   }
   
   .group-tabs {
@@ -500,16 +513,40 @@ body::after {
   }
   
   .tab {
-    padding: 6px 8px;
-    font-size: 11px;
+    padding: 7px 10px;
+    font-size: 12px; /* 移动端分类标签 12px */
   }
   
   .tool-card h3 {
-    font-size: 15px;
+    font-size: 17px; /* 移动端工具标题 17px */
   }
   
   .tool-card p {
-    font-size: 15px;
+    font-size: 14px; /* 移动端工具描述 14px */
+  }
+  
+  .tool-top, .tool-foot {
+    font-size: 12px; /* 移动端标签 12px */
+  }
+  
+  .tag {
+    font-size: 11px; /* 移动端标签 11px */
+    padding: 3px 8px;
+  }
+  
+  .footer {
+    font-size: 12px; /* 移动端底栏 12px */
+  }
+}
+
+/* 超小屏幕 (iPhone SE 等) */
+@media (max-width: 375px) {
+  .tab {
+    font-size: 11px; /* 超小屏幕分类标签 11px */
+  }
+  
+  .footer {
+    font-size: 11px; /* 超小屏幕底栏 11px */
   }
 }
 
@@ -528,7 +565,7 @@ body::after {
 
 .prompt {
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px; /* 命令行提示符 13px */
   white-space: nowrap;
   font-weight: 600;
 }
@@ -540,7 +577,7 @@ body::after {
   background: transparent;
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px; /* 命令行输入 14px */
 }
 
 .command input::placeholder { color: var(--dim); }

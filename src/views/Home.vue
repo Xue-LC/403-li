@@ -214,8 +214,8 @@ export default {
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  font-size: 11px;
+  padding: 3px 10px;
+  font-size: 12px; /* 状态标签 12px */
   font-family: var(--mono);
   border: 1px solid;
   background: rgba(255,255,255,0.05);
@@ -279,8 +279,8 @@ export default {
 /* 响应式 */
 @media (max-width: 640px) {
   .status-badge {
-    padding: 1px 6px;
-    font-size: 10px;
+    padding: 2px 8px;
+    font-size: 11px; /* 移动端状态标签 11px */
   }
 }
 </style>

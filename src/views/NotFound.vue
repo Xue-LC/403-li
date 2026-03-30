@@ -103,7 +103,7 @@ export default {
 }
 
 h2 {
-  font-size: 19px;
+  font-size: 18px; /* 404 标题 18px */
   margin: 1.5rem 0 0.5rem;
   color: var(--text);
   font-family: var(--mono);
@@ -112,7 +112,7 @@ h2 {
 p {
   color: var(--text-dim);
   margin: 0.5rem 0 2rem;
-  font-size: 16px;
+  font-size: 15px; /* 404 描述 15px */
 }
 
 .home-btn {
@@ -122,7 +122,7 @@ p {
   color: var(--accent);
   padding: 10px 20px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 按钮 13px */
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.2s;
@@ -147,7 +147,7 @@ p {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -159,12 +159,12 @@ p {
   }
   
   h2 {
-    font-size: 17px; /* 移动端与主页标题一致 */
+    font-size: 17px; /* 移动端 404 标题 17px */
     margin: 1rem 0 0.5rem;
   }
   
   p {
-    font-size: 15px; /* 移动端与主页描述一致 */
+    font-size: 14px; /* 移动端 404 描述 14px */
     margin: 0.5rem 0 1.5rem;
   }
   
@@ -184,11 +184,15 @@ p {
     padding: 14px 24px; /* 触摸目标至少 44px 高度 */
     min-height: 44px;
     text-align: center;
-    font-size: 12px; /* 与底栏一致 */
+    font-size: 13px; /* 移动端按钮 13px */
   }
   
   .content {
     padding: 0;
+  }
+  
+  .footer {
+    font-size: 12px; /* 移动端底栏 12px */
   }
 }
 
@@ -203,7 +207,7 @@ p {
   }
   
   p {
-    font-size: 15px;
+    font-size: 14px;
   }
   
   .pane-body {
@@ -211,7 +215,11 @@ p {
   }
   
   .home-btn {
-    font-size: 11px;
+    font-size: 12px; /* 超小屏幕按钮 12px */
+  }
+  
+  .footer {
+    font-size: 11px; /* 超小屏幕底栏 11px */
   }
 }
 </style>

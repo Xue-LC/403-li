@@ -66,7 +66,7 @@ export default {
   gap: 10px;
   min-width: 0;
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 16px; /* 与 styles.css 一致 */
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text);
@@ -79,7 +79,7 @@ export default {
 
 @media (max-width: 640px) {
   .brand {
-    font-size: 13px;
+    font-size: 15px; /* 移动端 15px */
   }
 }
 
@@ -120,7 +120,7 @@ export default {
 .status {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px; /* 与 styles.css 一致 */
   white-space: nowrap;
 }
 

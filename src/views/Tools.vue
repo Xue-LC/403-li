@@ -246,7 +246,7 @@ export default {
   align-items: center;
   gap: 10px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--muted);
   text-transform: uppercase;
   background: rgba(255,255,255,0.02);
@@ -268,9 +268,9 @@ export default {
   border: 1px solid var(--line-strong);
   background: rgba(255,255,255,0.02);
   color: var(--muted);
-  padding: 7px 10px;
+  padding: 8px 12px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
@@ -340,7 +340,7 @@ export default {
   align-items: center;
   margin-bottom: 8px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -353,7 +353,7 @@ export default {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 19px;
+  font-size: 18px; /* 与 styles.css 一致 */
   line-height: 1.35;
   color: var(--text);
 }
@@ -362,7 +362,7 @@ export default {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
-  font-size: 16px;
+  font-size: 15px; /* 与 styles.css 一致 */
 }
 
 .tool-foot {
@@ -373,7 +373,7 @@ export default {
   align-items: center;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -382,9 +382,9 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border: 1px solid;
-  font-size: 12px;
+  font-size: 12px; /* 与 styles.css 一致 */
 }
 
 /* === Footer === */
@@ -398,7 +398,7 @@ export default {
   gap: 10px;
   flex-wrap: wrap;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   color: var(--dim);
   text-transform: uppercase;
 }
@@ -416,11 +416,11 @@ export default {
   }
   
   .prompt {
-    font-size: 11px;
+    font-size: 12px; /* 移动端命令行提示符 12px */
   }
   
   .command input {
-    font-size: 11px;
+    font-size: 14px; /* 移动端输入框保持 14px 避免缩放 */
   }
   
   .group-tabs {
@@ -430,7 +430,7 @@ export default {
   
   .tab {
     padding: 10px 12px; /* 触摸目标至少 44px 高度 */
-    font-size: 12px;
+    font-size: 12px; /* 移动端分类标签 12px */
     min-height: 44px;
     display: inline-flex;
     align-items: center;
@@ -451,11 +451,16 @@ export default {
   }
   
   .tool-card p {
-    font-size: 15px; /* 移动端描述 15px */
+    font-size: 14px; /* 移动端描述 14px */
   }
   
   .tool-top, .tool-foot {
     font-size: 12px; /* 移动端标签 12px */
+  }
+  
+  .tag {
+    font-size: 11px; /* 移动端标签 11px */
+    padding: 3px 8px;
   }
   
   .pane-body {
@@ -464,11 +469,7 @@ export default {
   
   .footer {
     padding: 8px 10px;
-    font-size: 12px;
-  }
-  
-  .tab {
-    font-size: 11px;
+    font-size: 12px; /* 移动端底栏 12px */
   }
 }
 
@@ -483,12 +484,16 @@ export default {
   }
   
   .tool-card p {
-    font-size: 15px;
+    font-size: 14px;
   }
   
   .tab {
-    font-size: 11px;
+    font-size: 11px; /* 超小屏幕分类标签 11px */
     padding: 10px 10px;
+  }
+  
+  .footer {
+    font-size: 11px; /* 超小屏幕底栏 11px */
   }
 }
 
@@ -507,7 +512,7 @@ export default {
 
 .prompt {
   color: var(--green);
-  font-size: 12px;
+  font-size: 13px; /* 与 styles.css 一致 */
   white-space: nowrap;
   font-weight: 600;
 }
@@ -519,7 +524,7 @@ export default {
   background: transparent;
   color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px; /* 与 styles.css 一致 */
 }
 
 .command input::placeholder { color: var(--dim); }
