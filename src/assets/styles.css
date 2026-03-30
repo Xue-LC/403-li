@@ -429,7 +429,7 @@ body::after {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 19px;
+  font-size: 16px;
   line-height: 1.35;
   color: var(--text);
 }
@@ -505,7 +505,7 @@ body::after {
   }
   
   .tool-card h3 {
-    font-size: 17px;
+    font-size: 15px;
   }
   
   .tool-card p {
