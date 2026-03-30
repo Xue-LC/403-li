@@ -1,6 +1,40 @@
 /* 403.li - 终端像素风格 (参考 factory-terminal-pixel-tools-zh-mobile.html) */
 /* 字体：Maple Mono NF CN - 本地 woff2 字体文件 */
 
+/* ========================================
+   字体规范 (Font Size Specification)
+   ========================================
+   桌面端 (Desktop, >= 641px):
+   - 品牌文字 (Brand): 14px
+   - 状态文字 (Status): 12px
+   - 工具标题 (Tool Title h3): 18px
+   - 工具描述 (Tool Description p): 15px
+   - 标签/编号 (Tag/ID): 11px
+   - 分类标签 (Tab): 11px
+   - 底栏 (Footer): 11px
+   - 按钮 (Button): 11px
+   - 输入框标签 (Input Label): 12px
+   - 状态提示 (Status Message): 11px
+   
+   移动端 (Mobile, <= 640px):
+   - 品牌文字 (Brand): 13px
+   - 状态文字 (Status): 12px
+   - 工具标题 (Tool Title h3): 16px
+   - 工具描述 (Tool Description p): 14px
+   - 标签/编号 (Tag/ID): 11px
+   - 分类标签 (Tab): 10px
+   - 底栏 (Footer): 11px
+   - 按钮 (Button): 11px
+   - 输入框标签 (Input Label): 11px
+   - 状态提示 (Status Message): 11px
+   
+   超小屏幕 (Extra Small, <= 375px):
+   - 分类标签 (Tab): 10px
+   - 按钮 (Button): 10px
+   - 底栏 (Footer): 10px
+   ========================================
+*/
+
 /* @font-face 定义 - Regular 400 */
 @font-face {
   font-family: 'Maple Mono NF CN';
@@ -181,11 +215,17 @@ body::after {
   gap: 10px;
   min-width: 0;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text);
   text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .brand {
+    font-size: 13px;
+  }
 }
 
 .leds {
@@ -214,7 +254,7 @@ body::after {
 .status {
   color: var(--dim);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -389,7 +429,7 @@ body::after {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.35;
   color: var(--text);
 }
@@ -398,7 +438,7 @@ body::after {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .tool-foot {
@@ -465,7 +505,11 @@ body::after {
   }
   
   .tool-card h3 {
-    font-size: 15px;
+    font-size: 16px;
+  }
+  
+  .tool-card p {
+    font-size: 14px;
   }
 }
 

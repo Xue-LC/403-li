@@ -353,7 +353,7 @@ export default {
 
 .tool-card h3 {
   margin: 0 0 6px;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.35;
   color: var(--text);
 }
@@ -362,7 +362,7 @@ export default {
   margin: 0;
   color: var(--muted);
   line-height: 1.7;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .tool-foot {
@@ -447,11 +447,11 @@ export default {
   }
   
   .tool-card h3 {
-    font-size: 15px; /* 移动端标题 15px */
+    font-size: 16px; /* 移动端标题 16px */
   }
   
   .tool-card p {
-    font-size: 13px; /* 移动端描述 13px */
+    font-size: 14px; /* 移动端描述 14px */
   }
   
   .tool-top, .tool-foot {
@@ -464,6 +464,10 @@ export default {
   
   .footer {
     padding: 8px 10px;
+    font-size: 11px;
+  }
+  
+  .tab {
     font-size: 10px;
   }
 }
@@ -475,11 +479,11 @@ export default {
   }
   
   .tool-card h3 {
-    font-size: 14px;
+    font-size: 16px;
   }
   
   .tool-card p {
-    font-size: 12px;
+    font-size: 14px;
   }
   
   .tab {

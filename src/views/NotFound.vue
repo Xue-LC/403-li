@@ -103,7 +103,7 @@ export default {
 }
 
 h2 {
-  font-size: 1.5rem;
+  font-size: 18px;
   margin: 1.5rem 0 0.5rem;
   color: var(--text);
   font-family: var(--mono);
@@ -112,7 +112,7 @@ h2 {
 p {
   color: var(--text-dim);
   margin: 0.5rem 0 2rem;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .home-btn {
@@ -120,9 +120,9 @@ p {
   border: 1px solid var(--line-strong);
   background: rgba(255,255,255,0.02);
   color: var(--accent);
-  padding: 12px 24px;
+  padding: 10px 20px;
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 11px;
   text-decoration: none;
   text-transform: uppercase;
   transition: all 0.2s;
@@ -159,12 +159,12 @@ p {
   }
   
   h2 {
-    font-size: 1.25rem; /* 移动端 1.25rem */
+    font-size: 16px; /* 移动端与主页标题一致 */
     margin: 1rem 0 0.5rem;
   }
   
   p {
-    font-size: 13px;
+    font-size: 14px; /* 移动端与主页描述一致 */
     margin: 0.5rem 0 1.5rem;
   }
   
@@ -184,7 +184,7 @@ p {
     padding: 14px 24px; /* 触摸目标至少 44px 高度 */
     min-height: 44px;
     text-align: center;
-    font-size: 14px;
+    font-size: 11px; /* 与底栏一致 */
   }
   
   .content {
@@ -199,15 +199,19 @@ p {
   }
   
   h2 {
-    font-size: 1.2rem;
+    font-size: 16px;
   }
   
   p {
-    font-size: 12px;
+    font-size: 14px;
   }
   
   .pane-body {
     padding: 0.75rem;
+  }
+  
+  .home-btn {
+    font-size: 10px;
   }
 }
 </style>
