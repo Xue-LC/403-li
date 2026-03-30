@@ -1,39 +1,49 @@
 <template>
   <div class="json-formatter">
-    <div class="terminal-window">
-      <div class="terminal-header">
-        <span class="terminal-title glitch">user@403-li:~/tools/json</span>
-        <div class="terminal-buttons">
-          <span class="btn btn-close"></span>
-          <span class="btn btn-minimize"></span>
-          <span class="btn btn-maximize"></span>
-        </div>
+    <!-- Topbar -->
+    <Topbar toolCount="1" />
+
+    <!-- 工具主体 -->
+    <section class="pane">
+      <div class="pane-head">
+        <span>📦 JSON 格式化</span>
+        <span>在线工具</span>
       </div>
-      <div class="terminal-body">
-        <h2 class="flicker">📦 JSON 格式化工具</h2>
-        <p style="color: var(--muted); margin: 1rem 0;">输入 JSON，点击格式化</p>
-        
+      <div class="pane-body">
         <div class="tool-body">
           <label class="input-label">输入 JSON：</label>
           <textarea 
             v-model="input" 
             placeholder='{"name": "test", "value": 123}'
-            rows="8"
+            rows="10"
             class="code-input"
           ></textarea>
           
           <div class="button-group">
-            <button class="button" @click="format">✨ 格式化</button>
-            <button class="button" @click="minify">📦 压缩</button>
-            <button class="button" @click="clear">🗑️ 清空</button>
+            <button class="button primary" @click="format" :disabled="!input.trim()">
+              ✨ 格式化
+            </button>
+            <button class="button" @click="minify" :disabled="!input.trim()">
+              📦 压缩
+            </button>
+            <button class="button" @click="validate" :disabled="!input.trim()">
+              ✓ 校验
+            </button>
+            <button class="button" @click="copyOutput" :disabled="!output.trim()">
+              📋 复制
+            </button>
+            <button class="button danger" @click="clear">
+              🗑️ 清空
+            </button>
           </div>
           
           <label class="input-label">输出：</label>
           <textarea 
             v-model="output" 
             readonly 
-            rows="8"
+            rows="10"
             class="code-input output"
+            placeholder="结果将显示在这里..."
           ></textarea>
           
           <div v-if="error" class="status-error">
@@ -44,20 +54,25 @@
             ✅ JSON 格式正确
           </div>
         </div>
-        
-        <div class="command-line">
-          <span class="prompt">root@403:~/tools/json$</span>
-          <input type="text" class="command-input" placeholder="按 Enter 格式化..." @keyup.enter="format" />
-          <span class="cursor"></span>
-        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>403.li // JSON 工具</span>
+      <span>纯前端处理 · 数据不会上传</span>
+    </footer>
   </div>
 </template>
 
 <script>
+import Topbar from '../components/Topbar.vue'
+
 export default {
   name: 'JsonFormatter',
+  components: {
+    Topbar
+  },
   data() {
     return {
       input: '',
@@ -71,6 +86,11 @@ export default {
       this.error = ''
       this.valid = false
       
+      if (!this.input.trim()) {
+        this.error = '请输入 JSON 内容'
+        return
+      }
+      
       try {
         const parsed = JSON.parse(this.input)
         this.output = JSON.stringify(parsed, null, 2)
@@ -78,11 +98,17 @@ export default {
       } catch (e) {
         this.error = e.message
         this.output = ''
+        this.valid = false
       }
     },
     minify() {
       this.error = ''
       this.valid = false
+      
+      if (!this.input.trim()) {
+        this.error = '请输入 JSON 内容'
+        return
+      }
       
       try {
         const parsed = JSON.parse(this.input)
@@ -91,7 +117,43 @@ export default {
       } catch (e) {
         this.error = e.message
         this.output = ''
+        this.valid = false
       }
+    },
+    validate() {
+      this.error = ''
+      this.valid = false
+      
+      if (!this.input.trim()) {
+        this.error = '请输入 JSON 内容'
+        return
+      }
+      
+      try {
+        JSON.parse(this.input)
+        this.valid = true
+        this.output = this.input
+      } catch (e) {
+        this.error = e.message
+        this.output = ''
+        this.valid = false
+      }
+    },
+    copyOutput() {
+      if (!this.output.trim()) {
+        this.error = '没有可复制的内容'
+        return
+      }
+      
+      navigator.clipboard.writeText(this.output).then(() => {
+        const originalText = event.target.innerText
+        event.target.innerText = '✓ 已复制'
+        setTimeout(() => {
+          event.target.innerText = originalText
+        }, 2000)
+      }).catch(() => {
+        this.error = '复制失败，请手动复制'
+      })
     },
     clear() {
       this.input = ''
@@ -112,14 +174,16 @@ export default {
   padding: 12px 0 20px;
 }
 
-.terminal-window {
+/* === Pane === */
+.pane {
+  margin-top: 12px;
   border: 1px solid var(--line);
-  background: var(--panel);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
   box-shadow: var(--shadow);
   position: relative;
 }
 
-.terminal-window::before {
+.pane::before {
   content: "";
   position: absolute;
   top: 0;
@@ -130,48 +194,22 @@ export default {
   opacity: 0.4;
 }
 
-.terminal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+.pane-head {
+  padding: 10px 12px;
   border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
   background: rgba(255,255,255,0.02);
 }
 
-.terminal-title {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--green);
-  text-shadow: 0 0 10px var(--green-glow);
-}
-
-.terminal-buttons {
-  display: flex;
-  gap: 6px;
-}
-
-.btn {
-  width: 12px;
-  height: 12px;
-  border-radius: 0;
-  border: 1px solid rgba(0,0,0,0.3);
-}
-
-.btn-close { background: var(--red); }
-.btn-minimize { background: var(--amber); }
-.btn-maximize { background: var(--green); }
-
-.terminal-body {
+.pane-body {
   padding: 12px;
-}
-
-h2 {
-  color: var(--green);
-  margin-bottom: 0.5rem;
-  font-family: var(--mono);
-  font-size: 17px;
-  text-shadow: 0 0 10px var(--green-glow);
 }
 
 .tool-body {
@@ -197,6 +235,7 @@ h2 {
   padding: 12px;
   resize: vertical;
   transition: all 0.2s;
+  border-radius: 0;
 }
 
 .code-input:focus {
@@ -227,17 +266,44 @@ h2 {
   color: var(--text);
   font-family: var(--mono);
   font-size: 12px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
+  border-radius: 0;
 }
 
-.button:hover {
+.button:hover:not(:disabled) {
   border-color: var(--green);
   background: var(--green-soft);
   color: var(--green);
   box-shadow: 0 0 15px var(--green-glow);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button.primary {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.button.primary:hover:not(:disabled) {
+  background: rgba(157,255,107,0.2);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.button.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: rgba(255,107,125,0.1);
+  box-shadow: 0 0 15px rgba(255,107,125,0.3);
 }
 
 .status-error {
@@ -245,7 +311,7 @@ h2 {
   margin-top: 1rem;
   font-family: var(--mono);
   font-size: 12px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid rgba(255,107,125,0.3);
   background: rgba(255,107,125,0.05);
 }
@@ -255,62 +321,28 @@ h2 {
   margin-top: 1rem;
   font-family: var(--mono);
   font-size: 12px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid rgba(157,255,107,0.3);
   background: var(--green-soft);
 }
 
-.command-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* === Footer === */
+.footer {
+  margin-top: 12px;
   border: 1px solid var(--line);
-  background: var(--panel-2);
+  background: rgba(255,255,255,0.02);
   padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
   font-family: var(--mono);
-  margin-top: 1rem;
+  font-size: 11px;
+  color: var(--dim);
+  text-transform: uppercase;
 }
 
-.prompt {
-  color: var(--green);
-  font-size: 12px;
-  white-space: nowrap;
-  font-weight: 600;
-}
-
-.command-input {
-  flex: 1;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 12px;
-}
-
-.command-input::placeholder { color: var(--dim); }
-
-.cursor {
-  width: 8px;
-  height: 18px;
-  background: var(--green);
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.flicker {
-  animation: flicker 3s infinite;
-}
-
-@keyframes flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
+/* === Responsive === */
 @media (max-width: 640px) {
   .json-formatter {
     width: min(var(--max), calc(100vw - 12px));
