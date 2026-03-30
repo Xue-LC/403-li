@@ -159,12 +159,12 @@ p {
   }
   
   h2 {
-    font-size: 17px; /* 移动端 404 标题 17px */
+    font-size: 16px; /* 移动端 404 标题 16px */
     margin: 1rem 0 0.5rem;
   }
   
   p {
-    font-size: 14px; /* 移动端 404 描述 14px */
+    font-size: 13px; /* 移动端 404 描述 13px */
     margin: 0.5rem 0 1.5rem;
   }
   
@@ -203,11 +203,11 @@ p {
   }
   
   h2 {
-    font-size: 17px;
+    font-size: 16px;
   }
   
   p {
-    font-size: 14px;
+    font-size: 13px;
   }
   
   .pane-body {

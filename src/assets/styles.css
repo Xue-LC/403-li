@@ -236,7 +236,7 @@ body::after {
 
 @media (max-width: 640px) {
   .brand {
-    font-size: 15px; /* 移动端 15px */
+    font-size: 14px; /* 移动端 14px */
   }
 }
 
@@ -495,8 +495,7 @@ body::after {
 /* === Responsive === */
 @media (max-width: 640px) {
   .app {
-    width: 100%;
-    max-width: 100%;
+    width: min(var(--max), calc(100vw - 12px));
   }
   
   .topbar {
@@ -519,11 +518,11 @@ body::after {
   }
   
   .tool-card h3 {
-    font-size: 17px; /* 移动端工具标题 17px */
+    font-size: 16px; /* 移动端工具标题 16px */
   }
   
   .tool-card p {
-    font-size: 14px; /* 移动端工具描述 14px */
+    font-size: 13px; /* 移动端工具描述 13px */
   }
   
   .tool-top, .tool-foot {
