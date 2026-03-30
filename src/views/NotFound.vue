@@ -89,9 +89,40 @@ export default {
   display: inline-block;
   margin: 0;
   line-height: 1;
+  position: relative;
   animation: glitch 2s infinite;
   max-width: 100%;
   word-break: break-word;
+}
+
+/* 故障特效 - 多层颜色偏移 */
+.error-code::before,
+.error-code::after {
+  content: "404";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00)), var(--panel);
+}
+
+.error-code::before {
+  animation: glitch-before 2s infinite;
+  color: #00ffff;
+  text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff;
+  opacity: 0.8;
+  z-index: -1;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+.error-code::after {
+  animation: glitch-after 2s infinite;
+  color: #ff00ff;
+  text-shadow: -2px 0 #00ffff, 2px 0 #ff00ff;
+  opacity: 0.8;
+  z-index: -2;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
 }
 
 @keyframes glitch {
@@ -100,6 +131,37 @@ export default {
   40% { transform: translate(-3px, -3px); }
   60% { transform: translate(3px, 3px); }
   80% { transform: translate(3px, -3px); }
+  10% { transform: translate(2px, -2px) skewX(10deg); }
+  30% { transform: translate(-2px, 2px) skewX(-10deg); }
+  50% { transform: translate(2px, 2px) rotate(1deg); }
+  70% { transform: translate(-2px, -2px) rotate(-1deg); }
+  90% { transform: translate(0, 3px) scale(1.02); }
+}
+
+@keyframes glitch-before {
+  0%, 100% { transform: translate(0); clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+  20% { transform: translate(-4px, 2px); clip-path: polygon(0 5%, 100% 5%, 100% 50%, 0 50%); }
+  40% { transform: translate(3px, -3px); clip-path: polygon(0 0, 100% 0, 100% 40%, 0 40%); }
+  60% { transform: translate(-2px, 4px); clip-path: polygon(0 10%, 100% 10%, 100% 55%, 0 55%); }
+  80% { transform: translate(4px, -2px); clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%); }
+  10% { transform: translate(3px, 1px) skewX(15deg); }
+  30% { transform: translate(-3px, -1px) skewX(-15deg); }
+  50% { transform: translate(2px, 3px); }
+  70% { transform: translate(-2px, -3px); }
+  90% { transform: translate(1px, 2px) scale(1.05); }
+}
+
+@keyframes glitch-after {
+  0%, 100% { transform: translate(0); clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
+  20% { transform: translate(3px, -2px); clip-path: polygon(0 50%, 100% 50%, 100% 95%, 0 95%); }
+  40% { transform: translate(-4px, 3px); clip-path: polygon(0 60%, 100% 60%, 100% 100%, 0 100%); }
+  60% { transform: translate(2px, -4px); clip-path: polygon(0 45%, 100% 45%, 100% 90%, 0 90%); }
+  80% { transform: translate(-3px, 2px); clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%); }
+  10% { transform: translate(-2px, -2px) skewX(-12deg); }
+  30% { transform: translate(2px, 2px) skewX(12deg); }
+  50% { transform: translate(-3px, 1px); }
+  70% { transform: translate(3px, -1px); }
+  90% { transform: translate(-1px, -3px) scale(0.98); }
 }
 
 h2 {
