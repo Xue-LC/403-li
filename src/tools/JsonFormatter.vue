@@ -229,7 +229,7 @@ export default {
   width: 100%;
   max-width: 100%;
   border: 1px solid var(--line);
-  background: var(--panel-2);
+  background: rgba(18,22,27,0.94); /* 与 Topbar 一致 */
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px; /* 输入框 14px，舒适编辑 */
