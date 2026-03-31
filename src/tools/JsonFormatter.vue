@@ -205,7 +205,7 @@ export default {
   font-size: 13px; /* 与 styles.css 一致 */
   color: var(--muted);
   text-transform: uppercase;
-  background: rgba(255,255,255,0.02);
+  background: rgba(18,22,27,0.94); /* 与 Topbar 一致 */
 }
 
 .pane-body {
@@ -365,16 +365,17 @@ export default {
   }
   
   .button-group {
-    flex-direction: column; /* 移动端垂直排列 */
-    gap: 8px;
+    flex-direction: row; /* 移动端水平排列 */
+    gap: 6px;
     margin: 0.75rem 0;
+    flex-wrap: wrap;
   }
   
   .button {
-    width: 100%; /* 移动端全宽 */
-    max-width: 100%;
+    flex: 1 1 auto; /* 按钮宽度自适应 */
+    min-width: calc(50% - 6px); /* 每行最多 2 个按钮 */
     text-align: center;
-    padding: 12px 16px;
+    padding: 10px 12px;
     min-height: 44px; /* 触摸目标至少 44px 高度 */
     font-size: 13px; /* 移动端按钮 13px */
   }
