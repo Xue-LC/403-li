@@ -32,7 +32,7 @@
             <button class="button" @click="copyOutput" :disabled="!output.trim()">
               📋 复制
             </button>
-            <button class="button danger" @click="clear">
+            <button class="button danger full-width" @click="clear">
               🗑️ 清空
             </button>
           </div>
@@ -257,10 +257,10 @@ export default {
 }
 
 .button-group {
-  display: flex;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
   margin: 1rem 0;
-  flex-wrap: wrap;
 }
 
 .button {
@@ -268,13 +268,21 @@ export default {
   background: rgba(255,255,255,0.02);
   color: var(--text);
   font-family: var(--mono);
-  font-size: 13px; /* 按钮 13px */
-  padding: 10px 16px;
+  font-size: 13px;
+  padding: 0;
   cursor: pointer;
   transition: all 0.2s;
   text-transform: uppercase;
   border-radius: 0;
-  min-height: 44px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button.full-width {
+  grid-column: 1 / -1;
 }
 
 .button:hover:not(:disabled) {
@@ -365,19 +373,14 @@ export default {
   }
   
   .button-group {
-    flex-direction: row; /* 移动端水平排列 */
-    gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
     margin: 0.75rem 0;
-    flex-wrap: wrap;
   }
   
   .button {
-    flex: 1 1 auto; /* 按钮宽度自适应 */
-    min-width: calc(50% - 6px); /* 每行最多 2 个按钮 */
-    text-align: center;
-    padding: 10px 12px;
-    min-height: 44px; /* 触摸目标至少 44px 高度 */
-    font-size: 13px; /* 移动端按钮 13px */
+    height: 48px;
+    font-size: 13px;
   }
   
   .input-label {
@@ -413,8 +416,8 @@ export default {
   }
   
   .button {
-    padding: 11px 14px;
-    font-size: 12px; /* 超小屏幕按钮 12px */
+    height: 48px;
+    font-size: 12px;
   }
   
   .footer {
