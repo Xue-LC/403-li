@@ -89,6 +89,12 @@ export default {
       ballSpeedX: 0.4,
       ballSpeedY: 0.3,
       
+      // Speed limits
+      initialSpeedX: 0.4,
+      initialSpeedY: 0.3,
+      maxSpeedX: 0.8,
+      maxSpeedY: 0.6,
+      
       // Paddle positions
       playerY: 50,
       aiY: 50,
@@ -198,8 +204,10 @@ export default {
     resetBall() {
       this.ballX = 50
       this.ballY = 50
-      this.ballSpeedX = Math.random() > 0.5 ? 0.4 : -0.4
-      this.ballSpeedY = (Math.random() - 0.5) * 0.5
+      // 重置为初始速度，防止多轮后球速过快
+      const direction = Math.random() > 0.5 ? 1 : -1
+      this.ballSpeedX = direction * this.initialSpeedX
+      this.ballSpeedY = (Math.random() - 0.5) * this.initialSpeedY
     },
     
     gameLoop() {
@@ -232,10 +240,14 @@ export default {
           ballRight >= this.playerPaddleLeft &&
           ballBottom >= playerTop && 
           ballTop <= playerBottom) {
-        this.ballSpeedX = Math.abs(this.ballSpeedX) * 1.03 // Bounce right, slight speed up
-        // Add angle based on hit position
+        // 反弹向右，限制最大速度
+        const newSpeedX = Math.min(Math.abs(this.ballSpeedX) * 1.02, this.maxSpeedX)
+        this.ballSpeedX = newSpeedX
+        // 优化碰撞检测：基于击球位置调整角度，但限制 Y 速度
         const hitPos = (ballTop + ballBottom) / 2 - (playerTop + playerBottom) / 2
-        this.ballSpeedY += hitPos * 0.03
+        this.ballSpeedY = Math.max(Math.min(this.ballSpeedY + hitPos * 0.02, this.maxSpeedY), -this.maxSpeedY)
+        // 确保球不会穿过球拍
+        this.ballX = playerPaddleRight + 0.1
       }
       
       // AI paddle collision
@@ -244,9 +256,13 @@ export default {
           ballLeft <= aiPaddleLeft + 5 &&
           ballBottom >= aiTop && 
           ballTop <= aiBottom) {
-        this.ballSpeedX = -Math.abs(this.ballSpeedX) * 1.03 // Bounce left
+        // 反弹向左，限制最大速度
+        const newSpeedX = Math.min(Math.abs(this.ballSpeedX) * 1.02, this.maxSpeedX)
+        this.ballSpeedX = -newSpeedX
         const hitPos = (ballTop + ballBottom) / 2 - (aiTop + aiBottom) / 2
-        this.ballSpeedY += hitPos * 0.03
+        this.ballSpeedY = Math.max(Math.min(this.ballSpeedY + hitPos * 0.02, this.maxSpeedY), -this.maxSpeedY)
+        // 确保球不会穿过球拍
+        this.ballX = aiPaddleLeft - 0.1
       }
       
       // Score detection (ball out of bounds horizontally)
@@ -269,11 +285,17 @@ export default {
       
       // AI movement (follows ball with delay)
       const aiTarget = this.ballY - this.paddleHeight / 2
-      const aiSpeed = 0.06
+      // AI 速度根据球速动态调整，能跟上球但不会太完美
+      const baseAiSpeed = 0.08
+      const aiSpeed = baseAiSpeed + Math.abs(this.ballSpeedX) * 0.05
+      // 添加反应延迟：只有当球向 AI 移动时才快速响应
+      const ballMovingToAI = (this.playerPaddleLeft < 50 && this.ballSpeedX > 0) || 
+                             (this.playerPaddleLeft > 50 && this.ballSpeedX < 0)
+      const effectiveAiSpeed = ballMovingToAI ? aiSpeed : aiSpeed * 0.5
       if (this.aiY < aiTarget) {
-        this.aiY = Math.min(this.aiY + aiSpeed, aiTarget)
+        this.aiY = Math.min(this.aiY + effectiveAiSpeed, aiTarget)
       } else if (this.aiY > aiTarget) {
-        this.aiY = Math.max(this.aiY - aiSpeed, aiTarget)
+        this.aiY = Math.max(this.aiY - effectiveAiSpeed, aiTarget)
       }
       
       // Keep paddles in bounds
