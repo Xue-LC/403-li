@@ -3,16 +3,43 @@
     <!-- Topbar -->
     <Topbar toolCount="0" />
 
-    <!-- 404 Content -->
+    <!-- 404 Pong Game -->
     <section class="pane">
       <div class="pane-body">
-        <div class="content">
-          <h1 class="error-code" data-text="404">404</h1>
-          <h2>页面未找到</h2>
-          <p>抱歉，你访问的页面不存在或已被移除</p>
-          <router-link to="/" class="home-btn">
-            ← 返回首页
-          </router-link>
+        <div class="game-container" ref="gameContainer">
+          <div class="pong-game">
+            <div 
+              class="paddle player" 
+              ref="playerPaddle"
+              @mousedown="startDrag"
+              @touchstart="startDrag"
+            >4</div>
+            <div class="ball" ref="ball">0</div>
+            <div class="paddle ai" ref="aiPaddle">4</div>
+          </div>
+          
+          <!-- Game Over Message -->
+          <div v-if="gameOver" class="game-over">
+            <p>页面找不到，但游戏可以继续！</p>
+            <button @click="resetGame" class="restart-btn">再玩一次</button>
+          </div>
+          
+          <!-- Score -->
+          <div class="score">
+            <span>玩家：{{ playerScore }}</span>
+            <span>AI: {{ aiScore }}</span>
+          </div>
+        </div>
+        
+        <div class="content" v-if="!gameStarted">
+          <h2>404 乒乓球游戏</h2>
+          <p>拖动左边的 "4" 控制球拍，别让 "0" 掉下去！</p>
+          <button @click="startGame" class="start-btn">开始游戏</button>
+        </div>
+        
+        <div class="content" v-if="gameStarted && !gameOver" style="display: none;">
+          <h2>404 乒乓球游戏</h2>
+          <p>拖动左边的 "4" 控制球拍，别让 "0" 掉下去！</p>
         </div>
       </div>
     </section>
@@ -32,6 +59,179 @@ export default {
   name: 'NotFound',
   components: {
     Topbar
+  },
+  data() {
+    return {
+      gameStarted: false,
+      gameOver: false,
+      playerScore: 0,
+      aiScore: 0,
+      ballX: 50,
+      ballY: 50,
+      ballSpeedX: 0.5,
+      ballSpeedY: 0.3,
+      playerY: 50,
+      aiY: 50,
+      paddleHeight: 15,
+      animationId: null,
+      isDragging: false
+    }
+  },
+  methods: {
+    startGame() {
+      this.gameStarted = true
+      this.resetBall()
+      this.gameLoop()
+    },
+    resetGame() {
+      this.gameOver = false
+      this.playerScore = 0
+      this.aiScore = 0
+      this.playerY = 50
+      this.aiY = 50
+      this.resetBall()
+      this.gameLoop()
+    },
+    resetBall() {
+      this.ballX = 50
+      this.ballY = 50
+      this.ballSpeedX = Math.random() > 0.5 ? 0.5 : -0.5
+      this.ballSpeedY = (Math.random() - 0.5) * 0.6
+    },
+    gameLoop() {
+      if (this.gameOver) return
+      
+      // Update ball position
+      this.ballX += this.ballSpeedX
+      this.ballY += this.ballSpeedY
+      
+      // Wall collision (top/bottom)
+      if (this.ballY <= 5 || this.ballY >= 95) {
+        this.ballSpeedY = -this.ballSpeedY
+      }
+      
+      // Paddle collision detection
+      const playerPaddle = this.$refs.playerPaddle
+      const aiPaddle = this.$refs.aiPaddle
+      const ball = this.$refs.ball
+      
+      if (playerPaddle && aiPaddle && ball) {
+        const playerRect = playerPaddle.getBoundingClientRect()
+        const aiRect = aiPaddle.getBoundingClientRect()
+        const ballRect = ball.getBoundingClientRect()
+        const containerRect = this.$refs.gameContainer.getBoundingClientRect()
+        
+        // Normalize positions to percentage
+        const playerTop = ((playerRect.top - containerRect.top) / containerRect.height) * 100
+        const playerBottom = ((playerRect.bottom - containerRect.top) / containerRect.height) * 100
+        const aiTop = ((aiRect.top - containerRect.top) / containerRect.height) * 100
+        const aiBottom = ((aiRect.bottom - containerRect.top) / containerRect.height) * 100
+        
+        const ballLeft = ((ballRect.left - containerRect.left) / containerRect.width) * 100
+        const ballRight = ((ballRect.right - containerRect.left) / containerRect.width) * 100
+        const ballTop = ((ballRect.top - containerRect.top) / containerRect.height) * 100
+        const ballBottom = ((ballRect.bottom - containerRect.top) / containerRect.height) * 100
+        
+        // Player paddle collision (left side, around 10-15%)
+        if (ballLeft <= 15 && ballLeft >= 10 && 
+            ballBottom >= playerTop && ballTop <= playerBottom &&
+            this.ballSpeedX < 0) {
+          this.ballSpeedX = -this.ballSpeedX * 1.05 // Slight speed increase
+          // Add angle based on where ball hits paddle
+          const hitPos = (ballTop + ballBottom) / 2 - (playerTop + playerBottom) / 2
+          this.ballSpeedY += hitPos * 0.02
+        }
+        
+        // AI paddle collision (right side, around 85-90%)
+        if (ballRight >= 85 && ballRight <= 90 && 
+            ballBottom >= aiTop && ballTop <= aiBottom &&
+            this.ballSpeedX > 0) {
+          this.ballSpeedX = -this.ballSpeedX * 1.05
+          const hitPos = (ballTop + ballBottom) / 2 - (aiTop + aiBottom) / 2
+          this.ballSpeedY += hitPos * 0.02
+        }
+      }
+      
+      // Score detection
+      if (this.ballX < 0) {
+        this.aiScore++
+        this.resetBall()
+      } else if (this.ballX > 100) {
+        this.playerScore++
+        this.resetBall()
+      }
+      
+      // Ball falls down (game over)
+      if (this.ballY < -10 || this.ballY > 110) {
+        this.gameOver = true
+        if (this.animationId) {
+          cancelAnimationFrame(this.animationId)
+        }
+        return
+      }
+      
+      // AI movement (follows ball with delay)
+      const aiTarget = this.ballY - this.paddleHeight / 2
+      const aiSpeed = 0.08
+      if (this.aiY < aiTarget) {
+        this.aiY = Math.min(this.aiY + aiSpeed, aiTarget)
+      } else {
+        this.aiY = Math.max(this.aiY - aiSpeed, aiTarget)
+      }
+      
+      // Keep paddles in bounds
+      this.playerY = Math.max(0, Math.min(100 - this.paddleHeight, this.playerY))
+      this.aiY = Math.max(0, Math.min(100 - this.paddleHeight, this.aiY))
+      
+      // Update DOM positions
+      this.updatePositions()
+      
+      this.animationId = requestAnimationFrame(() => this.gameLoop())
+    },
+    updatePositions() {
+      if (this.$refs.playerPaddle) {
+        this.$refs.playerPaddle.style.top = this.playerY + '%'
+      }
+      if (this.$refs.aiPaddle) {
+        this.$refs.aiPaddle.style.top = this.aiY + '%'
+      }
+      if (this.$refs.ball) {
+        this.$refs.ball.style.left = this.ballX + '%'
+        this.$refs.ball.style.top = this.ballY + '%'
+      }
+    },
+    startDrag(e) {
+      this.isDragging = true
+      this.handleDrag(e)
+      
+      document.addEventListener('mousemove', this.handleDrag)
+      document.addEventListener('mouseup', this.endDrag)
+      document.addEventListener('touchmove', this.handleDrag, { passive: false })
+      document.addEventListener('touchend', this.endDrag)
+    },
+    handleDrag(e) {
+      if (!this.isDragging || !this.$refs.gameContainer) return
+      e.preventDefault()
+      
+      const containerRect = this.$refs.gameContainer.getBoundingClientRect()
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY
+      const relativeY = ((clientY - containerRect.top) / containerRect.height) * 100
+      
+      this.playerY = Math.max(0, Math.min(100 - this.paddleHeight, relativeY - this.paddleHeight / 2))
+      this.updatePositions()
+    },
+    endDrag() {
+      this.isDragging = false
+      document.removeEventListener('mousemove', this.handleDrag)
+      document.removeEventListener('mouseup', this.endDrag)
+      document.removeEventListener('touchmove', this.handleDrag)
+      document.removeEventListener('touchend', this.endDrag)
+    }
+  },
+  beforeUnmount() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId)
+    }
   }
 }
 </script>
@@ -74,6 +274,7 @@ export default {
   padding: 2rem;
   width: 100%;
   max-width: 100%;
+  position: relative;
 }
 
 .content {
@@ -81,94 +282,150 @@ export default {
   padding: 0 1rem;
 }
 
-/* === 404 Glitch Effect === */
-.error-code {
-  font-size: 6rem;
-  font-family: var(--mono);
-  color: var(--error);
+/* === Game Container === */
+.game-container {
+  width: 100%;
+  height: 400px;
   position: relative;
-  display: inline-block;
-  margin: 0;
-  line-height: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+}
+
+/* === Pong Game === */
+.pong-game {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.paddle {
+  position: absolute;
+  font-family: var(--mono);
+  font-size: 3rem;
   font-weight: 700;
-  letter-spacing: 8px;
+  color: var(--accent);
+  width: 50px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  transition: transform 0.1s;
+  left: 10%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-/* 红色层 */
-.error-code::before {
-  content: attr(data-text);
+.paddle:active {
+  cursor: grabbing;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.paddle.ai {
+  left: auto;
+  right: 10%;
+  color: var(--text-dim);
+  cursor: default;
+}
+
+.paddle.ai:active {
+  transform: none;
+}
+
+.ball {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: #ff003c;
-  opacity: 0.8;
-  overflow: hidden;
-  animation: glitch-1 2.5s infinite linear alternate-reverse;
+  font-family: var(--mono);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--green);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 0 10px var(--green-glow);
 }
 
-/* 蓝色层 */
-.error-code::after {
-  content: attr(data-text);
+/* === Score === */
+.score {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: #00f0ff;
-  opacity: 0.8;
-  overflow: hidden;
-  animation: glitch-2 3s infinite linear alternate-reverse;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 40px;
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-dim);
+  z-index: 10;
 }
 
-/* 随机切片效果 */
-@keyframes glitch-1 {
-  0% { clip-path: inset(80% 0 0 0); transform: translate(-2px, 1px); }
-  5% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -1px); }
-  10% { clip-path: inset(50% 0 30% 0); transform: translate(-1px, 2px); }
-  15% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); }
-  20% { clip-path: inset(70% 0 10% 0); transform: translate(-2px, 1px); }
-  25% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 1px); }
-  30% { clip-path: inset(90% 0 0 0); transform: translate(-1px, -1px); }
-  35% { clip-path: inset(15% 0 70% 0); transform: translate(1px, 2px); }
-  40% { clip-path: inset(55% 0 25% 0); transform: translate(-2px, -1px); }
-  45% { clip-path: inset(5% 0 85% 0); transform: translate(2px, 2px); }
-  50% { clip-path: inset(75% 0 5% 0); transform: translate(-1px, 1px); }
-  55% { clip-path: inset(25% 0 60% 0); transform: translate(1px, -2px); }
-  60% { clip-path: inset(65% 0 20% 0); transform: translate(-2px, 2px); }
-  65% { clip-path: inset(0 0 90% 0); transform: translate(2px, -1px); }
-  70% { clip-path: inset(45% 0 40% 0); transform: translate(-1px, -2px); }
-  75% { clip-path: inset(85% 0 5% 0); transform: translate(1px, 1px); }
-  80% { clip-path: inset(35% 0 55% 0); transform: translate(-2px, -2px); }
-  85% { clip-path: inset(10% 0 75% 0); transform: translate(2px, 1px); }
-  90% { clip-path: inset(60% 0 30% 0); transform: translate(-1px, 2px); }
-  95% { clip-path: inset(20% 0 65% 0); transform: translate(1px, -1px); }
-  100% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, 1px); }
+/* === Game Over === */
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  z-index: 20;
 }
 
-@keyframes glitch-2 {
-  0% { clip-path: inset(10% 0 70% 0); transform: translate(2px, -1px); }
-  5% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 1px); }
-  10% { clip-path: inset(25% 0 65% 0); transform: translate(1px, 2px); }
-  15% { clip-path: inset(80% 0 10% 0); transform: translate(-1px, -2px); }
-  20% { clip-path: inset(5% 0 85% 0); transform: translate(2px, 2px); }
-  25% { clip-path: inset(50% 0 35% 0); transform: translate(-2px, -1px); }
-  30% { clip-path: inset(90% 0 0 0); transform: translate(1px, 1px); }
-  35% { clip-path: inset(15% 0 75% 0); transform: translate(-1px, -2px); }
-  40% { clip-path: inset(70% 0 15% 0); transform: translate(2px, -2px); }
-  45% { clip-path: inset(30% 0 55% 0); transform: translate(-2px, 1px); }
-  50% { clip-path: inset(85% 0 5% 0); transform: translate(1px, 2px); }
-  55% { clip-path: inset(0 0 95% 0); transform: translate(-1px, -1px); }
-  60% { clip-path: inset(45% 0 45% 0); transform: translate(2px, 1px); }
-  65% { clip-path: inset(20% 0 70% 0); transform: translate(-2px, -2px); }
-  70% { clip-path: inset(75% 0 10% 0); transform: translate(1px, 1px); }
-  75% { clip-path: inset(35% 0 50% 0); transform: translate(-1px, 2px); }
-  80% { clip-path: inset(95% 0 0 0); transform: translate(2px, -1px); }
-  85% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, -1px); }
-  90% { clip-path: inset(55% 0 35% 0); transform: translate(1px, -2px); }
-  95% { clip-path: inset(25% 0 60% 0); transform: translate(-1px, 1px); }
-  100% { clip-path: inset(65% 0 25% 0); transform: translate(2px, 2px); }
+.game-over p {
+  font-family: var(--mono);
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 1.5rem;
+}
+
+.restart-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 12px 24px;
+  font-family: var(--mono);
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.restart-btn:hover {
+  background: var(--green);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+/* === Start Button === */
+.start-btn {
+  display: inline-block;
+  border: 1px solid var(--line-strong);
+  background: rgba(255,255,255,0.02);
+  color: var(--accent);
+  padding: 10px 20px;
+  font-family: var(--mono);
+  font-size: 13px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  min-height: 44px;
+  margin-top: 1rem;
+}
+
+.start-btn:hover {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
+  color: var(--green);
 }
 
 h2 {
@@ -182,27 +439,6 @@ p {
   color: var(--text-dim);
   margin: 0.5rem 0 2rem;
   font-size: 15px;
-}
-
-.home-btn {
-  display: inline-block;
-  border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,0.02);
-  color: var(--accent);
-  padding: 10px 20px;
-  font-family: var(--mono);
-  font-size: 13px;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  min-height: 44px;
-}
-
-.home-btn:hover {
-  border-color: var(--green);
-  background: var(--green-soft);
-  box-shadow: 0 0 20px var(--green-glow);
-  color: var(--green);
 }
 
 /* === Footer === */
@@ -223,19 +459,20 @@ p {
 
 /* === Responsive === */
 @media (max-width: 640px) {
-  .error-code {
-    font-size: 4rem;
-    letter-spacing: 4px;
+  .game-container {
+    height: 300px;
   }
   
-  h2 {
-    font-size: 16px;
-    margin: 1rem 0 0.5rem;
+  .paddle {
+    font-size: 2rem;
+    width: 40px;
+    height: 50px;
   }
   
-  p {
-    font-size: 13px;
-    margin: 0.5rem 0 1.5rem;
+  .ball {
+    font-size: 2rem;
+    width: 35px;
+    height: 35px;
   }
   
   .pane-body {
@@ -245,16 +482,6 @@ p {
   .pane {
     min-height: auto;
     margin-top: 8px;
-  }
-  
-  .home-btn {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    padding: 14px 24px;
-    min-height: 44px;
-    text-align: center;
-    font-size: 13px;
   }
   
   .content {
@@ -267,25 +494,24 @@ p {
 }
 
 @media (max-width: 375px) {
-  .error-code {
-    font-size: 3.5rem;
-    letter-spacing: 3px;
+  .game-container {
+    height: 250px;
   }
   
-  h2 {
-    font-size: 16px;
+  .paddle {
+    font-size: 1.5rem;
+    width: 35px;
+    height: 45px;
   }
   
-  p {
-    font-size: 13px;
+  .ball {
+    font-size: 1.5rem;
+    width: 30px;
+    height: 30px;
   }
   
   .pane-body {
     padding: 0.75rem;
-  }
-  
-  .home-btn {
-    font-size: 12px;
   }
   
   .footer {
