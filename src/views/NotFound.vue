@@ -133,19 +133,19 @@ export default {
         if (ballLeft <= 15 && ballLeft >= 10 && 
             ballBottom >= playerTop && ballTop <= playerBottom &&
             this.ballSpeedX < 0) {
-          this.ballSpeedX = -this.ballSpeedX * 1.05 // Slight speed increase
+          this.ballSpeedX = -this.ballSpeedX // 只反转方向，不加速
           // Add angle based on where ball hits paddle
           const hitPos = (ballTop + ballBottom) / 2 - (playerTop + playerBottom) / 2
-          this.ballSpeedY += hitPos * 0.02
+          this.ballSpeedY = hitPos * 0.02 // 设置角度，不是累加
         }
         
         // AI paddle collision (right side, around 85-90%)
         if (ballRight >= 85 && ballRight <= 90 && 
             ballBottom >= aiTop && ballTop <= aiBottom &&
             this.ballSpeedX > 0) {
-          this.ballSpeedX = -this.ballSpeedX * 1.05
+          this.ballSpeedX = -this.ballSpeedX // 只反转方向，不加速
           const hitPos = (ballTop + ballBottom) / 2 - (aiTop + aiBottom) / 2
-          this.ballSpeedY += hitPos * 0.02
+          this.ballSpeedY = hitPos * 0.02 // 设置角度，不是累加
         }
       }
       
