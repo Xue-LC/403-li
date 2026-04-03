@@ -6,7 +6,19 @@
     <!-- 404 Pong Game -->
     <section class="pane">
       <div class="pane-body">
-        <div class="game-container" ref="gameContainer">
+        <!-- 初始 404 视图 -->
+        <div v-if="!gameStarted" class="static-404">
+          <div class="error-code">
+            <span class="digit digit-4" ref="dragFour" @mousedown="initDrag" @touchstart="initDrag">4</span>
+            <span class="digit">0</span>
+            <span class="digit">4</span>
+          </div>
+          <p class="error-message">页面未找到</p>
+          <a href="/" class="home-btn">← 返回首页</a>
+        </div>
+        
+        <!-- 游戏视图 -->
+        <div v-else class="game-container" ref="gameContainer">
           <div class="pong-game">
             <div 
               class="paddle player" 
@@ -18,8 +30,8 @@
             <div class="paddle ai" ref="aiPaddle">4</div>
           </div>
           
-          <!-- Score (hidden before game starts) -->
-          <div class="score" :style="{ opacity: gameStarted && !gameOver ? 1 : 0 }">
+          <!-- Score -->
+          <div class="score">
             <span>玩家：{{ playerScore }}</span>
             <span>AI: {{ aiScore }}</span>
           </div>
@@ -29,12 +41,6 @@
             <p>页面找不到，但游戏可以继续！</p>
             <a href="/" class="restart-btn">← 返回首页</a>
           </div>
-        </div>
-        
-        <!-- Initial view: no start button, drag to trigger -->
-        <div class="content" v-if="!gameStarted">
-          <h2>404 乒乓球游戏</h2>
-          <p>拖动左边的 "4" 控制球拍，别让 "0" 掉下去！</p>
         </div>
       </div>
     </section>
@@ -227,6 +233,26 @@ export default {
         e.preventDefault()
       }
     },
+    initDrag(e) {
+      // 初始 404 页面的 "4" 拖动触发
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY
+      
+      if (!this.gameStarted && !this.gameTriggered) {
+        this.gameTriggered = true
+        this.gameStarted = true
+        this.dragStartY = clientY
+        this.isDragging = true
+        
+        document.addEventListener('mousemove', this.handleDrag)
+        document.addEventListener('mouseup', this.endDrag)
+        document.addEventListener('touchmove', this.handleDrag, { passive: false })
+        document.addEventListener('touchend', this.endDrag)
+        e.preventDefault()
+        
+        this.resetBall()
+        this.gameLoop()
+      }
+    },
     handleDrag(e) {
       if (!this.isDragging) return
       e.preventDefault()
@@ -299,9 +325,65 @@ export default {
   position: relative;
 }
 
-.content {
+/* === Static 404 View === */
+.static-404 {
   text-align: center;
-  padding: 0 1rem;
+  padding: 2rem 1rem;
+}
+
+.error-code {
+  font-family: var(--mono);
+  font-size: 8rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+  user-select: none;
+}
+
+.digit {
+  display: inline-block;
+}
+
+.digit-4 {
+  cursor: grab;
+  transition: transform 0.2s;
+}
+
+.digit-4:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.error-message {
+  font-size: 18px;
+  color: var(--text-dim);
+  margin: 1rem 0 2rem;
+  font-family: var(--mono);
+}
+
+.home-btn {
+  display: inline-block;
+  border: 1px solid var(--line-strong);
+  background: rgba(255,255,255,0.02);
+  color: var(--accent);
+  padding: 12px 24px;
+  font-family: var(--mono);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.2s;
+  min-height: 44px;
+}
+
+.home-btn:hover {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
+  color: var(--green);
 }
 
 /* === Game Container === */
@@ -506,8 +588,16 @@ p {
     margin-top: 8px;
   }
   
-  .content {
-    padding: 0;
+  .static-404 {
+    padding: 1rem;
+  }
+  
+  .error-code {
+    font-size: 5rem;
+  }
+  
+  .error-message {
+    font-size: 16px;
   }
   
   .footer {
@@ -534,6 +624,18 @@ p {
   
   .pane-body {
     padding: 0.75rem;
+  }
+  
+  .static-404 {
+    padding: 0.5rem;
+  }
+  
+  .error-code {
+    font-size: 4rem;
+  }
+  
+  .error-message {
+    font-size: 14px;
   }
   
   .footer {
