@@ -91,7 +91,7 @@ export default {
     resetBall() {
       this.ballX = 50
       this.ballY = 50
-      this.ballSpeedX = Math.random() > 0.5 ? 0.5 : -0.5
+      this.ballSpeedX = Math.random() > 0.5 ? 0.7 : -0.7
       this.ballSpeedY = (Math.random() - 0.5) * 0.6
     },
     startDrag(e) {
@@ -214,12 +214,12 @@ export default {
         return
       }
       
-      // AI movement (with max speed limit)
+      // AI movement (with strict speed limit and reaction delay)
       const aiTarget = this.ballY - this.paddleHeight / 2
-      const aiSpeed = 0.12
+      const aiSpeed = 0.08 // 降低基础速度
       const aiDelta = (aiTarget - this.aiY) * aiSpeed
-      // 限制 AI 最大移动速度
-      const maxAIDelta = 3 // 每帧最大移动 3 像素
+      // 严格限制 AI 最大移动速度（每帧最多 1.5 像素）
+      const maxAIDelta = 1.5
       this.aiY += Math.max(-maxAIDelta, Math.min(maxAIDelta, aiDelta))
       
       // Keep paddles in bounds
