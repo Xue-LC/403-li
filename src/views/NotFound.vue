@@ -216,10 +216,10 @@ export default {
       
       // AI movement (with strict speed limit and reaction delay)
       const aiTarget = this.ballY - this.paddleHeight / 2
-      const aiSpeed = 0.08 // 降低基础速度
+      const aiSpeed = 0.06 // 进一步降低基础速度
       const aiDelta = (aiTarget - this.aiY) * aiSpeed
-      // 严格限制 AI 最大移动速度（每帧最多 1.5 像素）
-      const maxAIDelta = 1.5
+      // 严格限制 AI 最大移动速度（每帧最多 0.8 像素）
+      const maxAIDelta = 0.8
       this.aiY += Math.max(-maxAIDelta, Math.min(maxAIDelta, aiDelta))
       
       // Keep paddles in bounds
