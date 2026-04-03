@@ -6,8 +6,15 @@
     <!-- 404 Pong Game -->
     <section class="pane">
       <div class="pane-body">
-        <!-- Game Container -->
-        <div class="game-container" ref="gameContainer">
+        <!-- 初始 404 视图（游戏开始前显示） -->
+        <div v-if="!gameStarted" class="fake-404">
+          <span class="digit digit-4 fake-left" ref="dragFour" @mousedown="initDrag" @touchstart="initDrag">4</span>
+          <span class="digit fake-zero">0</span>
+          <span class="digit fake-right">4</span>
+        </div>
+        
+        <!-- 游戏容器（一直存在，但初始隐藏） -->
+        <div class="game-container" ref="gameContainer" :style="{ opacity: gameStarted ? 1 : 0, pointerEvents: gameStarted ? 'auto' : 'none' }">
           <div class="pong-game">
             <div 
               class="paddle player" 
@@ -19,7 +26,7 @@
             <div class="paddle ai" ref="aiPaddle">4</div>
           </div>
           
-          <!-- Score (hidden before game starts) -->
+          <!-- Score -->
           <div class="score" v-if="gameStarted && !gameOver">
             <span>玩家：{{ playerScore }}</span>
             <span>AI: {{ aiScore }}</span>
@@ -30,12 +37,6 @@
             <p>页面找不到，但游戏可以继续！</p>
             <a href="/" class="restart-btn">← 返回首页</a>
           </div>
-        </div>
-        
-        <!-- Bottom Info -->
-        <div class="bottom-info">
-          <p class="error-text">页面不存在</p>
-          <button @click="goBack" class="back-btn">← 返回上页</button>
         </div>
       </div>
     </section>
@@ -74,8 +75,8 @@ export default {
       ballRadius: 27,
       animationId: null,
       isDragging: false,
-      dragStartY: 0,
       gameTriggered: false,
+      dragStartY: 0,
       containerHeight: 400,
       containerWidth: 800,
       playerDragging: false,
@@ -104,70 +105,9 @@ export default {
           this.aiY = this.containerHeight / 2
           this.ballX = this.containerWidth / 2
           this.ballY = this.containerHeight / 2
+          this.updatePositions()
         }
       }
-    },
-    goBack() {
-      if (window.history.length > 1) {
-        window.history.back()
-      } else {
-        window.location.href = '/'
-      }
-    },
-    startDrag(e) {
-      if (!this.gameStarted && !this.gameTriggered) {
-        // 拖动触发游戏
-        this.gameTriggered = true
-        this.gameStarted = true
-        this.isDragging = true
-        this.playerDragging = true
-        this.dragStartY = e.touches ? e.touches[0].clientY : e.clientY
-        this.playerTargetY = this.dragStartY
-        
-        document.addEventListener('mousemove', this.handleDrag)
-        document.addEventListener('mouseup', this.endDrag)
-        document.addEventListener('touchmove', this.handleDrag, { passive: false })
-        document.addEventListener('touchend', this.endDrag)
-        e.preventDefault()
-        
-        this.resetBall()
-        this.gameLoop()
-      } else if (this.gameStarted && !this.gameOver) {
-        // 游戏中拖动球拍
-        this.playerDragging = true
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY
-        const container = this.$refs.gameContainer
-        if (container) {
-          const rect = container.getBoundingClientRect()
-          this.playerTargetY = clientY - rect.top
-        }
-        
-        document.addEventListener('mousemove', this.handleDrag)
-        document.addEventListener('mouseup', this.endDrag)
-        document.addEventListener('touchmove', this.handleDrag, { passive: false })
-        document.addEventListener('touchend', this.endDrag)
-        e.preventDefault()
-      }
-    },
-    handleDrag(e) {
-      if (!this.playerDragging) return
-      e.preventDefault()
-      
-      if (this.gameStarted && !this.gameOver) {
-        const container = this.$refs.gameContainer
-        if (container) {
-          const rect = container.getBoundingClientRect()
-          const clientY = e.touches ? e.touches[0].clientY : e.clientY
-          this.playerTargetY = clientY - rect.top
-        }
-      }
-    },
-    endDrag() {
-      this.playerDragging = false
-      document.removeEventListener('mousemove', this.handleDrag)
-      document.removeEventListener('mouseup', this.endDrag)
-      document.removeEventListener('touchmove', this.handleDrag)
-      document.removeEventListener('touchend', this.endDrag)
     },
     resetBall() {
       this.ballX = this.containerWidth / 2
@@ -187,16 +127,17 @@ export default {
       if (isLeft && this.ballX - this.ballRadius <= paddleX + this.paddleWidth) {
         this.ballX = paddleX + this.paddleWidth + this.ballRadius + 1
         this.vx = Math.abs(this.vx) + 0.35
+        this.playerScore += 1
       } else if (!isLeft && this.ballX + this.ballRadius >= paddleX) {
         this.ballX = paddleX - this.ballRadius - 1
         this.vx = -Math.abs(this.vx) - 0.35
+        this.playerScore += 1
       } else {
         return false
       }
 
       const offset = (this.ballY - paddleY) / (this.paddleHeight / 2)
       this.vy += offset * 1.4
-      this.playerScore += 1
       return true
     },
     gameLoop() {
@@ -249,13 +190,95 @@ export default {
       this.animationId = requestAnimationFrame(() => this.gameLoop())
     },
     updatePositions() {
-      const container = this.$refs.gameContainer
-      if (container) {
-        container.style.setProperty('--player-y-px', `${this.playerY}px`)
-        container.style.setProperty('--ai-y-px', `${this.aiY}px`)
-        container.style.setProperty('--ball-x-px', `${this.ballX}px`)
-        container.style.setProperty('--ball-y-px', `${this.ballY}px`)
+      if (this.$refs.playerPaddle) {
+        this.$refs.playerPaddle.style.top = this.playerY + 'px'
       }
+      if (this.$refs.aiPaddle) {
+        this.$refs.aiPaddle.style.top = this.aiY + 'px'
+      }
+      if (this.$refs.ball) {
+        this.$refs.ball.style.left = this.ballX + 'px'
+        this.$refs.ball.style.top = this.ballY + 'px'
+      }
+    },
+    startDrag(e) {
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY
+      
+      if (!this.gameStarted && !this.gameTriggered) {
+        // 拖动触发游戏
+        this.gameTriggered = true
+        this.gameStarted = true
+        this.isDragging = true
+        this.playerDragging = true
+        this.dragStartY = clientY
+        this.playerTargetY = clientY
+        
+        document.addEventListener('mousemove', this.handleDrag)
+        document.addEventListener('mouseup', this.endDrag)
+        document.addEventListener('touchmove', this.handleDrag, { passive: false })
+        document.addEventListener('touchend', this.endDrag)
+        e.preventDefault()
+        
+        this.resetBall()
+        this.gameLoop()
+      } else if (this.gameStarted && !this.gameOver) {
+        // 游戏中拖动球拍
+        this.playerDragging = true
+        const container = this.$refs.gameContainer
+        if (container) {
+          const rect = container.getBoundingClientRect()
+          this.playerTargetY = clientY - rect.top
+        }
+        
+        document.addEventListener('mousemove', this.handleDrag)
+        document.addEventListener('mouseup', this.endDrag)
+        document.addEventListener('touchmove', this.handleDrag, { passive: false })
+        document.addEventListener('touchend', this.endDrag)
+        e.preventDefault()
+      }
+    },
+    initDrag(e) {
+      // 初始 404 页面的 "4" 拖动触发
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY
+      
+      if (!this.gameStarted && !this.gameTriggered) {
+        this.gameTriggered = true
+        this.gameStarted = true
+        this.dragStartY = clientY
+        this.isDragging = true
+        this.playerDragging = true
+        this.playerTargetY = clientY
+        
+        document.addEventListener('mousemove', this.handleDrag)
+        document.addEventListener('mouseup', this.endDrag)
+        document.addEventListener('touchmove', this.handleDrag, { passive: false })
+        document.addEventListener('touchend', this.endDrag)
+        e.preventDefault()
+        
+        this.resetBall()
+        this.gameLoop()
+      }
+    },
+    handleDrag(e) {
+      if (!this.isDragging) return
+      e.preventDefault()
+      
+      if (this.gameStarted && !this.gameOver) {
+        const container = this.$refs.gameContainer
+        if (container) {
+          const rect = container.getBoundingClientRect()
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY
+          this.playerTargetY = clientY - rect.top
+        }
+      }
+    },
+    endDrag() {
+      this.isDragging = false
+      this.playerDragging = false
+      document.removeEventListener('mousemove', this.handleDrag)
+      document.removeEventListener('mouseup', this.endDrag)
+      document.removeEventListener('touchmove', this.handleDrag)
+      document.removeEventListener('touchend', this.endDrag)
     }
   }
 }
@@ -264,7 +287,19 @@ export default {
 <style scoped>
 @import '../assets/styles.css';
 
+.not-found {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Pane === */
 .pane {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
@@ -279,6 +314,41 @@ export default {
   position: relative;
 }
 
+/* === Fake 404 Display === */
+.fake-404 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 8rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
+  user-select: none;
+}
+
+.digit {
+  display: inline-grid;
+  place-items: center;
+  width: 1em;
+  height: 1em;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05));
+  border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.fake-left {
+  cursor: grab;
+  touch-action: none;
+  transform-origin: center;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.fake-left:active { cursor: grabbing; }
+.fake-left.dragging {
+  transform: scale(1.08) rotate(-8deg);
+  box-shadow: 0 12px 28px rgba(138,180,255,0.25);
+}
+
 /* === Game Container === */
 .game-container {
   width: 100%;
@@ -290,6 +360,7 @@ export default {
   overflow: hidden;
   touch-action: none;
   user-select: none;
+  transition: opacity 0.3s ease;
 }
 
 /* === Pong Game === */
@@ -305,16 +376,19 @@ export default {
   font-size: 3rem;
   font-weight: 700;
   color: var(--accent);
-  width: 50px;
-  height: 60px;
+  width: 72px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
   left: 28px;
-  top: var(--player-y-px, 200px);
+  top: 200px;
   transform: translateY(-50%);
   will-change: top;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+  border: 1px solid rgba(255,255,255,0.16);
 }
 
 .paddle:active {
@@ -326,7 +400,6 @@ export default {
   right: 28px;
   color: var(--text-dim);
   cursor: default;
-  top: var(--ai-y-px, 200px);
 }
 
 .ball {
@@ -335,16 +408,19 @@ export default {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--green);
-  width: 40px;
-  height: 40px;
+  width: 54px;
+  height: 54px;
   display: flex;
   align-items: center;
   justify-content: center;
-  left: var(--ball-x-px, 400px);
-  top: var(--ball-y-px, 200px);
+  left: 400px;
+  top: 200px;
   transform: translate(-50%, -50%);
   text-shadow: 0 0 10px var(--green-glow);
   will-change: left, top;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95), #dfe7ff 48%, #a8b7ef 100%);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.28);
 }
 
 /* === Score === */
@@ -402,45 +478,6 @@ export default {
   color: var(--green);
 }
 
-/* === Bottom Info === */
-.bottom-info {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.error-text {
-  font-family: var(--mono);
-  font-size: 14px;
-  color: var(--text-dim);
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.back-btn {
-  display: inline-block;
-  border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,0.02);
-  color: var(--accent);
-  padding: 10px 20px;
-  font-family: var(--mono);
-  font-size: 13px;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-
-.back-btn:hover {
-  border-color: var(--green);
-  background: var(--green-soft);
-  box-shadow: 0 0 20px var(--green-glow);
-  color: var(--green);
-}
-
 /* === Responsive === */
 @media (max-width: 640px) {
   .pane-body {
@@ -451,16 +488,20 @@ export default {
     height: 300px;
   }
   
+  .fake-404 {
+    font-size: 5rem;
+  }
+  
   .paddle {
     font-size: 2rem;
-    width: 40px;
-    height: 50px;
+    width: 58px;
+    height: 150px;
   }
   
   .ball {
     font-size: 2rem;
-    width: 35px;
-    height: 35px;
+    width: 42px;
+    height: 42px;
   }
 }
 
@@ -469,16 +510,20 @@ export default {
     height: 250px;
   }
   
+  .fake-404 {
+    font-size: 4rem;
+  }
+  
   .paddle {
     font-size: 1.5rem;
-    width: 35px;
-    height: 45px;
+    width: 50px;
+    height: 120px;
   }
   
   .ball {
     font-size: 1.5rem;
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
   }
 }
 </style>
