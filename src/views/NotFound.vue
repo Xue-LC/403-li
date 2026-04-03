@@ -18,8 +18,8 @@
             <div class="paddle ai" ref="aiPaddle">4</div>
           </div>
           
-          <!-- Score -->
-          <div class="score">
+          <!-- Score (hidden before game starts) -->
+          <div class="score" v-if="animationId !== null">
             <span>玩家：{{ playerScore }}</span>
             <span>AI: {{ aiScore }}</span>
           </div>
@@ -214,11 +214,13 @@ export default {
         return
       }
       
-      // AI movement (smooth follow with lerp)
+      // AI movement (with max speed limit)
       const aiTarget = this.ballY - this.paddleHeight / 2
-      const aiSpeed = 0.12 // 提高 AI 速度
-      // 使用 lerp 实现更丝滑的跟随
-      this.aiY += (aiTarget - this.aiY) * aiSpeed
+      const aiSpeed = 0.12
+      const aiDelta = (aiTarget - this.aiY) * aiSpeed
+      // 限制 AI 最大移动速度
+      const maxAIDelta = 3 // 每帧最大移动 3 像素
+      this.aiY += Math.max(-maxAIDelta, Math.min(maxAIDelta, aiDelta))
       
       // Keep paddles in bounds
       this.playerY = Math.max(0, Math.min(100 - this.paddleHeight, this.playerY))
