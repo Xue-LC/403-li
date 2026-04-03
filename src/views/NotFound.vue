@@ -173,7 +173,7 @@ export default {
             this.ballSpeedX < 0) {
           this.ballSpeedX = -this.ballSpeedX
           const hitPos = (ballTop + ballBottom) / 2 - (playerTop + playerBottom) / 2
-          this.ballSpeedY = hitPos * 0.15 // 设置角度，不是累加
+          this.ballSpeedY = hitPos * 0.08 // 减小反弹角度
         }
         
         // AI paddle collision (right side, around 85-90%)
@@ -182,7 +182,7 @@ export default {
             this.ballSpeedX > 0) {
           this.ballSpeedX = -this.ballSpeedX
           const hitPos = (ballTop + ballBottom) / 2 - (aiTop + aiBottom) / 2
-          this.ballSpeedY = hitPos * 0.15 // 设置角度，不是累加
+          this.ballSpeedY = hitPos * 0.08 // 减小反弹角度
         }
       }
       
@@ -214,14 +214,11 @@ export default {
         return
       }
       
-      // AI movement (follows ball with delay)
+      // AI movement (smooth follow with lerp)
       const aiTarget = this.ballY - this.paddleHeight / 2
-      const aiSpeed = 0.08
-      if (this.aiY < aiTarget) {
-        this.aiY += Math.min(aiSpeed, aiTarget - this.aiY)
-      } else if (this.aiY > aiTarget) {
-        this.aiY -= Math.min(aiSpeed, this.aiY - aiTarget)
-      }
+      const aiSpeed = 0.12 // 提高 AI 速度
+      // 使用 lerp 实现更丝滑的跟随
+      this.aiY += (aiTarget - this.aiY) * aiSpeed
       
       // Keep paddles in bounds
       this.playerY = Math.max(0, Math.min(100 - this.paddleHeight, this.playerY))
