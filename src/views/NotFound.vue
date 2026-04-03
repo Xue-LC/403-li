@@ -6,19 +6,15 @@
     <!-- 404 Pong Game -->
     <section class="pane">
       <div class="pane-body">
-        <!-- 初始 404 视图 -->
-        <div v-if="!gameStarted" class="static-404">
-          <div class="error-code">
-            <span class="digit digit-4" ref="dragFour" @mousedown="initDrag" @touchstart="initDrag">4</span>
-            <span class="digit">0</span>
-            <span class="digit">4</span>
-          </div>
-          <p class="error-message">页面未找到</p>
-          <a href="/" class="home-btn">← 返回首页</a>
+        <!-- 初始 404 视图（游戏开始前显示） -->
+        <div v-if="!gameStarted" class="fake-404">
+          <span class="digit digit-4 fake-left" ref="dragFour" @mousedown="initDrag" @touchstart="initDrag">4</span>
+          <span class="digit fake-zero">0</span>
+          <span class="digit fake-right">4</span>
         </div>
         
-        <!-- 游戏视图 -->
-        <div v-else class="game-container" ref="gameContainer">
+        <!-- 游戏容器（一直存在，但初始隐藏） -->
+        <div class="game-container" ref="gameContainer" :style="{ opacity: gameStarted ? 1 : 0, pointerEvents: gameStarted ? 'auto' : 'none' }">
           <div class="pong-game">
             <div 
               class="paddle player" 
@@ -31,7 +27,7 @@
           </div>
           
           <!-- Score -->
-          <div class="score">
+          <div class="score" v-if="gameStarted && !gameOver">
             <span>玩家：{{ playerScore }}</span>
             <span>AI: {{ aiScore }}</span>
           </div>
@@ -323,72 +319,67 @@ export default {
   width: 100%;
   max-width: 100%;
   position: relative;
+  height: 400px; /* 与游戏容器高度一致 */
 }
 
-/* === Static 404 View === */
-.static-404 {
-  text-align: center;
-  padding: 2rem 1rem;
+/* === Fake 404 View (Initial State) === */
+.fake-404 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
 }
 
-.error-code {
+.fake-404 .digit {
+  position: absolute;
   font-family: var(--mono);
-  font-size: clamp(4rem, 15vw, 10rem);
-  font-weight: 900;
-  letter-spacing: -10px;
-  margin-bottom: 1rem;
-  user-select: none;
+  font-weight: 700;
+  color: var(--green);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
 }
 
-.digit {
-  display: inline-block;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  color: var(--green);
-}
-
-.digit-4 {
+.fake-left {
+  /* 与游戏中玩家球拍位置完全一致 */
+  font-size: 3rem;
+  width: 50px;
+  height: 60px;
+  left: 10%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   cursor: grab;
   touch-action: none;
+  pointer-events: auto;
 }
 
-.digit-4:active {
+.fake-left:active {
   cursor: grabbing;
 }
 
-.error-message {
-  font-family: var(--mono);
-  font-size: clamp(14px, 3vw, 18px);
+.fake-zero {
+  /* 与游戏中球位置完全一致 */
+  font-size: 2.5rem;
+  width: 40px;
+  height: 40px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-shadow: 0 0 10px var(--green-glow);
+}
+
+.fake-right {
+  /* 与游戏中 AI 球拍位置完全一致 */
+  font-size: 3rem;
+  width: 50px;
+  height: 60px;
+  right: 10%;
+  top: 50%;
+  transform: translate(50%, -50%);
   color: var(--text-dim);
-  margin: 1rem 0;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.home-btn {
-  display: inline-block;
-  border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,0.02);
-  color: var(--accent);
-  padding: 12px 24px;
-  font-family: var(--mono);
-  font-size: 13px;
-  text-decoration: none;
-  text-transform: uppercase;
-  transition: all 0.2s;
-  margin-top: 1rem;
-}
-
-.home-btn:hover {
-  border-color: var(--green);
-  background: var(--green-soft);
-  box-shadow: 0 0 20px var(--green-glow);
-  color: var(--green);
 }
 
 /* === Game Container === */
@@ -402,6 +393,7 @@ export default {
   overflow: hidden;
   touch-action: none;
   user-select: none;
+  transition: opacity 0.3s ease;
 }
 
 /* === Pong Game === */
