@@ -333,35 +333,41 @@ export default {
 
 .error-code {
   font-family: var(--mono);
-  font-size: 8rem;
-  font-weight: 700;
-  color: var(--accent);
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+  font-size: clamp(4rem, 15vw, 10rem);
+  font-weight: 900;
+  letter-spacing: -10px;
   margin-bottom: 1rem;
   user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .digit {
   display: inline-block;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--green);
 }
 
 .digit-4 {
   cursor: grab;
-  transition: transform 0.2s;
+  touch-action: none;
 }
 
 .digit-4:active {
   cursor: grabbing;
-  transform: scale(1.1);
 }
 
 .error-message {
-  font-size: 18px;
-  color: var(--text-dim);
-  margin: 1rem 0 2rem;
   font-family: var(--mono);
+  font-size: clamp(14px, 3vw, 18px);
+  color: var(--text-dim);
+  margin: 1rem 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .home-btn {
@@ -371,12 +377,11 @@ export default {
   color: var(--accent);
   padding: 12px 24px;
   font-family: var(--mono);
-  font-size: 14px;
-  cursor: pointer;
+  font-size: 13px;
   text-decoration: none;
-  border-radius: 4px;
+  text-transform: uppercase;
   transition: all 0.2s;
-  min-height: 44px;
+  margin-top: 1rem;
 }
 
 .home-btn:hover {
