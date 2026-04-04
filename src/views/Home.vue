@@ -118,9 +118,9 @@ export default {
           path: '/tools/qrcode', 
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
-          status: 'maintenance',
-          statusText: '维护中', statusColor: '#fff3b3',
-          features: '生成 / 导出',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: '生成 / 下载',
           category: 'image' 
         },
         { 
