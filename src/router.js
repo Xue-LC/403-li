@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from './views/Home.vue'
 import Tools from './views/Tools.vue'
 import JsonFormatter from './tools/JsonFormatter.vue'
+import Base64Tool from './views/Base64Tool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -20,6 +21,11 @@ const routes = [
     path: '/tools/json',
     name: 'JsonFormatter',
     component: JsonFormatter
+  },
+  {
+    path: '/tools/base64',
+    name: 'Base64Tool',
+    component: Base64Tool
   },
   {
     path: '/games',

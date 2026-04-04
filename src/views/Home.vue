@@ -108,8 +108,8 @@ export default {
           path: '/tools/base64', 
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
-          status: 'error',
-          statusText: '异常', statusColor: '#ff8a8a',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding' 
         },
