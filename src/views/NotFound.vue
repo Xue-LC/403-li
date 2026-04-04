@@ -98,20 +98,23 @@ export default {
       // 只响应球拍上的触摸
       if (e.target !== this.$refs.playerPaddle) return
       
+      // Chrome 优化：立即停止传播
+      e.preventDefault()
+      e.stopPropagation()
+      
       this.isDragging = true
       const clientY = e.touches ? e.touches[0].clientY : e.clientY
       
-      document.addEventListener('mousemove', this.handleDrag)
-      document.addEventListener('mouseup', this.endDrag)
-      document.addEventListener('touchmove', this.handleDrag, { passive: false })
-      document.addEventListener('touchend', this.endDrag)
+      // Chrome 优化：使用 capture 阶段监听
+      document.addEventListener('mousemove', this.handleDrag, { capture: true })
+      document.addEventListener('mouseup', this.endDrag, { capture: true })
+      document.addEventListener('touchmove', this.handleDrag, { passive: false, capture: true })
+      document.addEventListener('touchend', this.endDrag, { capture: true })
       
       if (!this.gameOver && this.animationId === null) {
         this.resetBall()
         this.gameLoop()
       }
-      e.preventDefault()
-      e.stopPropagation()
     },
     handleDrag(e) {
       if (!this.isDragging) return
@@ -127,10 +130,10 @@ export default {
     },
     endDrag() {
       this.isDragging = false
-      document.removeEventListener('mousemove', this.handleDrag)
-      document.removeEventListener('mouseup', this.endDrag)
-      document.removeEventListener('touchmove', this.handleDrag)
-      document.removeEventListener('touchend', this.endDrag)
+      document.removeEventListener('mousemove', this.handleDrag, { capture: true })
+      document.removeEventListener('mouseup', this.endDrag, { capture: true })
+      document.removeEventListener('touchmove', this.handleDrag, { capture: true })
+      document.removeEventListener('touchend', this.endDrag, { capture: true })
     },
     gameLoop() {
       if (this.gameOver) return
@@ -289,6 +292,9 @@ export default {
   user-select: none;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  /* Chrome 优化 */
+  overscroll-behavior: none;
+  contain: layout style paint;
 }
 
 /* === Pong Game === */
