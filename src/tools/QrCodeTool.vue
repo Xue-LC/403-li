@@ -92,7 +92,9 @@ export default {
           text: this.input.trim(),
           width: 256,
           height: 256,
-          correctLevel: QRCode.CorrectLevel.M
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: 2  // M 级别 = 2
         })
         
         this.qrGenerated = true
