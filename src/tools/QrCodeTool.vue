@@ -56,7 +56,7 @@
 
 <script>
 import Topbar from '../components/Topbar.vue'
-import QRCode from 'qrcodejs'
+import qrcode from 'qrcode-generator'
 
 export default {
   name: 'QrCodeTool',
@@ -87,15 +87,14 @@ export default {
         // 清空容器
         this.$refs.qrContainer.innerHTML = ''
         
-        // 生成二维码
-        this.qrCodeInstance = new QRCode(this.$refs.qrContainer, {
-          text: this.input.trim(),
-          width: 256,
-          height: 256,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: 2  // M 级别 = 2
-        })
+        // 生成二维码 - 使用 qrcode-generator
+        const qr = qrcode(0, 'M') // 0=自动版本，M=纠错级别
+        qr.addData(this.input.trim())
+        qr.make()
+        
+        // 获取 SVG 并渲染
+        const svg = qr.createSvgTag()
+        this.$refs.qrContainer.innerHTML = svg
         
         this.qrGenerated = true
         this.success = '二维码生成成功！'
@@ -116,32 +115,36 @@ export default {
       }
       
       try {
-        // 获取二维码图片
-        const qrCanvas = this.$refs.qrContainer.querySelector('canvas')
-        const qrImg = this.$refs.qrContainer.querySelector('img')
-        
-        let dataURL
-        if (qrCanvas) {
-          dataURL = qrCanvas.toDataURL('image/png')
-        } else if (qrImg) {
-          dataURL = qrImg.src
-        } else {
-          this.error = '无法获取二维码图片'
+        // qrcode-generator 生成的是 SVG，需要转换为 PNG
+        const svg = this.$refs.qrContainer.querySelector('svg')
+        if (!svg) {
+          this.error = '无法获取 SVG 二维码'
           return
         }
         
-        // 创建下载链接
-        const link = document.createElement('a')
-        link.href = dataURL
-        link.download = 'qrcode-' + Date.now() + '.png'
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
+        const svgData = new XMLSerializer().serializeToString(svg)
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const img = new Image()
         
-        this.success = '下载已开始！'
-        setTimeout(() => {
-          this.success = ''
-        }, 3000)
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0)
+          const link = document.createElement('a')
+          link.download = 'qrcode-' + Date.now() + '.png'
+          link.href = canvas.toDataURL('image/png')
+          link.click()
+          
+          this.success = '下载已开始！'
+          setTimeout(() => {
+            this.success = ''
+          }, 3000)
+        }
+        
+        img.onerror = () => {
+          this.error = '图片转换失败'
+        }
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
       } catch (e) {
         this.error = '下载失败：' + e.message
       }
