@@ -14,27 +14,33 @@
           <label class="input-label">输入文本或 URL：</label>
           <textarea 
             v-model="input" 
-            placeholder="输入要生成二维码的内容，比如网址、文本、联系方式等..."
+            placeholder="输入要生成二维码的内容，例如：https://403.li"
             rows="6"
             class="code-input"
           ></textarea>
           
           <div class="button-group">
-            <button @click="generate" class="button primary">📱 生成二维码</button>
-            <button @click="download" class="button" :disabled="!qrGenerated">💾 下载图片</button>
-            <button @click="clear" class="button danger full-width">🗑️ 清空</button>
+            <button @click="generate" class="button primary" :disabled="!input.trim()">
+              📱 生成
+            </button>
+            <button @click="download" class="button" :disabled="!qrGenerated">
+              💾 下载
+            </button>
+            <button @click="clear" class="button danger">
+              🗑️ 清空
+            </button>
           </div>
           
-          <div class="qr-output" v-show="qrGenerated || error">
-            <div ref="qrContainer" class="qr-container"></div>
+          <div class="output-area" v-show="qrGenerated">
+            <div ref="qrContainer" class="qr-wrapper"></div>
           </div>
           
           <div v-if="error" class="status-error">
-            ❌ {{ error }}
+            ❌ 错误：{{ error }}
           </div>
           
           <div v-if="success" class="status-success">
-            ✅ 二维码生成成功！点击下载保存图片
+            ✅ 二维码生成成功！
           </div>
         </div>
       </div>
@@ -60,16 +66,16 @@ export default {
   data() {
     return {
       input: '',
-      qrCode: null,
       error: '',
-      success: false,
-      qrGenerated: false
+      success: '',
+      qrGenerated: false,
+      qrCodeInstance: null
     }
   },
   methods: {
     generate() {
       this.error = ''
-      this.success = false
+      this.success = ''
       this.qrGenerated = false
       
       if (!this.input.trim()) {
@@ -77,21 +83,25 @@ export default {
         return
       }
       
-      // 清空容器
-      this.$refs.qrContainer.innerHTML = ''
-      
       try {
-        this.qrCode = new QRCode(this.$refs.qrContainer, {
+        // 清空容器
+        this.$refs.qrContainer.innerHTML = ''
+        
+        // 生成二维码
+        this.qrCodeInstance = new QRCode(this.$refs.qrContainer, {
           text: this.input.trim(),
           width: 256,
           height: 256,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         })
         
         this.qrGenerated = true
-        this.success = true
+        this.success = '二维码生成成功！'
+        
+        // 3 秒后清除成功提示
+        setTimeout(() => {
+          this.success = ''
+        }, 3000)
       } catch (e) {
         this.error = '生成失败：' + e.message
         this.qrGenerated = false
@@ -103,29 +113,33 @@ export default {
         return
       }
       
-      const canvas = this.$refs.qrContainer.querySelector('canvas')
-      if (!canvas) {
-        // 如果 canvas 不存在，尝试获取 img（qrcodejs 可能生成 img）
-        const img = this.$refs.qrContainer.querySelector('img')
-        if (img && img.src) {
-          // 如果是 data URL，可以直接下载
-          if (img.src.startsWith('data:image')) {
-            const link = document.createElement('a')
-            link.download = 'qrcode-' + Date.now() + '.png'
-            link.href = img.src
-            link.click()
-            return
-          }
-        }
-        this.error = '无法获取二维码图片'
-        return
-      }
-      
       try {
+        // 获取二维码图片
+        const qrCanvas = this.$refs.qrContainer.querySelector('canvas')
+        const qrImg = this.$refs.qrContainer.querySelector('img')
+        
+        let dataURL
+        if (qrCanvas) {
+          dataURL = qrCanvas.toDataURL('image/png')
+        } else if (qrImg) {
+          dataURL = qrImg.src
+        } else {
+          this.error = '无法获取二维码图片'
+          return
+        }
+        
+        // 创建下载链接
         const link = document.createElement('a')
+        link.href = dataURL
         link.download = 'qrcode-' + Date.now() + '.png'
-        link.href = canvas.toDataURL('image/png')
+        document.body.appendChild(link)
         link.click()
+        document.body.removeChild(link)
+        
+        this.success = '下载已开始！'
+        setTimeout(() => {
+          this.success = ''
+        }, 3000)
       } catch (e) {
         this.error = '下载失败：' + e.message
       }
@@ -133,10 +147,14 @@ export default {
     clear() {
       this.input = ''
       this.error = ''
-      this.success = false
+      this.success = ''
       this.qrGenerated = false
-      this.$refs.qrContainer.innerHTML = ''
-      this.qrCode = null
+      this.qrCodeInstance = null
+      
+      // 清空容器
+      if (this.$refs.qrContainer) {
+        this.$refs.qrContainer.innerHTML = ''
+      }
     }
   }
 }
@@ -230,7 +248,7 @@ export default {
 
 .button-group {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin: 1rem 0;
 }
@@ -251,10 +269,6 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
-}
-
-.button.full-width {
-  grid-column: 1 / -1;
 }
 
 .button:hover:not(:disabled) {
@@ -290,27 +304,23 @@ export default {
   box-shadow: 0 0 15px rgba(255,107,125,0.3);
 }
 
-.qr-output {
+.output-area {
+  margin: 1.5rem 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
-  background: rgba(255,255,255,0.02);
-  border-radius: 8px;
-  margin-top: 1rem;
+}
+
+.qr-wrapper {
+  padding: 20px;
+  background: rgba(255,255,255,0.95);
   border: 1px solid var(--line);
+  border-radius: 4px;
 }
 
-.qr-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.qr-container canvas,
-.qr-container img {
-  max-width: 100%;
-  height: auto;
+.qr-wrapper :deep(canvas),
+.qr-wrapper :deep(img) {
+  display: block;
 }
 
 .status-error {
@@ -364,11 +374,11 @@ export default {
   .code-input {
     font-size: 14px;
     padding: 10px;
-    min-height: 120px;
+    min-height: 130px;
   }
   
   .button-group {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin: 0.75rem 0;
   }
@@ -378,13 +388,13 @@ export default {
     font-size: 13px;
   }
   
+  .button:last-child {
+    grid-column: 1 / -1;
+  }
+  
   .input-label {
     font-size: 12px;
     margin-bottom: 0.4rem;
-  }
-  
-  .qr-output {
-    padding: 1.5rem;
   }
   
   .status-error, .status-success {
@@ -396,6 +406,10 @@ export default {
   .footer {
     padding: 8px 10px;
     font-size: 12px;
+  }
+  
+  .qr-wrapper {
+    padding: 15px;
   }
 }
 
@@ -417,10 +431,6 @@ export default {
   .button {
     height: 48px;
     font-size: 12px;
-  }
-  
-  .qr-output {
-    padding: 1rem;
   }
   
   .footer {
