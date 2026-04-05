@@ -99,7 +99,7 @@
 
 <script>
 import Topbar from '../components/Topbar.vue'
-import QRCode from 'qrcode'
+import qrcode from 'qrcode-generator'
 
 export default {
   name: 'QrCodeTool',
@@ -118,6 +118,21 @@ export default {
     }
   },
   methods: {
+    // 绘制圆角矩形
+    drawRoundedRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath()
+      ctx.moveTo(x + radius, y)
+      ctx.lineTo(x + width - radius, y)
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
+      ctx.lineTo(x + width, y + height - radius)
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
+      ctx.lineTo(x + radius, y + height)
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
+      ctx.lineTo(x, y + radius)
+      ctx.quadraticCurveTo(x, y, x + radius, y)
+      ctx.closePath()
+      ctx.fill()
+    },
     async generate() {
       this.error = ''
       this.success = ''
@@ -130,25 +145,60 @@ export default {
       
       try {
         const canvas = this.$refs.qrCanvas
+        const ctx = canvas.getContext('2d')
         
-        // 根据样式设置参数
-        let margin = 2
-        let width = 300
+        // 设置画布尺寸
+        const size = 300
+        canvas.width = size
+        canvas.height = size
         
-        if (this.qrStyle === 'dots') {
-          margin = 1
-        } else if (this.qrStyle === 'rounded') {
-          margin = 2
-        }
+        // 填充背景
+        ctx.fillStyle = this.bgColor
+        ctx.fillRect(0, 0, size, size)
         
-        await QRCode.toCanvas(canvas, this.input.trim(), {
-          width: width,
-          margin: margin,
-          color: {
-            dark: this.fgColor,
-            light: this.bgColor
+        // 生成二维码数据
+        const qr = qrcode(0, 'M') // 0=自动版本，M=纠错级别
+        qr.addData(this.input.trim())
+        qr.make()
+        
+        const moduleCount = qr.getModuleCount()
+        const margin = 2 // 边距模块数
+        const totalModules = moduleCount + margin * 2
+        const moduleSize = size / totalModules
+        
+        // 设置前景色
+        ctx.fillStyle = this.fgColor
+        
+        // 根据样式绘制二维码模块
+        for (let row = 0; row < moduleCount; row++) {
+          for (let col = 0; col < moduleCount; col++) {
+            if (qr.isDark(row, col)) {
+              const x = (col + margin) * moduleSize
+              const y = (row + margin) * moduleSize
+              
+              if (this.qrStyle === 'square') {
+                // 方形点阵
+                ctx.fillRect(x, y, moduleSize, moduleSize)
+              } else if (this.qrStyle === 'dots') {
+                // 圆点
+                const radius = moduleSize / 2 * 0.9
+                ctx.beginPath()
+                ctx.arc(
+                  x + moduleSize / 2,
+                  y + moduleSize / 2,
+                  radius,
+                  0,
+                  Math.PI * 2
+                )
+                ctx.fill()
+              } else if (this.qrStyle === 'rounded') {
+                // 圆角方形
+                const radius = moduleSize * 0.3
+                this.drawRoundedRect(ctx, x, y, moduleSize, moduleSize, radius)
+              }
+            }
           }
-        })
+        }
         
         this.qrGenerated = true
         this.success = '二维码生成成功！'
