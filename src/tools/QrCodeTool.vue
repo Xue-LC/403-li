@@ -118,18 +118,49 @@ export default {
     }
   },
   methods: {
-    // 绘制圆角矩形
-    drawRoundedRect(ctx, x, y, width, height, radius) {
+    // 绘制智能圆角矩形 - 只有指定的角才圆角
+    drawSmartRoundedRect(ctx, x, y, w, h, r, corners) {
       ctx.beginPath()
-      ctx.moveTo(x + radius, y)
-      ctx.lineTo(x + width - radius, y)
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
-      ctx.lineTo(x + width, y + height - radius)
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
-      ctx.lineTo(x + radius, y + height)
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
-      ctx.lineTo(x, y + radius)
-      ctx.quadraticCurveTo(x, y, x + radius, y)
+      
+      // 从左上角开始
+      if (corners.topLeft) {
+        ctx.moveTo(x + r, y)
+      } else {
+        ctx.moveTo(x, y)
+      }
+      
+      // 上边
+      if (corners.topRight) {
+        ctx.lineTo(x + w - r, y)
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r)
+      } else {
+        ctx.lineTo(x + w, y)
+      }
+      
+      // 右边
+      if (corners.bottomRight) {
+        ctx.lineTo(x + w, y + h - r)
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h)
+      } else {
+        ctx.lineTo(x + w, y + h)
+      }
+      
+      // 下边
+      if (corners.bottomLeft) {
+        ctx.lineTo(x + r, y + h)
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r)
+      } else {
+        ctx.lineTo(x, y + h)
+      }
+      
+      // 左边
+      if (corners.topLeft) {
+        ctx.lineTo(x, y + r)
+        ctx.quadraticCurveTo(x, y, x + r, y)
+      } else {
+        ctx.lineTo(x, y)
+      }
+      
       ctx.closePath()
       ctx.fill()
     },
@@ -203,12 +234,34 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 圆角方形：绘制时稍微扩大，让相邻模块相连
-                const expandSize = moduleSize * 0.15  // 扩展 15%，确保相邻模块相连
-                const x = (col + margin) * moduleSize - expandSize / 2
-                const y = (row + margin) * moduleSize - expandSize / 2
-                const radius = moduleSize * 0.3
-                this.drawRoundedRect(ctx, x, y, moduleSize + expandSize, moduleSize + expandSize, radius)
+                // 智能圆角：检查上下左右是否有相邻模块
+                const hasTop = row > 0 && qr.isDark(row - 1, col)
+                const hasBottom = row < moduleCount - 1 && qr.isDark(row + 1, col)
+                const hasLeft = col > 0 && qr.isDark(row, col - 1)
+                const hasRight = col < moduleCount - 1 && qr.isDark(row, col + 1)
+                
+                const x = (col + margin) * moduleSize
+                const y = (row + margin) * moduleSize
+                const borderRadius = moduleSize * 0.3
+                
+                // 如果四个方向都有模块，绘制完整矩形（无缝）
+                if (hasTop && hasBottom && hasLeft && hasRight) {
+                  ctx.fillRect(x, y, moduleSize, moduleSize)
+                } else {
+                  // 否则绘制智能圆角矩形
+                  // 只有没有相邻的方向才需要圆角
+                  const roundTL = !hasTop && !hasLeft  // 左上角
+                  const roundTR = !hasTop && !hasRight // 右上角
+                  const roundBR = !hasBottom && !hasRight // 右下角
+                  const roundBL = !hasBottom && !hasLeft // 左下角
+                  
+                  this.drawSmartRoundedRect(ctx, x, y, moduleSize, moduleSize, borderRadius, {
+                    topLeft: roundTL,
+                    topRight: roundTR,
+                    bottomRight: roundBR,
+                    bottomLeft: roundBL
+                  })
+                }
                 roundedCount++
               }
             }
