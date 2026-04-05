@@ -32,6 +32,33 @@
             </div>
           </div>
           
+          <div class="style-selector">
+            <label class="input-label">二维码样式：</label>
+            <div class="style-buttons">
+              <button 
+                class="style-btn" 
+                :class="{ active: qrStyle === 'square' }"
+                @click="qrStyle = 'square'"
+              >
+                ⬜ 点阵
+              </button>
+              <button 
+                class="style-btn" 
+                :class="{ active: qrStyle === 'dots' }"
+                @click="qrStyle = 'dots'"
+              >
+                ⚫ 圆点
+              </button>
+              <button 
+                class="style-btn" 
+                :class="{ active: qrStyle === 'rounded' }"
+                @click="qrStyle = 'rounded'"
+              >
+                🔲 圆角
+              </button>
+            </div>
+          </div>
+          
           <div class="button-group">
             <button class="button primary" @click="generate" :disabled="!input.trim()">
               📱 生成二维码
@@ -84,6 +111,7 @@ export default {
       input: '',
       fgColor: '#9dff6b',  // 网站绿色
       bgColor: '#0d1117',  // 网站黑色
+      qrStyle: 'square',   // square, dots, rounded
       error: '',
       success: '',
       qrGenerated: false
@@ -102,9 +130,20 @@ export default {
       
       try {
         const canvas = this.$refs.qrCanvas
+        
+        // 根据样式设置参数
+        let margin = 2
+        let width = 300
+        
+        if (this.qrStyle === 'dots') {
+          margin = 1
+        } else if (this.qrStyle === 'rounded') {
+          margin = 2
+        }
+        
         await QRCode.toCanvas(canvas, this.input.trim(), {
-          width: 300,
-          margin: 2,
+          width: width,
+          margin: margin,
           color: {
             dark: this.fgColor,
             light: this.bgColor
@@ -265,6 +304,45 @@ export default {
   color: var(--text-dim);
 }
 
+/* === Style Selector === */
+.style-selector {
+  margin: 1rem 0;
+}
+
+.style-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 0.5rem;
+}
+
+.style-btn {
+  flex: 1;
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  border-radius: 4px;
+}
+
+.style-btn:hover {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.style-btn.active {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
 /* === Button Group === */
 .button-group {
   display: grid;
@@ -384,6 +462,10 @@ export default {
   .color-picker-group {
     flex-direction: column;
     gap: 10px;
+  }
+  
+  .style-buttons {
+    flex-direction: column;
   }
   
   .button-group {
