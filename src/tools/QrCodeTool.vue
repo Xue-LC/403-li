@@ -203,11 +203,12 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 圆角方形
-                const x = (col + margin) * moduleSize
-                const y = (row + margin) * moduleSize
+                // 圆角方形：绘制时稍微扩大，让相邻模块相连
+                const expandSize = moduleSize * 0.15  // 扩展 15%，确保相邻模块相连
+                const x = (col + margin) * moduleSize - expandSize / 2
+                const y = (row + margin) * moduleSize - expandSize / 2
                 const radius = moduleSize * 0.3
-                this.drawRoundedRect(ctx, x, y, moduleSize, moduleSize, radius)
+                this.drawRoundedRect(ctx, x, y, moduleSize + expandSize, moduleSize + expandSize, radius)
                 roundedCount++
               }
             }
