@@ -22,45 +22,73 @@
           <div class="color-picker-group">
             <div class="color-picker">
               <label class="input-label">前景色：</label>
-              <div class="color-preview" :style="{ backgroundColor: fgColor }" @click="togglePicker('fg')"></div>
-              <input 
-                type="text" 
-                v-model="fgColor" 
-                @change="validateColor"
-                class="color-input"
-                placeholder="#9dff6b"
-              />
-              <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
-                <div class="preset-colors">
-                  <div 
-                    v-for="color in presetColors" 
-                    :key="color"
-                    class="preset-color"
-                    :style="{ backgroundColor: color }"
-                    @click="selectColor('fg', color)"
-                  ></div>
+              <div class="color-preview-wrapper">
+                <div class="color-preview" :style="{ backgroundColor: fgColor }" @click.stop="togglePicker('fg')"></div>
+                <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
+                  <!-- 饱和度/亮度区域 -->
+                  <div class="sl-gradient" @click="selectSaturationLightness">
+                    <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
+                  </div>
+                  <!-- 色相滑块 -->
+                  <div class="hue-slider" @click="selectHue">
+                    <div class="hue-thumb" :style="{ left: hueThumbX + '%' }"></div>
+                  </div>
+                  <!-- HEX 输入 -->
+                  <div class="hex-input-wrapper">
+                    <input 
+                      type="text" 
+                      v-model="fgColor" 
+                      @change="validateColor"
+                      class="hex-input"
+                      placeholder="#9dff6b"
+                    />
+                  </div>
+                  <!-- 预设颜色 -->
+                  <div class="preset-colors">
+                    <div 
+                      v-for="color in fgPresetColors" 
+                      :key="color"
+                      class="preset-color"
+                      :style="{ backgroundColor: color }"
+                      @click="selectColor('fg', color)"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="color-picker">
               <label class="input-label">背景色：</label>
-              <div class="color-preview" :style="{ backgroundColor: bgColor }" @click="togglePicker('bg')"></div>
-              <input 
-                type="text" 
-                v-model="bgColor" 
-                @change="validateColor"
-                class="color-input"
-                placeholder="#0d1117"
-              />
-              <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
-                <div class="preset-colors">
-                  <div 
-                    v-for="color in presetColors" 
-                    :key="color"
-                    class="preset-color"
-                    :style="{ backgroundColor: color }"
-                    @click="selectColor('bg', color)"
-                  ></div>
+              <div class="color-preview-wrapper">
+                <div class="color-preview" :style="{ backgroundColor: bgColor }" @click.stop="togglePicker('bg')"></div>
+                <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
+                  <!-- 饱和度/亮度区域 -->
+                  <div class="sl-gradient" @click="selectSaturationLightnessBg">
+                    <div class="sl-thumb" :style="{ left: slThumbXBg + '%', top: slThumbYBg + '%' }"></div>
+                  </div>
+                  <!-- 色相滑块 -->
+                  <div class="hue-slider" @click="selectHueBg">
+                    <div class="hue-thumb" :style="{ left: hueThumbXBg + '%' }"></div>
+                  </div>
+                  <!-- HEX 输入 -->
+                  <div class="hex-input-wrapper">
+                    <input 
+                      type="text" 
+                      v-model="bgColor" 
+                      @change="validateColorBg"
+                      class="hex-input"
+                      placeholder="#0d1117"
+                    />
+                  </div>
+                  <!-- 预设颜色（包含渐变） -->
+                  <div class="preset-colors bg-presets">
+                    <div 
+                      v-for="(color, index) in bgPresetColors" 
+                      :key="index"
+                      class="preset-color bg-preset"
+                      :style="{ background: bgGradients[index] ? `linear-gradient(135deg, ${bgGradients[index][0]}, ${bgGradients[index][1]})` : color }"
+                      @click="selectBgColor(index)"
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -151,10 +179,54 @@ export default {
       qrGenerated: false,
       showFgPicker: false,
       showBgPicker: false,
-      presetColors: [
-        '#9dff6b', '#0d1117', '#ffffff', '#ff8a8a',
-        '#ffd866', '#00f0ff', '#8a9bb8', '#c9d1d9'
-      ]
+      // 前景色预设（常用颜色）
+      fgPresetColors: [
+        '#9dff6b',  // 网站绿色（默认）
+        '#000000',  // 黑色
+        '#ffffff',  // 白色
+        '#ff6b6b',  // 红色
+        '#ffd93d',  // 黄色
+        '#4d96ff',  // 蓝色
+        '#6bcb77',  // 绿色
+        '#c0c0c0'   // 银色
+      ],
+      // 背景色预设（纯色）
+      bgPresetColors: [
+        '#0d1117',  // 黑色（默认）
+        '#ffffff',  // 白色
+        '#667eea',  // 蓝紫
+        '#f093fb',  // 粉紫
+        '#4facfe',  // 蓝青
+        '#43e97b',  // 绿青
+        '#fa709a',  // 粉黄
+        '#a8edea'   // 青粉
+      ],
+      // 背景渐变预设（用于 Canvas 绘制）
+      bgGradients: [
+        null,  // 黑色（纯色）
+        null,  // 白色（纯色）
+        ['#667eea', '#764ba2'],  // 蓝紫渐变
+        ['#f093fb', '#f5576c'],  // 粉紫渐变
+        ['#4facfe', '#00f2fe'],  // 蓝青渐变
+        ['#43e97b', '#38f9d7'],  // 绿青渐变
+        ['#fa709a', '#fee140'],  // 粉黄渐变
+        ['#a8edea', '#fed6e3']   // 青粉渐变
+      ],
+      bgGradientIndex: -1,  // 当前选择的渐变索引，-1 表示纯色,
+      // 前景色 HSL
+      fgHue: 120,
+      fgSaturation: 100,
+      fgLightness: 50,
+      slThumbX: 100,
+      slThumbY: 0,
+      hueThumbX: 33,
+      // 背景色 HSL
+      bgHue: 210,
+      bgSaturation: 20,
+      bgLightness: 7,
+      slThumbXBg: 20,
+      slThumbYBg: 86,
+      hueThumbXBg: 70
     }
   },
   methods: {
@@ -171,26 +243,169 @@ export default {
       if (type === 'fg') {
         this.fgColor = color
         this.showFgPicker = false
+        const hsl = this.hexToHsl(color)
+        this.fgHue = hsl.h
+        this.fgSaturation = hsl.s
+        this.fgLightness = hsl.l
+        this.updateSlThumb('fg')
+        this.updateHueThumb('fg')
       } else {
         this.bgColor = color
         this.showBgPicker = false
+        const hsl = this.hexToHsl(color)
+        this.bgHue = hsl.h
+        this.bgSaturation = hsl.s
+        this.bgLightness = hsl.l
+        this.updateSlThumb('bg')
+        this.updateHueThumb('bg')
       }
     },
-    validateColor() {
-      // 简单的 HEX 颜色验证
-      const hex = this.fgColor
-      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
-        this.fgColor = '#9dff6b'
+    selectBgColor(index) {
+      this.bgGradientIndex = index
+      const color = this.bgPresetColors[index]
+      const gradient = this.bgGradients[index]
+      
+      if (gradient) {
+        // 使用渐变的第一个颜色作为 bgColor（用于滑块等）
+        this.bgColor = gradient[0]
+      } else {
+        this.bgColor = color
       }
+      
+      this.showBgPicker = false
+      const hsl = this.hexToHsl(this.bgColor)
+      this.bgHue = hsl.h
+      this.bgSaturation = hsl.s
+      this.bgLightness = hsl.l
+      this.updateSlThumb('bg')
+      this.updateHueThumb('bg')
+    },
+    validateColor() {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.fgColor)) {
+        this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+      } else {
+        const hsl = this.hexToHsl(this.fgColor)
+        this.fgHue = hsl.h
+        this.fgSaturation = hsl.s
+        this.fgLightness = hsl.l
+        this.updateSlThumb('fg')
+        this.updateHueThumb('fg')
+      }
+    },
+    validateColorBg() {
+      if (!/^#[0-9A-Fa-f]{6}$/.test(this.bgColor)) {
+        this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+      } else {
+        const hsl = this.hexToHsl(this.bgColor)
+        this.bgHue = hsl.h
+        this.bgSaturation = hsl.s
+        this.bgLightness = hsl.l
+        this.updateSlThumb('bg')
+        this.updateHueThumb('bg')
+      }
+    },
+    selectSaturationLightness(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      this.slThumbX = Math.max(0, Math.min(100, x))
+      this.slThumbY = Math.max(0, Math.min(100, y))
+      this.fgSaturation = this.slThumbX
+      this.fgLightness = 100 - this.slThumbY
+      this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+    },
+    selectSaturationLightnessBg(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      const y = ((e.clientY - rect.top) / rect.height) * 100
+      this.slThumbXBg = Math.max(0, Math.min(100, x))
+      this.slThumbYBg = Math.max(0, Math.min(100, y))
+      this.bgSaturation = this.slThumbXBg
+      this.bgLightness = 100 - this.slThumbYBg
+      this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+    },
+    selectHue(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      this.hueThumbX = Math.max(0, Math.min(100, x))
+      this.fgHue = (this.hueThumbX / 100) * 360
+      this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+    },
+    selectHueBg(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      this.hueThumbXBg = Math.max(0, Math.min(100, x))
+      this.bgHue = (this.hueThumbXBg / 100) * 360
+      this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+    },
+    updateSlThumb(type) {
+      if (type === 'fg') {
+        this.slThumbX = this.fgSaturation
+        this.slThumbY = 100 - this.fgLightness
+      } else {
+        this.slThumbXBg = this.bgSaturation
+        this.slThumbYBg = 100 - this.bgLightness
+      }
+    },
+    updateHueThumb(type) {
+      if (type === 'fg') {
+        this.hueThumbX = (this.fgHue / 360) * 100
+      } else {
+        this.hueThumbXBg = (this.bgHue / 360) * 100
+      }
+    },
+    hexToHsl(hex) {
+      let r = parseInt(hex.slice(1, 3), 16) / 255
+      let g = parseInt(hex.slice(3, 5), 16) / 255
+      let b = parseInt(hex.slice(5, 7), 16) / 255
+      let max = Math.max(r, g, b), min = Math.min(r, g, b)
+      let h, s, l = (max + min) / 2
+      if (max === min) {
+        h = s = 0
+      } else {
+        let d = max - min
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
+          case g: h = ((b - r) / d + 2) / 6; break
+          case b: h = ((r - g) / d + 4) / 6; break
+        }
+      }
+      return { h: h * 360, s: s * 100, l: l * 100 }
+    },
+    hslToHex(h, s, l) {
+      h /= 360
+      s /= 100
+      l /= 100
+      let r, g, b
+      if (s === 0) {
+        r = g = b = l
+      } else {
+        const hue2rgb = (p, q, t) => {
+          if (t < 0) t += 1
+          if (t > 1) t -= 1
+          if (t < 1/6) return p + (q - p) * 6 * t
+          if (t < 1/2) return q
+          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
+          return p
+        }
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+        const p = 2 * l - q
+        r = hue2rgb(p, q, h + 1/3)
+        g = hue2rgb(p, q, h)
+        b = hue2rgb(p, q, h - 1/3)
+      }
+      return '#' + [r, g, b].map(x => {
+        const hex = Math.round(x * 255).toString(16)
+        return hex.length === 1 ? '0' + hex : hex
+      }).join('')
     },
     drawSmartRoundedRect(ctx, x, y, width, height, radius, corners) {
       ctx.beginPath()
-      
       const topLeft = corners.topLeft ? radius : 0
       const topRight = corners.topRight ? radius : 0
       const bottomRight = corners.bottomRight ? radius : 0
       const bottomLeft = corners.bottomLeft ? radius : 0
-      
       ctx.moveTo(x + topLeft, y)
       ctx.lineTo(x + width - topRight, y)
       ctx.quadraticCurveTo(x + width, y, x + width, y + topRight)
@@ -223,7 +438,7 @@ export default {
         const pixelRatio = 4
         const displaySize = 400
         const size = displaySize * pixelRatio
-        const moduleCount = qr.modules.length
+        const moduleCount = qr.getModuleCount()
         const margin = 2
         const totalModules = moduleCount + margin * 2
         const moduleSize = Math.floor(size / totalModules)
@@ -242,6 +457,17 @@ export default {
         
         ctx.fillStyle = this.bgColor
         ctx.fillRect(0, 0, size, size)
+        
+        // 如果选择了渐变，使用 Canvas 渐变绘制背景
+        if (this.bgGradientIndex >= 2 && this.bgGradients[this.bgGradientIndex]) {
+          const gradient = this.bgGradients[this.bgGradientIndex]
+          const grad = ctx.createLinearGradient(0, 0, size, size)
+          grad.addColorStop(0, gradient[0])
+          grad.addColorStop(1, gradient[1])
+          ctx.fillStyle = grad
+          ctx.fillRect(0, 0, size, size)
+        }
+        
         ctx.fillStyle = this.fgColor
         
         let squareCount = 0, dotsCount = 0, roundedCount = 0
@@ -344,6 +570,20 @@ export default {
       this.showFgPicker = false
       this.showBgPicker = false
     })
+    // 初始化滑块位置
+    const fgHsl = this.hexToHsl(this.fgColor)
+    this.fgHue = fgHsl.h
+    this.fgSaturation = fgHsl.s
+    this.fgLightness = fgHsl.l
+    this.updateSlThumb('fg')
+    this.updateHueThumb('fg')
+    
+    const bgHsl = this.hexToHsl(this.bgColor)
+    this.bgHue = bgHsl.h
+    this.bgSaturation = bgHsl.s
+    this.bgLightness = bgHsl.l
+    this.updateSlThumb('bg')
+    this.updateHueThumb('bg')
   }
 }
 </script>
@@ -431,16 +671,21 @@ export default {
 }
 
 .color-picker {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  flex: 1;
   position: relative;
 }
 
+.color-preview-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .color-preview {
-  width: 50px;
+  width: 60px;
   height: 40px;
-  border: 1px solid var(--line);
+  border: 2px solid var(--line);
   border-radius: 0;
   cursor: pointer;
   transition: transform 0.2s;
@@ -451,8 +696,76 @@ export default {
   border-color: var(--green);
 }
 
-.color-input {
-  width: 100px;
+.color-picker-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  border-radius: 0;
+  padding: 12px;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  margin-top: 8px;
+  width: 280px;
+}
+
+.sl-gradient {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to top, #000, transparent),
+              linear-gradient(to right, #fff, transparent);
+  border: 2px solid var(--line);
+  border-radius: 0;
+  position: relative;
+  margin-bottom: 12px;
+  cursor: crosshair;
+}
+
+.sl-thumb {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+.hue-slider {
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(to right, 
+    #ff0000, #ffff00, #00ff00, 
+    #00ffff, #0000ff, #ff00ff, #ff0000);
+  border: 2px solid var(--line);
+  border-radius: 0;
+  position: relative;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.hue-thumb {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+.hex-input-wrapper {
+  margin-bottom: 12px;
+}
+
+.hex-input {
+  width: 100%;
   background: var(--panel-2);
   border: 1px solid var(--line);
   border-radius: 0;
@@ -460,24 +773,12 @@ export default {
   font-family: var(--mono);
   font-size: 13px;
   padding: 8px;
+  text-transform: uppercase;
 }
 
-.color-input:focus {
+.hex-input:focus {
   outline: 0;
   border-color: var(--green);
-}
-
-.color-picker-panel {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 0;
-  padding: 12px;
-  z-index: 100;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  margin-top: 8px;
 }
 
 .preset-colors {
@@ -498,6 +799,14 @@ export default {
 .preset-color:hover {
   transform: scale(1.1);
   border-color: var(--green);
+}
+
+.bg-presets {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.bg-preset {
+  height: 40px;
 }
 
 .style-selector {
@@ -656,6 +965,17 @@ export default {
   .color-picker-group {
     flex-direction: column;
     gap: 10px;
+  }
+  
+  .color-picker-panel {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    margin: 0;
+    border-radius: 0;
   }
   
   .style-buttons {
