@@ -119,23 +119,14 @@ export default {
   },
   methods: {
     // 智能圆角矩形绘制 - 根据位置自动调整圆角
-    drawSmartRoundedRect(ctx, x, y, width, height, radius, isCorner) {
+    drawSmartRoundedRect(ctx, x, y, width, height, radius, corners) {
       ctx.beginPath()
       
-      // 默认所有角都圆滑
-      let topLeft = radius
-      let topRight = radius
-      let bottomRight = radius
-      let bottomLeft = radius
-      
-      // 如果是定位点（finder pattern），使用特殊处理
-      if (isCorner) {
-        // 定位点保持较大圆角
-        topLeft = radius * 1.5
-        topRight = radius * 1.5
-        bottomRight = radius * 1.5
-        bottomLeft = radius * 1.5
-      }
+      // 根据 corners 对象决定哪些角需要圆滑
+      const topLeft = corners.topLeft ? radius : 0
+      const topRight = corners.topRight ? radius : 0
+      const bottomRight = corners.bottomRight ? radius : 0
+      const bottomLeft = corners.bottomLeft ? radius : 0
       
       ctx.moveTo(x + topLeft, y)
       ctx.lineTo(x + width - topRight, y)
