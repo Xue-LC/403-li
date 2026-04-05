@@ -430,9 +430,16 @@ export default {
         return
       }
       
+      // 安全过滤：移除可能的 HTML/JS 注入
+      const safeInput = this.input.trim()
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+      
       try {
         const qr = QRCode(0, 'M')
-        qr.addData(this.input.trim())
+        qr.addData(safeInput)
         qr.make()
         
         const pixelRatio = 4
