@@ -194,7 +194,8 @@ export default {
         canvas.style.maxWidth = '100%'
         canvas.style.height = 'auto'
         
-        // 填充背景
+        // 清空画布并填充背景
+        ctx.clearRect(0, 0, size, size)
         ctx.fillStyle = this.bgColor
         ctx.fillRect(0, 0, size, size)
         
@@ -208,24 +209,35 @@ export default {
         const totalModules = moduleCount + margin * 2
         const moduleSize = size / totalModules  // 使用高分辨率计算（可以是小数）
         
+        // 计算居中偏移量
+        const qrSize = moduleCount * moduleSize
+        const offset = (size - qrSize) / 2
+        
         // 设置前景色
         ctx.fillStyle = this.fgColor
         
-        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size, 'pixelRatio:', pixelRatio)
+        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size, 'pixelRatio:', pixelRatio, 'offset:', offset)
         
-        // 根据样式绘制二维码模块 - 所有绘制都使用高分辨率的 moduleSize
+        // 根据样式绘制二维码模块 - 所有绘制都使用高分辨率的 moduleSize 和 offset 居中
         let squareCount = 0, dotsCount = 0, roundedCount = 0
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
               if (this.qrStyle === 'square') {
-                // 方形：使用高分辨率的 moduleSize
-                ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize, moduleSize)
+                // 方形：使用高分辨率的 moduleSize 和 offset
+                ctx.fillRect(offset + col * moduleSize, offset + row * moduleSize, moduleSize, moduleSize)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点：使用高分辨率的 moduleSize
-                const radius = moduleSize / 2 * 0.85
-                ctx.arc(col * moduleSize + moduleSize / 2, row * moduleSize + moduleSize / 2, radius, 0, Math.PI * 2)
+                // 圆点：使用高分辨率的 moduleSize 和 offset，确保半径不超过模块大小的一半
+                const radius = moduleSize * 0.4  // 40% 的模块大小，确保圆点独立不相连
+                ctx.beginPath()
+                ctx.arc(
+                  offset + col * moduleSize + moduleSize / 2,  // 中心 X
+                  offset + row * moduleSize + moduleSize / 2,  // 中心 Y
+                  radius,
+                  0,
+                  Math.PI * 2
+                )
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
@@ -239,7 +251,7 @@ export default {
                 
                 // 如果四个方向都有模块，绘制完整矩形（无缝）
                 if (hasTop && hasBottom && hasLeft && hasRight) {
-                  ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize, moduleSize)
+                  ctx.fillRect(offset + col * moduleSize, offset + row * moduleSize, moduleSize, moduleSize)
                 } else {
                   // 否则绘制智能圆角矩形
                   // 只有没有相邻的方向才需要圆角
@@ -248,12 +260,20 @@ export default {
                   const roundBR = !hasBottom && !hasRight // 右下角
                   const roundBL = !hasBottom && !hasLeft // 左下角
                   
-                  this.drawSmartRoundedRect(ctx, col * moduleSize, row * moduleSize, moduleSize, moduleSize, borderRadius, {
-                    topLeft: roundTL,
-                    topRight: roundTR,
-                    bottomRight: roundBR,
-                    bottomLeft: roundBL
-                  })
+                  this.drawSmartRoundedRect(
+                    ctx,
+                    offset + col * moduleSize,
+                    offset + row * moduleSize,
+                    moduleSize,
+                    moduleSize,
+                    borderRadius,
+                    {
+                      topLeft: roundTL,
+                      topRight: roundTR,
+                      bottomRight: roundBR,
+                      bottomLeft: roundBL
+                    }
+                  )
                 }
                 roundedCount++
               }
