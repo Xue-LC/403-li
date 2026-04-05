@@ -22,13 +22,47 @@
           <div class="color-picker-group">
             <div class="color-picker">
               <label class="input-label">前景色：</label>
-              <input type="color" v-model="fgColor">
-              <span class="color-value">{{ fgColor }}</span>
+              <div class="color-preview" :style="{ backgroundColor: fgColor }" @click="togglePicker('fg')"></div>
+              <input 
+                type="text" 
+                v-model="fgColor" 
+                @change="validateColor"
+                class="color-input"
+                placeholder="#9dff6b"
+              />
+              <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
+                <div class="preset-colors">
+                  <div 
+                    v-for="color in presetColors" 
+                    :key="color"
+                    class="preset-color"
+                    :style="{ backgroundColor: color }"
+                    @click="selectColor('fg', color)"
+                  ></div>
+                </div>
+              </div>
             </div>
             <div class="color-picker">
               <label class="input-label">背景色：</label>
-              <input type="color" v-model="bgColor">
-              <span class="color-value">{{ bgColor }}</span>
+              <div class="color-preview" :style="{ backgroundColor: bgColor }" @click="togglePicker('bg')"></div>
+              <input 
+                type="text" 
+                v-model="bgColor" 
+                @change="validateColor"
+                class="color-input"
+                placeholder="#0d1117"
+              />
+              <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
+                <div class="preset-colors">
+                  <div 
+                    v-for="color in presetColors" 
+                    :key="color"
+                    class="preset-color"
+                    :style="{ backgroundColor: color }"
+                    @click="selectColor('bg', color)"
+                  ></div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -99,7 +133,7 @@
 
 <script>
 import Topbar from '../components/Topbar.vue'
-import { qrcode } from 'qrcode-generator'
+import QRCode from 'qrcode-generator'
 
 export default {
   name: 'QrCodeTool',
@@ -109,20 +143,49 @@ export default {
   data() {
     return {
       input: '',
-      fgColor: '#9dff6b',  // 网站绿色
-      bgColor: '#0d1117',  // 网站黑色
-      qrStyle: 'square',   // square, dots, rounded
+      fgColor: '#9dff6b',
+      bgColor: '#0d1117',
+      qrStyle: 'square',
       error: '',
       success: '',
-      qrGenerated: false
+      qrGenerated: false,
+      showFgPicker: false,
+      showBgPicker: false,
+      presetColors: [
+        '#9dff6b', '#0d1117', '#ffffff', '#ff8a8a',
+        '#ffd866', '#00f0ff', '#8a9bb8', '#c9d1d9'
+      ]
     }
   },
   methods: {
-    // 智能圆角矩形绘制 - 根据位置自动调整圆角
+    togglePicker(type) {
+      if (type === 'fg') {
+        this.showFgPicker = !this.showFgPicker
+        this.showBgPicker = false
+      } else {
+        this.showBgPicker = !this.showBgPicker
+        this.showFgPicker = false
+      }
+    },
+    selectColor(type, color) {
+      if (type === 'fg') {
+        this.fgColor = color
+        this.showFgPicker = false
+      } else {
+        this.bgColor = color
+        this.showBgPicker = false
+      }
+    },
+    validateColor() {
+      // 简单的 HEX 颜色验证
+      const hex = this.fgColor
+      if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        this.fgColor = '#9dff6b'
+      }
+    },
     drawSmartRoundedRect(ctx, x, y, width, height, radius, corners) {
       ctx.beginPath()
       
-      // 根据 corners 对象决定哪些角需要圆滑
       const topLeft = corners.topLeft ? radius : 0
       const topRight = corners.topRight ? radius : 0
       const bottomRight = corners.bottomRight ? radius : 0
@@ -144,6 +207,8 @@ export default {
       this.error = ''
       this.success = ''
       this.qrGenerated = false
+      this.showFgPicker = false
+      this.showBgPicker = false
       
       if (!this.input.trim()) {
         this.error = '请输入要生成二维码的内容'
@@ -151,75 +216,47 @@ export default {
       }
       
       try {
-        console.log('[QrCode] generate() called, qrStyle:', this.qrStyle)
+        const qr = QRCode(0, 'M')
+        qr.addData(this.input.trim())
+        qr.make()
+        
+        const pixelRatio = 4
+        const displaySize = 400
+        const size = displaySize * pixelRatio
+        const moduleCount = qr.modules.length
+        const margin = 2
+        const totalModules = moduleCount + margin * 2
+        const moduleSize = Math.floor(size / totalModules)
+        const qrSize = moduleCount * moduleSize
+        const offset = Math.round((size - qrSize) / 2)
+        
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 使用 3x 分辨率提高清晰度
-        const pixelRatio = 4
-        const displaySize = 400
-        const size = displaySize * pixelRatio  // 1200
-        
-        // 设置 Canvas 尺寸（高分辨率）
         canvas.width = size
         canvas.height = size
-        
-        // CSS 限制显示尺寸
         canvas.style.width = displaySize + 'px'
         canvas.style.height = displaySize + 'px'
         canvas.style.maxWidth = '100%'
         canvas.style.height = 'auto'
         
-        // 填充背景
         ctx.fillStyle = this.bgColor
         ctx.fillRect(0, 0, size, size)
-        
-        // 生成二维码数据
-        const qr = qrcode(0, 'M')
-        qr.addData(this.input.trim())
-        qr.make()
-        
-        const moduleCount = qr.getModuleCount()
-        const margin = 2
-        
-        // 计算整数模块尺寸，避免小数缝隙
-        const totalModules = moduleCount + margin * 2
-        const moduleSize = Math.floor(size / totalModules)
-        
-        // 重新计算实际二维码大小
-        const qrSize = moduleCount * moduleSize
-        
-        // 居中偏移
-        const offset = Math.round((size - qrSize) / 2)
-        
-        // 设置前景色
         ctx.fillStyle = this.fgColor
         
-        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size, 'offset:', offset)
-        
-        // 根据样式绘制二维码模块
         let squareCount = 0, dotsCount = 0, roundedCount = 0
+        
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
-              // 使用整数坐标
               const x = Math.round(offset + col * moduleSize)
               const y = Math.round(offset + row * moduleSize)
-              const w = Math.round(moduleSize)
-              const h = Math.round(moduleSize)
               
               if (this.qrStyle === 'square') {
-                // 方形点阵 - 确保所有坐标和尺寸都是整数，避免缝隙
                 const size = Math.round(moduleSize)
-                ctx.fillRect(
-                  Math.round(x),
-                  Math.round(y),
-                  size,
-                  size
-                )
+                ctx.fillRect(x, y, size, size)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点 - 确保整数半径和坐标，点几乎相连
                 const radius = Math.round(moduleSize * 0.48)
                 ctx.beginPath()
                 ctx.arc(
@@ -232,17 +269,14 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 智能圆角 - 检查相邻模块，避免内部缝隙
                 const hasTop = row > 0 && qr.isDark(row - 1, col)
                 const hasBottom = row < moduleCount - 1 && qr.isDark(row + 1, col)
                 const hasLeft = col > 0 && qr.isDark(row, col - 1)
                 const hasRight = col < moduleCount - 1 && qr.isDark(row, col + 1)
                 
-                // 如果四个方向都有模块，绘制矩形（无缝）
                 if (hasTop && hasBottom && hasLeft && hasRight) {
                   ctx.fillRect(x, y, Math.round(moduleSize), Math.round(moduleSize))
                 } else {
-                  // 否则绘制智能圆角
                   const radius = Math.round(moduleSize * 0.3)
                   this.drawSmartRoundedRect(ctx, x, y, Math.round(moduleSize), Math.round(moduleSize), radius, {
                     topLeft: !hasTop && !hasLeft,
@@ -250,12 +284,13 @@ export default {
                     bottomRight: !hasBottom && !hasRight,
                     bottomLeft: !hasBottom && !hasLeft
                   })
+                  roundedCount++
                 }
-                roundedCount++
               }
             }
           }
         }
+        
         console.log('[QrCode] Drawn:', { square: squareCount, dots: dotsCount, rounded: roundedCount })
         
         this.qrGenerated = true
@@ -294,6 +329,8 @@ export default {
       this.error = ''
       this.success = ''
       this.qrGenerated = false
+      this.showFgPicker = false
+      this.showBgPicker = false
       
       const canvas = this.$refs.qrCanvas
       if (canvas) {
@@ -301,6 +338,12 @@ export default {
         ctx.clearRect(0, 0, canvas.width, canvas.height)
       }
     }
+  },
+  mounted() {
+    document.addEventListener('click', () => {
+      this.showFgPicker = false
+      this.showBgPicker = false
+    })
   }
 }
 </script>
@@ -314,7 +357,6 @@ export default {
   padding: 12px 0 20px;
 }
 
-/* === Pane === */
 .pane {
   margin-top: 12px;
   border: 1px solid var(--line);
@@ -356,7 +398,6 @@ export default {
   margin-top: 1rem;
 }
 
-/* === Input Label === */
 .input-label {
   color: var(--green);
   display: block;
@@ -366,7 +407,6 @@ export default {
   text-transform: uppercase;
 }
 
-/* === Input === */
 .code-input {
   width: 100%;
   background: var(--panel-2);
@@ -384,7 +424,6 @@ export default {
   box-shadow: 0 0 20px var(--green-glow);
 }
 
-/* === Color Picker Group === */
 .color-picker-group {
   display: flex;
   gap: 20px;
@@ -395,24 +434,72 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 
-.color-picker input[type="color"] {
+.color-preview {
   width: 50px;
   height: 40px;
-  border: none;
+  border: 1px solid var(--line);
   border-radius: 0;
   cursor: pointer;
-  background: transparent;
+  transition: transform 0.2s;
 }
 
-.color-value {
+.color-preview:hover {
+  transform: scale(1.05);
+  border-color: var(--green);
+}
+
+.color-input {
+  width: 100px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--text);
   font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-dim);
+  font-size: 13px;
+  padding: 8px;
 }
 
-/* === Style Selector === */
+.color-input:focus {
+  outline: 0;
+  border-color: var(--green);
+}
+
+.color-picker-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  margin-top: 8px;
+}
+
+.preset-colors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.preset-color {
+  width: 100%;
+  height: 30px;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.preset-color:hover {
+  transform: scale(1.1);
+  border-color: var(--green);
+}
+
 .style-selector {
   margin: 1rem 0;
 }
@@ -451,7 +538,6 @@ export default {
   box-shadow: 0 0 20px var(--green-glow);
 }
 
-/* === Button Group === */
 .button-group {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -509,7 +595,6 @@ export default {
   grid-column: 1 / -1;
 }
 
-/* === QR Output === */
 .qr-output {
   display: flex;
   justify-content: center;
@@ -518,18 +603,16 @@ export default {
   background: rgba(255,255,255,0.02);
   border-radius: 8px;
   margin-top: 1rem;
-  min-height: 320px;
+  min-height: 420px;
   position: relative;
+  overflow: hidden;
 }
 
 .qr-output canvas {
-  max-width: 400px;
+  max-width: 100%;
   width: auto;
   height: auto;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
+  image-rendering: auto;
 }
 
 .qr-placeholder {
@@ -539,7 +622,6 @@ export default {
   font-size: 14px;
 }
 
-/* === Status Messages === */
 .status-error {
   color: var(--red);
   margin-top: 1rem;
@@ -552,7 +634,7 @@ export default {
 
 .status-success {
   color: var(--green);
-  built: 1rem;
+  margin-top: 1rem;
   font-family: var(--mono);
   font-size: 13px;
   padding: 10px 12px;
@@ -560,7 +642,6 @@ export default {
   background: var(--green-soft);
 }
 
-/* === Responsive === */
 @media (max-width: 640px) {
   .qr-code-tool {
     width: 100%;
