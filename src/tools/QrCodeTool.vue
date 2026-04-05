@@ -400,10 +400,10 @@ export default {
 .color-picker input[type="color"] {
   width: 50px;
   height: 40px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
+  border: none;
+  border-radius: 0;
   cursor: pointer;
-  background: var(--panel-2);
+  background: transparent;
 }
 
 .color-value {
@@ -435,7 +435,7 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   min-height: 44px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .style-btn:hover {
