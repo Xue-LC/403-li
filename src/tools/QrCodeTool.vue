@@ -190,10 +190,15 @@ export default {
         
         const moduleCount = qr.getModuleCount()
         const margin = 2
-        const qrSize = moduleCount * (size / (moduleCount + margin * 2))
-        const moduleSize = size / (moduleCount + margin * 2)
         
-        // 居中绘制，使用 Math.round 避免缝隙
+        // 计算整数模块尺寸，避免小数缝隙
+        const totalModules = moduleCount + margin * 2
+        const moduleSize = Math.floor(size / totalModules)
+        
+        // 重新计算实际二维码大小
+        const qrSize = moduleCount * moduleSize
+        
+        // 居中偏移
         const offset = Math.round((size - qrSize) / 2)
         
         // 设置前景色
@@ -206,21 +211,23 @@ export default {
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
-              // 使用 Math.round 确保位置精确，避免缝隙
+              // 使用整数坐标
               const x = Math.round(offset + col * moduleSize)
               const y = Math.round(offset + row * moduleSize)
+              const w = Math.round(moduleSize)
+              const h = Math.round(moduleSize)
               
               if (this.qrStyle === 'square') {
                 // 方形点阵
-                ctx.fillRect(x, y, Math.round(moduleSize), Math.round(moduleSize))
+                ctx.fillRect(x, y, w, h)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点 - 半径 0.48 确保点之间有小间隙
-                const radius = moduleSize * 0.48
+                // 圆点：使用整数坐标，半径确保是整数
+                const radius = Math.round(moduleSize * 0.48)
                 ctx.beginPath()
                 ctx.arc(
-                  x + moduleSize / 2,
-                  y + moduleSize / 2,
+                  x + w / 2,
+                  y + h / 2,
                   radius,
                   0,
                   Math.PI * 2
@@ -228,13 +235,13 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 智能圆角方形
-                const radius = moduleSize * 0.3
+                // 智能圆角：使用整数半径
+                const radius = Math.round(moduleSize * 0.3)
                 // 检测是否是定位点（finder pattern）
                 const isCorner = (row < 7 && col < 7) || 
                                  (row < 7 && col >= moduleCount - 7) || 
                                  (row >= moduleCount - 7 && col < 7)
-                this.drawSmartRoundedRect(ctx, x, y, Math.round(moduleSize), Math.round(moduleSize), radius, isCorner)
+                this.drawSmartRoundedRect(ctx, x, y, w, h, radius, isCorner)
                 roundedCount++
               }
             }
