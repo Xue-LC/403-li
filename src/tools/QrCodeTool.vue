@@ -19,20 +19,36 @@
             class="code-input"
           ></textarea>
           
+          <div class="color-picker-group">
+            <div class="color-picker">
+              <label class="input-label">前景色：</label>
+              <input type="color" v-model="fgColor">
+              <span class="color-value">{{ fgColor }}</span>
+            </div>
+            <div class="color-picker">
+              <label class="input-label">背景色：</label>
+              <input type="color" v-model="bgColor">
+              <span class="color-value">{{ bgColor }}</span>
+            </div>
+          </div>
+          
           <div class="button-group">
-            <button @click="generate" class="button primary" :disabled="!input.trim()">
-              📱 生成
+            <button class="button primary" @click="generate" :disabled="!input.trim()">
+              📱 生成二维码
             </button>
-            <button @click="download" class="button" :disabled="!qrGenerated">
-              💾 下载
+            <button class="button" @click="download" :disabled="!qrGenerated">
+              💾 下载图片
             </button>
-            <button @click="clear" class="button danger">
+            <button class="button danger full-width" @click="clear">
               🗑️ 清空
             </button>
           </div>
           
-          <div class="output-area" v-show="qrGenerated">
-            <div ref="qrContainer" class="qr-wrapper"></div>
+          <div class="qr-output">
+            <canvas ref="qrCanvas" v-show="qrGenerated"></canvas>
+            <div v-if="!qrGenerated" class="qr-placeholder">
+              <p>二维码将显示在这里</p>
+            </div>
           </div>
           
           <div v-if="error" class="status-error">
@@ -40,7 +56,7 @@
           </div>
           
           <div v-if="success" class="status-success">
-            ✅ 二维码生成成功！
+            ✅ {{ success }}
           </div>
         </div>
       </div>
@@ -56,7 +72,7 @@
 
 <script>
 import Topbar from '../components/Topbar.vue'
-import qrcode from 'qrcode-generator'
+import QRCode from 'qrcode'
 
 export default {
   name: 'QrCodeTool',
@@ -66,14 +82,15 @@ export default {
   data() {
     return {
       input: '',
+      fgColor: '#9dff6b',  // 网站绿色
+      bgColor: '#0d1117',  // 网站黑色
       error: '',
       success: '',
-      qrGenerated: false,
-      qrCodeInstance: null
+      qrGenerated: false
     }
   },
   methods: {
-    generate() {
+    async generate() {
       this.error = ''
       this.success = ''
       this.qrGenerated = false
@@ -84,22 +101,18 @@ export default {
       }
       
       try {
-        // 清空容器
-        this.$refs.qrContainer.innerHTML = ''
-        
-        // 生成二维码 - 使用 qrcode-generator
-        const qr = qrcode(0, 'M') // 0=自动版本，M=纠错级别
-        qr.addData(this.input.trim())
-        qr.make()
-        
-        // 获取 SVG 并渲染
-        const svg = qr.createSvgTag()
-        this.$refs.qrContainer.innerHTML = svg
+        const canvas = this.$refs.qrCanvas
+        await QRCode.toCanvas(canvas, this.input.trim(), {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: this.fgColor,
+            light: this.bgColor
+          }
+        })
         
         this.qrGenerated = true
         this.success = '二维码生成成功！'
-        
-        // 3 秒后清除成功提示
         setTimeout(() => {
           this.success = ''
         }, 3000)
@@ -115,36 +128,16 @@ export default {
       }
       
       try {
-        // qrcode-generator 生成的是 SVG，需要转换为 PNG
-        const svg = this.$refs.qrContainer.querySelector('svg')
-        if (!svg) {
-          this.error = '无法获取 SVG 二维码'
-          return
-        }
+        const canvas = this.$refs.qrCanvas
+        const link = document.createElement('a')
+        link.download = 'qrcode-' + Date.now() + '.png'
+        link.href = canvas.toDataURL('image/png')
+        link.click()
         
-        const svgData = new XMLSerializer().serializeToString(svg)
-        const canvas = document.createElement('canvas')
-        const ctx = canvas.getContext('2d')
-        const img = new Image()
-        
-        img.onload = () => {
-          ctx.drawImage(img, 0, 0)
-          const link = document.createElement('a')
-          link.download = 'qrcode-' + Date.now() + '.png'
-          link.href = canvas.toDataURL('image/png')
-          link.click()
-          
-          this.success = '下载已开始！'
-          setTimeout(() => {
-            this.success = ''
-          }, 3000)
-        }
-        
-        img.onerror = () => {
-          this.error = '图片转换失败'
-        }
-        
-        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)))
+        this.success = '下载已开始！'
+        setTimeout(() => {
+          this.success = ''
+        }, 3000)
       } catch (e) {
         this.error = '下载失败：' + e.message
       }
@@ -154,11 +147,11 @@ export default {
       this.error = ''
       this.success = ''
       this.qrGenerated = false
-      this.qrCodeInstance = null
       
-      // 清空容器
-      if (this.$refs.qrContainer) {
-        this.$refs.qrContainer.innerHTML = ''
+      const canvas = this.$refs.qrCanvas
+      if (canvas) {
+        const ctx = canvas.getContext('2d')
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
       }
     }
   }
@@ -216,6 +209,7 @@ export default {
   margin-top: 1rem;
 }
 
+/* === Input Label === */
 .input-label {
   color: var(--green);
   display: block;
@@ -225,20 +219,16 @@ export default {
   text-transform: uppercase;
 }
 
+/* === Input === */
 .code-input {
   width: 100%;
-  max-width: 100%;
+  background: var(--panel-2);
   border: 1px solid var(--line);
-  background: rgba(18,22,27,0.94);
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px;
   padding: 12px;
   resize: vertical;
-  transition: all 0.2s;
-  border-radius: 0;
-  box-sizing: border-box;
-  min-height: 150px;
 }
 
 .code-input:focus {
@@ -247,10 +237,35 @@ export default {
   box-shadow: 0 0 20px var(--green-glow);
 }
 
-.code-input::placeholder {
-  color: var(--dim);
+/* === Color Picker Group === */
+.color-picker-group {
+  display: flex;
+  gap: 20px;
+  margin: 1rem 0;
 }
 
+.color-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-picker input[type="color"] {
+  width: 50px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--panel-2);
+}
+
+.color-value {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* === Button Group === */
 .button-group {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -259,28 +274,23 @@ export default {
 }
 
 .button {
-  border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,0.02);
-  color: var(--text);
+  padding: 10px 16px;
   font-family: var(--mono);
   font-size: 13px;
-  padding: 0;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
   cursor: pointer;
   transition: all 0.2s;
-  text-transform: uppercase;
-  border-radius: 0;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  min-height: 44px;
 }
 
 .button:hover:not(:disabled) {
   border-color: var(--green);
   background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
   color: var(--green);
-  box-shadow: 0 0 15px var(--green-glow);
 }
 
 .button:disabled {
@@ -289,13 +299,13 @@ export default {
 }
 
 .button.primary {
-  border-color: var(--green);
   background: var(--green-soft);
+  border-color: var(--green);
   color: var(--green);
 }
 
 .button.primary:hover:not(:disabled) {
-  background: rgba(157,255,107,0.2);
+  background: #9dff6b33;
   box-shadow: 0 0 20px var(--green-glow);
 }
 
@@ -305,37 +315,48 @@ export default {
 }
 
 .button.danger:hover:not(:disabled) {
-  background: rgba(255,107,125,0.1);
-  box-shadow: 0 0 15px rgba(255,107,125,0.3);
+  background: #ff6b7d1a;
+  box-shadow: 0 0 15px #ff6b7d4d;
 }
 
-.output-area {
-  margin: 1.5rem 0;
+.button.full-width {
+  grid-column: 1 / -1;
+}
+
+/* === QR Output === */
+.qr-output {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  margin-top: 1rem;
+  min-height: 320px;
+  position: relative;
 }
 
-.qr-wrapper {
-  padding: 20px;
-  background: rgba(255,255,255,0.95);
-  border: 1px solid var(--line);
-  border-radius: 4px;
+.qr-output canvas {
+  max-width: 100%;
+  height: auto;
 }
 
-.qr-wrapper :deep(canvas),
-.qr-wrapper :deep(img) {
-  display: block;
+.qr-placeholder {
+  position: absolute;
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 14px;
 }
 
+/* === Status Messages === */
 .status-error {
   color: var(--red);
   margin-top: 1rem;
   font-family: var(--mono);
   font-size: 13px;
   padding: 10px 12px;
-  border: 1px solid rgba(255,107,125,0.3);
-  background: rgba(255,107,125,0.05);
+  border: 1px solid rgba(255,107,125,.3);
+  background: #ff6b7d0d;
 }
 
 .status-success {
@@ -344,24 +365,8 @@ export default {
   font-family: var(--mono);
   font-size: 13px;
   padding: 10px 12px;
-  border: 1px solid rgba(157,255,107,0.3);
+  border: 1px solid rgba(157,255,107,.3);
   background: var(--green-soft);
-}
-
-/* === Footer === */
-.footer {
-  margin-top: 12px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.02);
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--dim);
-  text-transform: uppercase;
 }
 
 /* === Responsive === */
@@ -373,73 +378,35 @@ export default {
   }
   
   .pane-body {
-    padding: 12px;
+    padding: 10px;
   }
   
-  .code-input {
-    font-size: 14px;
-    padding: 10px;
-    min-height: 130px;
+  .color-picker-group {
+    flex-direction: column;
+    gap: 10px;
   }
   
   .button-group {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin: 0.75rem 0;
+    grid-template-columns: 1fr 1fr;
   }
   
-  .button {
-    height: 48px;
-    font-size: 13px;
-  }
-  
-  .button:last-child {
+  .button.full-width {
     grid-column: 1 / -1;
   }
   
-  .input-label {
-    font-size: 12px;
-    margin-bottom: 0.4rem;
-  }
-  
-  .status-error, .status-success {
-    font-size: 12px;
-    padding: 8px 10px;
-    margin-top: 0.75rem;
-  }
-  
-  .footer {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-  
-  .qr-wrapper {
-    padding: 15px;
+  .qr-output {
+    padding: 1rem;
+    min-height: 280px;
   }
 }
 
-/* 超小屏幕 */
 @media (max-width: 375px) {
-  .qr-code-tool {
-    padding: 6px 0 14px;
+  .button-group {
+    grid-template-columns: 1fr;
   }
   
-  .pane-body {
-    padding: 8px;
-  }
-  
-  .code-input {
-    font-size: 14px;
-    padding: 8px;
-  }
-  
-  .button {
-    height: 48px;
-    font-size: 12px;
-  }
-  
-  .footer {
-    font-size: 11px;
+  .qr-output {
+    min-height: 250px;
   }
 }
 </style>
