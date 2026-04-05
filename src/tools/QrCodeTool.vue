@@ -211,16 +211,22 @@ export default {
               const y = Math.round(offset + row * moduleSize)
               
               if (this.qrStyle === 'square') {
-                // 方形点阵
-                ctx.fillRect(x, y, Math.round(moduleSize), Math.round(moduleSize))
+                // 方形点阵 - 确保所有坐标和尺寸都是整数，避免缝隙
+                const size = Math.round(moduleSize)
+                ctx.fillRect(
+                  Math.round(x),
+                  Math.round(y),
+                  size,
+                  size
+                )
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点 - 半径 0.48 确保点之间有小间隙
-                const radius = moduleSize * 0.48
+                // 圆点 - 确保整数半径和坐标，点几乎相连
+                const radius = Math.round(moduleSize * 0.48)
                 ctx.beginPath()
                 ctx.arc(
-                  x + moduleSize / 2,
-                  y + moduleSize / 2,
+                  Math.round(x + moduleSize / 2),
+                  Math.round(y + moduleSize / 2),
                   radius,
                   0,
                   Math.PI * 2
@@ -228,13 +234,25 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 智能圆角方形
-                const radius = moduleSize * 0.3
-                // 检测是否是定位点（finder pattern）
-                const isCorner = (row < 7 && col < 7) || 
-                                 (row < 7 && col >= moduleCount - 7) || 
-                                 (row >= moduleCount - 7 && col < 7)
-                this.drawSmartRoundedRect(ctx, x, y, Math.round(moduleSize), Math.round(moduleSize), radius, isCorner)
+                // 智能圆角 - 检查相邻模块，避免内部缝隙
+                const hasTop = row > 0 && qr.isDark(row - 1, col)
+                const hasBottom = row < moduleCount - 1 && qr.isDark(row + 1, col)
+                const hasLeft = col > 0 && qr.isDark(row, col - 1)
+                const hasRight = col < moduleCount - 1 && qr.isDark(row, col + 1)
+                
+                // 如果四个方向都有模块，绘制矩形（无缝）
+                if (hasTop && hasBottom && hasLeft && hasRight) {
+                  ctx.fillRect(x, y, Math.round(moduleSize), Math.round(moduleSize))
+                } else {
+                  // 否则绘制智能圆角
+                  const radius = Math.round(moduleSize * 0.3)
+                  this.drawSmartRoundedRect(ctx, x, y, Math.round(moduleSize), Math.round(moduleSize), radius, {
+                    topLeft: !hasTop && !hasLeft,
+                    topRight: !hasTop && !hasRight,
+                    bottomRight: !hasBottom && !hasRight,
+                    bottomLeft: !hasBottom && !hasLeft
+                  })
+                }
                 roundedCount++
               }
             }
