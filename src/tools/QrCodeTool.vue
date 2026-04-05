@@ -536,7 +536,7 @@ export default {
 
 .status-success {
   color: var(--green);
-  margin-top: 1rem;
+  built: 1rem;
   font-family: var(--mono);
   font-size: 13px;
   padding: 10px 12px;
