@@ -118,18 +118,34 @@ export default {
     }
   },
   methods: {
-    // 绘制圆角矩形
-    drawRoundedRect(ctx, x, y, width, height, radius) {
+    // 智能圆角矩形绘制 - 根据位置自动调整圆角
+    drawSmartRoundedRect(ctx, x, y, width, height, radius, isCorner) {
       ctx.beginPath()
-      ctx.moveTo(x + radius, y)
-      ctx.lineTo(x + width - radius, y)
-      ctx.quadraticCurveTo(x + width, y, x + width, y + radius)
-      ctx.lineTo(x + width, y + height - radius)
-      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height)
-      ctx.lineTo(x + radius, y + height)
-      ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
-      ctx.lineTo(x, y + radius)
-      ctx.quadraticCurveTo(x, y, x + radius, y)
+      
+      // 默认所有角都圆滑
+      let topLeft = radius
+      let topRight = radius
+      let bottomRight = radius
+      let bottomLeft = radius
+      
+      // 如果是定位点（finder pattern），使用特殊处理
+      if (isCorner) {
+        // 定位点保持较大圆角
+        topLeft = radius * 1.5
+        topRight = radius * 1.5
+        bottomRight = radius * 1.5
+        bottomLeft = radius * 1.5
+      }
+      
+      ctx.moveTo(x + topLeft, y)
+      ctx.lineTo(x + width - topRight, y)
+      ctx.quadraticCurveTo(x + width, y, x + width, y + topRight)
+      ctx.lineTo(x + width, y + height - bottomRight)
+      ctx.quadraticCurveTo(x + width, y + height, x + width - bottomRight, y + height)
+      ctx.lineTo(x + bottomLeft, y + height)
+      ctx.quadraticCurveTo(x, y + height, x, y + height - bottomLeft)
+      ctx.lineTo(x, y + topLeft)
+      ctx.quadraticCurveTo(x, y, x + topLeft, y)
       ctx.closePath()
       ctx.fill()
     },
@@ -148,18 +164,18 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 使用 2x 分辨率提高清晰度
-        const pixelRatio = 2  // 2x 分辨率
-        const displaySize = 300  // 显示尺寸
-        const size = displaySize * pixelRatio  // 实际分辨率 600
+        // 使用 3x 分辨率提高清晰度
+        const pixelRatio = 3
+        const displaySize = 400
+        const size = displaySize * pixelRatio  // 1200
         
         // 设置 Canvas 尺寸（高分辨率）
-        canvas.width = size  // 600
-        canvas.height = size  // 600
+        canvas.width = size
+        canvas.height = size
         
         // CSS 限制显示尺寸
-        canvas.style.width = displaySize + 'px'  // 300px
-        canvas.style.height = displaySize + 'px'  // 300px
+        canvas.style.width = displaySize + 'px'
+        canvas.style.height = displaySize + 'px'
         canvas.style.maxWidth = '100%'
         canvas.style.height = 'auto'
         
@@ -168,35 +184,39 @@ export default {
         ctx.fillRect(0, 0, size, size)
         
         // 生成二维码数据
-        const qr = qrcode(0, 'M') // 0=自动版本，M=纠错级别
+        const qr = qrcode(0, 'M')
         qr.addData(this.input.trim())
         qr.make()
         
         const moduleCount = qr.getModuleCount()
-        const margin = 2 // 边距模块数
-        const totalModules = moduleCount + margin * 2
-        const moduleSize = size / totalModules
+        const margin = 2
+        const qrSize = moduleCount * (size / (moduleCount + margin * 2))
+        const moduleSize = size / (moduleCount + margin * 2)
+        
+        // 居中绘制，使用 Math.round 避免缝隙
+        const offset = Math.round((size - qrSize) / 2)
         
         // 设置前景色
         ctx.fillStyle = this.fgColor
         
-        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size)
+        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size, 'offset:', offset)
         
         // 根据样式绘制二维码模块
         let squareCount = 0, dotsCount = 0, roundedCount = 0
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
-              const x = (col + margin) * moduleSize
-              const y = (row + margin) * moduleSize
+              // 使用 Math.round 确保位置精确，避免缝隙
+              const x = Math.round(offset + col * moduleSize)
+              const y = Math.round(offset + row * moduleSize)
               
               if (this.qrStyle === 'square') {
                 // 方形点阵
-                ctx.fillRect(x, y, moduleSize, moduleSize)
+                ctx.fillRect(x, y, Math.round(moduleSize), Math.round(moduleSize))
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点
-                const radius = moduleSize / 2 * 0.9
+                // 圆点 - 半径 0.48 确保点之间有小间隙
+                const radius = moduleSize * 0.48
                 ctx.beginPath()
                 ctx.arc(
                   x + moduleSize / 2,
@@ -208,9 +228,13 @@ export default {
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
-                // 圆角方形
+                // 智能圆角方形
                 const radius = moduleSize * 0.3
-                this.drawRoundedRect(ctx, x, y, moduleSize, moduleSize, radius)
+                // 检测是否是定位点（finder pattern）
+                const isCorner = (row < 7 && col < 7) || 
+                                 (row < 7 && col >= moduleCount - 7) || 
+                                 (row >= moduleCount - 7 && col < 7)
+                this.drawSmartRoundedRect(ctx, x, y, Math.round(moduleSize), Math.round(moduleSize), radius, isCorner)
                 roundedCount++
               }
             }
@@ -483,7 +507,7 @@ export default {
 }
 
 .qr-output canvas {
-  max-width: 300px;  /* 限制最大宽度 */
+  max-width: 400px;
   width: auto;
   height: auto;
   image-rendering: -moz-crisp-edges;
