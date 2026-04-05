@@ -190,10 +190,15 @@ export default {
         
         const moduleCount = qr.getModuleCount()
         const margin = 2
-        const qrSize = moduleCount * (size / (moduleCount + margin * 2))
-        const moduleSize = size / (moduleCount + margin * 2)
         
-        // 居中绘制，使用 Math.round 避免缝隙
+        // 计算整数模块尺寸，避免小数缝隙
+        const totalModules = moduleCount + margin * 2
+        const moduleSize = Math.floor(size / totalModules)
+        
+        // 重新计算实际二维码大小
+        const qrSize = moduleCount * moduleSize
+        
+        // 居中偏移
         const offset = Math.round((size - qrSize) / 2)
         
         // 设置前景色
@@ -206,9 +211,11 @@ export default {
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
-              // 使用 Math.round 确保位置精确，避免缝隙
+              // 使用整数坐标
               const x = Math.round(offset + col * moduleSize)
               const y = Math.round(offset + row * moduleSize)
+              const w = Math.round(moduleSize)
+              const h = Math.round(moduleSize)
               
               if (this.qrStyle === 'square') {
                 // 方形点阵 - 确保所有坐标和尺寸都是整数，避免缝隙
