@@ -148,18 +148,14 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 获取屏幕宽度，动态设置尺寸
-        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 375
-        const maxSize = Math.min(300, screenWidth - 80)  // 最大 300，减去边距
-        
-        // 直接使用合适尺寸，不缩放
-        const size = maxSize
+        // 使用固定高分辨率，确保清晰
+        const size = 400  // 固定 400x400，足够清晰
         
         // 设置 Canvas 尺寸
         canvas.width = size
         canvas.height = size
         
-        // 移除 CSS 缩放
+        // CSS 样式让浏览器自适应缩放
         canvas.style.width = ''
         canvas.style.height = ''
         canvas.style.maxWidth = '100%'
@@ -177,7 +173,7 @@ export default {
         const moduleCount = qr.getModuleCount()
         const margin = 2 // 边距模块数
         const totalModules = moduleCount + margin * 2
-        const moduleSize = size / totalModules
+        const moduleSize = Math.floor(size / totalModules)  // 取整，避免小数
         
         // 设置前景色
         ctx.fillStyle = this.fgColor
@@ -189,28 +185,27 @@ export default {
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
-              const x = (col + margin) * moduleSize
-              const y = (row + margin) * moduleSize
-              
               if (this.qrStyle === 'square') {
-                // 方形点阵
-                ctx.fillRect(x, y, moduleSize, moduleSize)
+                // 方形：使用整数尺寸，确保无缝
+                const x = Math.floor((col + margin) * moduleSize)
+                const y = Math.floor((row + margin) * moduleSize)
+                const w = Math.ceil(moduleSize)  // 向上取整，确保覆盖
+                const h = Math.ceil(moduleSize)
+                ctx.fillRect(x, y, w, h)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点
-                const radius = moduleSize / 2 * 0.9
+                // 圆点：稍微缩小一点，避免边缘锯齿
+                const centerX = (col + margin) * moduleSize + moduleSize / 2
+                const centerY = (row + margin) * moduleSize + moduleSize / 2
+                const radius = (moduleSize / 2) * 0.85  // 85% 而不是 90%
                 ctx.beginPath()
-                ctx.arc(
-                  x + moduleSize / 2,
-                  y + moduleSize / 2,
-                  radius,
-                  0,
-                  Math.PI * 2
-                )
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
                 // 圆角方形
+                const x = (col + margin) * moduleSize
+                const y = (row + margin) * moduleSize
                 const radius = moduleSize * 0.3
                 this.drawRoundedRect(ctx, x, y, moduleSize, moduleSize, radius)
                 roundedCount++
@@ -488,7 +483,7 @@ export default {
   max-width: 100%;
   width: auto;
   height: auto;
-  image-rendering: auto;  /* 让浏览器平滑处理 */
+  /* 移除 image-rendering，让浏览器默认处理 */
 }
 
 .qr-placeholder {
