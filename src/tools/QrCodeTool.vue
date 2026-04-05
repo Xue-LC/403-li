@@ -148,12 +148,20 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 直接使用 300x300 分辨率
-        const size = 300
+        // 使用 2x 分辨率提高清晰度
+        const pixelRatio = 2  // 2x 分辨率
+        const displaySize = 300  // 显示尺寸
+        const size = displaySize * pixelRatio  // 实际分辨率 600
         
-        // 设置 Canvas 尺寸
-        canvas.width = size
-        canvas.height = size
+        // 设置 Canvas 尺寸（高分辨率）
+        canvas.width = size  // 600
+        canvas.height = size  // 600
+        
+        // CSS 限制显示尺寸
+        canvas.style.width = displaySize + 'px'  // 300px
+        canvas.style.height = displaySize + 'px'  // 300px
+        canvas.style.maxWidth = '100%'
+        canvas.style.height = 'auto'
         
         // 填充背景
         ctx.fillStyle = this.bgColor
