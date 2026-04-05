@@ -179,16 +179,18 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 使用固定高分辨率，确保清晰
-        const size = 400  // 固定 400x400，足够清晰
+        // 使用 3x 分辨率，确保超清晰
+        const pixelRatio = 3  // 3x 分辨率
+        const displaySize = 400  // 显示尺寸
+        const size = displaySize * pixelRatio  // 实际分辨率 1200
         
-        // 设置 Canvas 尺寸
-        canvas.width = size
-        canvas.height = size
+        // 设置 Canvas 尺寸（高分辨率）
+        canvas.width = size  // 1200
+        canvas.height = size  // 1200
         
-        // CSS 样式让浏览器自适应缩放
-        canvas.style.width = ''
-        canvas.style.height = ''
+        // CSS 限制显示尺寸
+        canvas.style.width = displaySize + 'px'  // 400px
+        canvas.style.height = displaySize + 'px'  // 400px
         canvas.style.maxWidth = '100%'
         canvas.style.height = 'auto'
         
@@ -204,33 +206,26 @@ export default {
         const moduleCount = qr.getModuleCount()
         const margin = 2 // 边距模块数
         const totalModules = moduleCount + margin * 2
-        const moduleSize = Math.floor(size / totalModules)  // 取整，避免小数
+        const moduleSize = size / totalModules  // 使用高分辨率计算（可以是小数）
         
         // 设置前景色
         ctx.fillStyle = this.fgColor
         
-        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size)
+        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'size:', size, 'pixelRatio:', pixelRatio)
         
-        // 根据样式绘制二维码模块
+        // 根据样式绘制二维码模块 - 所有绘制都使用高分辨率的 moduleSize
         let squareCount = 0, dotsCount = 0, roundedCount = 0
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
               if (this.qrStyle === 'square') {
-                // 方形：使用整数尺寸，确保无缝
-                const x = Math.floor((col + margin) * moduleSize)
-                const y = Math.floor((row + margin) * moduleSize)
-                const w = Math.ceil(moduleSize)  // 向上取整，确保覆盖
-                const h = Math.ceil(moduleSize)
-                ctx.fillRect(x, y, w, h)
+                // 方形：使用高分辨率的 moduleSize
+                ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize, moduleSize)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点：稍微缩小一点，避免边缘锯齿
-                const centerX = (col + margin) * moduleSize + moduleSize / 2
-                const centerY = (row + margin) * moduleSize + moduleSize / 2
-                const radius = (moduleSize / 2) * 0.85  // 85% 而不是 90%
-                ctx.beginPath()
-                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2)
+                // 圆点：使用高分辨率的 moduleSize
+                const radius = moduleSize / 2 * 0.85
+                ctx.arc(col * moduleSize + moduleSize / 2, row * moduleSize + moduleSize / 2, radius, 0, Math.PI * 2)
                 ctx.fill()
                 dotsCount++
               } else if (this.qrStyle === 'rounded') {
@@ -240,13 +235,11 @@ export default {
                 const hasLeft = col > 0 && qr.isDark(row, col - 1)
                 const hasRight = col < moduleCount - 1 && qr.isDark(row, col + 1)
                 
-                const x = (col + margin) * moduleSize
-                const y = (row + margin) * moduleSize
                 const borderRadius = moduleSize * 0.3
                 
                 // 如果四个方向都有模块，绘制完整矩形（无缝）
                 if (hasTop && hasBottom && hasLeft && hasRight) {
-                  ctx.fillRect(x, y, moduleSize, moduleSize)
+                  ctx.fillRect(col * moduleSize, row * moduleSize, moduleSize, moduleSize)
                 } else {
                   // 否则绘制智能圆角矩形
                   // 只有没有相邻的方向才需要圆角
@@ -255,7 +248,7 @@ export default {
                   const roundBR = !hasBottom && !hasRight // 右下角
                   const roundBL = !hasBottom && !hasLeft // 左下角
                   
-                  this.drawSmartRoundedRect(ctx, x, y, moduleSize, moduleSize, borderRadius, {
+                  this.drawSmartRoundedRect(ctx, col * moduleSize, row * moduleSize, moduleSize, moduleSize, borderRadius, {
                     topLeft: roundTL,
                     topRight: roundTR,
                     bottomRight: roundBR,
