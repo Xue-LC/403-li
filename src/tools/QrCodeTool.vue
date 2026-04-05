@@ -209,9 +209,9 @@ export default {
         const totalModules = moduleCount + margin * 2
         const moduleSize = size / totalModules  // 使用高分辨率计算（可以是小数）
         
-        // 计算居中偏移量
+        // 计算居中偏移量（使用 Math.round 确保是整数，避免亚像素渲染导致的缝隙）
         const qrSize = moduleCount * moduleSize
-        const offset = (size - qrSize) / 2
+        const offset = Math.round((size - qrSize) / 2)
         
         // 设置前景色
         ctx.fillStyle = this.fgColor
@@ -228,8 +228,8 @@ export default {
                 ctx.fillRect(offset + col * moduleSize, offset + row * moduleSize, moduleSize, moduleSize)
                 squareCount++
               } else if (this.qrStyle === 'dots') {
-                // 圆点：使用高分辨率的 moduleSize 和 offset，确保半径不超过模块大小的一半
-                const radius = moduleSize * 0.4  // 40% 的模块大小，确保圆点独立不相连
+                // 圆点：使用高分辨率的 moduleSize 和 offset，半径改为 48% 让圆点几乎相连
+                const radius = moduleSize * 0.48  // 48% 的模块大小，圆点几乎相连但保持独立
                 ctx.beginPath()
                 ctx.arc(
                   offset + col * moduleSize + moduleSize / 2,  // 中心 X
