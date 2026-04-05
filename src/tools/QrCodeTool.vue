@@ -156,7 +156,7 @@ export default {
         const ctx = canvas.getContext('2d')
         
         // 使用 3x 分辨率提高清晰度
-        const pixelRatio = 3
+        const pixelRatio = 4
         const displaySize = 400
         const size = displaySize * pixelRatio  // 1200
         
