@@ -148,18 +148,20 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 使用 2x 分辨率提高清晰度
-        const pixelRatio = 2  // 2x 分辨率
-        const displaySize = 300  // 显示尺寸
-        const size = displaySize * pixelRatio  // 实际分辨率 600
+        // 获取屏幕宽度，动态设置尺寸
+        const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 375
+        const maxSize = Math.min(300, screenWidth - 80)  // 最大 300，减去边距
         
-        // 设置 Canvas 尺寸（高分辨率）
-        canvas.width = size  // 600
-        canvas.height = size  // 600
+        // 直接使用合适尺寸，不缩放
+        const size = maxSize
         
-        // CSS 限制显示尺寸
-        canvas.style.width = displaySize + 'px'  // 300px
-        canvas.style.height = displaySize + 'px'  // 300px
+        // 设置 Canvas 尺寸
+        canvas.width = size
+        canvas.height = size
+        
+        // 移除 CSS 缩放
+        canvas.style.width = ''
+        canvas.style.height = ''
         canvas.style.maxWidth = '100%'
         canvas.style.height = 'auto'
         
@@ -483,13 +485,10 @@ export default {
 }
 
 .qr-output canvas {
-  max-width: 300px;  /* 限制最大宽度 */
+  max-width: 100%;
   width: auto;
   height: auto;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-  image-rendering: pixelated;
+  image-rendering: auto;  /* 让浏览器平滑处理 */
 }
 
 .qr-placeholder {
