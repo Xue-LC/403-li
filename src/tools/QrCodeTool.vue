@@ -148,10 +148,21 @@ export default {
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
-        // 设置画布尺寸
-        const size = 300
+        // 设置高分辨率 - 提高 Canvas 分辨率以适配高 DPI 屏幕
+        const displaySize = 300  // 显示尺寸
+        const pixelRatio = window.devicePixelRatio || 2  // 设备像素比
+        const size = displaySize * pixelRatio  // 实际分辨率
+        
+        // 设置 Canvas 尺寸（实际分辨率）
         canvas.width = size
         canvas.height = size
+        
+        // 设置 CSS 显示尺寸
+        canvas.style.width = displaySize + 'px'
+        canvas.style.height = displaySize + 'px'
+        
+        // 缩放绘图上下文
+        ctx.scale(pixelRatio, pixelRatio)
         
         // 填充背景
         ctx.fillStyle = this.bgColor
@@ -170,7 +181,7 @@ export default {
         // 设置前景色
         ctx.fillStyle = this.fgColor
         
-        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle)
+        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle, 'pixelRatio:', pixelRatio, 'actualSize:', size)
         
         // 根据样式绘制二维码模块
         let squareCount = 0, dotsCount = 0, roundedCount = 0
@@ -473,8 +484,12 @@ export default {
 }
 
 .qr-output canvas {
-  max-width: 100%;
+  max-width: 300px;  /* 限制显示尺寸 */
   height: auto;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
 }
 
 .qr-placeholder {
