@@ -99,7 +99,7 @@
 
 <script>
 import Topbar from '../components/Topbar.vue'
-import qrcode from 'qrcode-generator'
+import { qrcode } from 'qrcode-generator'
 
 export default {
   name: 'QrCodeTool',
@@ -144,6 +144,7 @@ export default {
       }
       
       try {
+        console.log('[QrCode] generate() called, qrStyle:', this.qrStyle)
         const canvas = this.$refs.qrCanvas
         const ctx = canvas.getContext('2d')
         
@@ -169,7 +170,10 @@ export default {
         // 设置前景色
         ctx.fillStyle = this.fgColor
         
+        console.log('[QrCode] moduleCount:', moduleCount, 'moduleSize:', moduleSize, 'qrStyle:', this.qrStyle)
+        
         // 根据样式绘制二维码模块
+        let squareCount = 0, dotsCount = 0, roundedCount = 0
         for (let row = 0; row < moduleCount; row++) {
           for (let col = 0; col < moduleCount; col++) {
             if (qr.isDark(row, col)) {
@@ -179,6 +183,7 @@ export default {
               if (this.qrStyle === 'square') {
                 // 方形点阵
                 ctx.fillRect(x, y, moduleSize, moduleSize)
+                squareCount++
               } else if (this.qrStyle === 'dots') {
                 // 圆点
                 const radius = moduleSize / 2 * 0.9
@@ -191,14 +196,17 @@ export default {
                   Math.PI * 2
                 )
                 ctx.fill()
+                dotsCount++
               } else if (this.qrStyle === 'rounded') {
                 // 圆角方形
                 const radius = moduleSize * 0.3
                 this.drawRoundedRect(ctx, x, y, moduleSize, moduleSize, radius)
+                roundedCount++
               }
             }
           }
         }
+        console.log('[QrCode] Drawn:', { square: squareCount, dots: dotsCount, rounded: roundedCount })
         
         this.qrGenerated = true
         this.success = '二维码生成成功！'
