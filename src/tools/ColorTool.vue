@@ -134,23 +134,27 @@ export default {
     togglePicker() {
       this.showPicker = !this.showPicker
     },
-    selectSaturationLightness(e) {
-      const rect = e.currentTarget.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width) * 100
-      const y = ((e.clientY - rect.top) / rect.height) * 100
-      this.slThumbX = Math.max(0, Math.min(100, x))
-      this.slThumbY = Math.max(0, Math.min(100, y))
-      this.saturation = this.slThumbX
-      this.lightness = 100 - this.slThumbY
+    selectSaturationLightness(event) {
+      const rect = event.currentTarget.getBoundingClientRect()
+      const x = ((event.clientX - rect.left) / rect.width) * 100
+      const y = ((event.clientY - rect.top) / rect.height) * 100
       
-      // 转换为 RGB
-      const rgb = this.hslToRgb(this.hue, this.saturation, this.lightness)
+      // 限制在 0-100 范围内
+      this.saturation = Math.max(0, Math.min(100, x))
+      this.lightness = Math.max(0, Math.min(100, 100 - y))
+      
+      // 更新滑块位置
+      this.slThumbX = this.saturation
+      this.slThumbY = this.lightness
+      
+      // 转换为 RGB（hslToRgb 需要 s 和 l 为 0-1 的小数）
+      const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
       
       // 保持当前透明度
       const alpha = this.alpha
       
       // 更新所有输入框（保持透明度通道）
-      this.updateAllInputs(rgb.r, rgb.g, rgb.b, alpha)
+      this.updateAllInputs(rgb[0], rgb[1], rgb[2], alpha)
     },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
