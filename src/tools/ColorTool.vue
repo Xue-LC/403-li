@@ -14,7 +14,7 @@
           <!-- 颜色预览 -->
           <div class="color-preview-wrapper">
             <label class="input-label">当前颜色：</label>
-            <div class="color-preview" :style="{ backgroundColor: hexColor }" @click.stop="togglePicker"></div>
+            <div class="color-preview" :style="{ backgroundColor: rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
               <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `hsl(${hue}, 100%, 50%)` }">
@@ -25,15 +25,13 @@
               <div class="hue-slider" @click="selectHue">
                 <div class="hue-thumb" :style="{ left: hueThumbX + '%' }"></div>
               </div>
-              <!-- HEX 输入 -->
-              <div class="hex-input-wrapper">
-                <input 
-                  type="text" 
-                  v-model="hexColor" 
-                  @change="validateColor"
-                  class="hex-input"
-                  placeholder="#9dff6b"
-                />
+              <!-- 透明度滑块 -->
+              <div class="alpha-slider-wrapper">
+                <label class="slider-label">透明度：{{ alpha }}%</label>
+                <div class="alpha-slider" @click="selectAlpha">
+                  <div class="alpha-gradient"></div>
+                  <div class="alpha-thumb" :style="{ left: alphaThumbX + '%' }"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -103,6 +101,7 @@ export default {
       hexColor: '#9dff6b',
       rgbColor: '',
       hslColor: '',
+      alpha: 100,
       error: '',
       showPicker: false,
       // HSL 值
@@ -111,7 +110,16 @@ export default {
       lightness: 50,
       slThumbX: 100,
       slThumbY: 0,
-      hueThumbX: 33
+      hueThumbX: 33,
+      alphaThumbX: 100
+    }
+  },
+  computed: {
+    rgbaColor() {
+      const r = parseInt(this.hexColor.slice(1, 3), 16)
+      const g = parseInt(this.hexColor.slice(3, 5), 16)
+      const b = parseInt(this.hexColor.slice(5, 7), 16)
+      return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     }
   },
   methods: {
@@ -136,6 +144,12 @@ export default {
       this.hue = (this.hueThumbX / 100) * 360
       this.hexColor = this.hslToHex(this.hue, this.saturation, this.lightness)
       this.convertFromHex()
+    },
+    selectAlpha(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      this.alphaThumbX = Math.max(0, Math.min(100, x))
+      this.alpha = Math.round(this.alphaThumbX)
     },
     validateColor() {
       if (!/^#[0-9A-Fa-f]{6}$/.test(this.hexColor)) {
@@ -408,8 +422,8 @@ export default {
 }
 
 .color-preview {
-  width: 80px;
-  height: 60px;
+  width: 100%;
+  height: 80px;
   border: 2px solid var(--line);
   border-radius: 0;
   cursor: pointer;
@@ -433,7 +447,8 @@ export default {
   z-index: 1000;
   box-shadow: 0 4px 20px rgba(0,0,0,0.6);
   margin-top: 8px;
-  width: 280px;
+  width: 100%;
+  min-width: 280px;
 }
 
 .sl-gradient {
@@ -493,25 +508,58 @@ export default {
   box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
-.hex-input-wrapper {
-  margin-bottom: 12px;
+.alpha-slider-wrapper {
+  margin-bottom: 8px;
 }
 
-.hex-input {
-  width: 100%;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-radius: 0;
-  color: var(--text);
+.slider-label {
+  color: var(--green);
   font-family: var(--mono);
-  font-size: 13px;
-  padding: 8px;
+  font-size: 12px;
   text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
 }
 
-.hex-input:focus {
-  outline: 0;
-  border-color: var(--green);
+.alpha-slider {
+  width: 100%;
+  height: 20px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.alpha-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, 
+    rgba(255,255,255,0), 
+    rgba(255,255,255,1));
+  background-image: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%), 
+    linear-gradient(-45deg, #ccc 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #ccc 75%), 
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+
+.alpha-thumb {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
 /* === Input Label === */
