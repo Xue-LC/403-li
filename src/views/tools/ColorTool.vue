@@ -155,8 +155,8 @@ export default {
       this.slThumbX = this.saturation
       this.slThumbY = 100 - this.lightness
       
-      // 转换为 RGB（hslToRgb 需要 s 和 l 为 0-1 的小数）
-      const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
+      // 转换为 RGB（hslToRgb 期望 s 和 l 为 0-100 的百分比值）
+      const rgb = this.hslToRgb(this.hue, this.saturation, this.lightness)
       
       // 保持当前透明度
       const alpha = this.alpha
@@ -489,21 +489,13 @@ export default {
     }
   },
   mounted() {
-    // 初始化时转换一次
+    // 初始化时转换一次（内部已包含滑块位置更新）
     this.convertFromHex()
     
     // 点击外部关闭选择器
     document.addEventListener('click', () => {
       this.showPicker = false
     })
-    
-    // 初始化滑块位置
-    const hsl = this.hexToHsl(this.hexColor)
-    this.hue = hsl.h
-    this.saturation = hsl.s
-    this.lightness = hsl.l
-    this.updateSlThumb()
-    this.updateHueThumb()
   }
 }
 </script>
