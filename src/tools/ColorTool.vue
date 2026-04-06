@@ -17,8 +17,7 @@
             <div class="color-preview" :style="{ '--current-color': rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
-              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `linear-gradient(to bottom, #fff, transparent), linear-gradient(to right, #808080, hsl(${hue}, 100%, 50%)), linear-gradient(to bottom, #000, #fff)` }"> 50%))` }">
-                <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to bottom, transparent, #000);"></div>
+              <div class="sl-gradient" @click="selectSaturationLightness" :style="slGradientStyle">
                 <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
               </div>
               <!-- 色相滑块 -->
@@ -128,6 +127,17 @@ export default {
       const g = parseInt(this.hexColor.slice(3, 5), 16)
       const b = parseInt(this.hexColor.slice(5, 7), 16)
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
+    },
+    slGradientStyle() {
+      // 标准 HSL 饱和度/亮度选择器渐变
+      // 顶层：从左到右 灰色→纯色（控制饱和度）
+      // 底层：从上到下 黑色→白色（控制亮度）
+      return {
+        background: `
+          linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%)),
+          linear-gradient(to bottom, #000, #fff)
+        `
+      }
     }
   },
   methods: {
@@ -140,12 +150,16 @@ export default {
       const y = ((event.clientY - rect.top) / rect.height) * 100
       
       // 限制在 0-100 范围内
+      // X 轴：从左到右 = 饱和度 0% → 100%
+      // Y 轴：从上到下 = 亮度 100% → 0%（上白下黑）
       this.saturation = Math.max(0, Math.min(100, x))
       this.lightness = Math.max(0, Math.min(100, 100 - y))
       
       // 更新圆点位置
+      // slThumbX = 饱和度百分比
+      // slThumbY = (100 - 亮度) 百分比，因为 CSS top 是向下的
       this.slThumbX = this.saturation
-      this.slThumbY = y
+      this.slThumbY = 100 - this.lightness
       
       // 转换为 RGB（hslToRgb 需要 s 和 l 为 0-1 的小数）
       const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
