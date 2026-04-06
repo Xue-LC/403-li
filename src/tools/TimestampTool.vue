@@ -46,7 +46,7 @@
             placeholder="输入日期（如：2024-01-01 12:00:00）"
             class="code-input"
           />
-          <div class="result-display" v-if="dateTimeResult">
+          <div class="result-display" v-if="dateTimeResult && dateTimeResult.seconds">
             秒：{{ dateTimeResult.seconds }}<br>
             毫秒：{{ dateTimeResult.milliseconds }}
           </div>
@@ -256,7 +256,7 @@ export default {
 }
 
 .tool-body {
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 /* === Current Time Display === */
@@ -264,8 +264,8 @@ export default {
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--line);
   border-radius: 0;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
 }
 
 .time-display {
@@ -325,7 +325,8 @@ export default {
 .input-label {
   color: var(--green);
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
   font-family: var(--mono);
   font-size: 13px;
   text-transform: uppercase;
@@ -355,8 +356,8 @@ export default {
   background: var(--green-soft);
   border: 1px solid var(--green);
   border-radius: 0;
-  padding: 10px 12px;
-  margin: 10px 0;
+  padding: 12px 14px;
+  margin: 1rem 0;
   font-family: var(--mono);
   font-size: 14px;
   color: var(--green);
@@ -366,8 +367,8 @@ export default {
 .button-group {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin: 1rem 0;
+  gap: 12px;
+  margin: 1.5rem 0;
 }
 
 .button {
@@ -424,10 +425,10 @@ export default {
 /* === Status Messages === */
 .status-error {
   color: var(--red);
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   font-family: var(--mono);
   font-size: 13px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid rgba(255,107,125,.3);
   background: #ff6b7d0d;
   border-radius: 0;
@@ -435,10 +436,10 @@ export default {
 
 .status-success {
   color: var(--green);
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   font-family: var(--mono);
   font-size: 13px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border: 1px solid rgba(157,255,107,.3);
   background: var(--green-soft);
   border-radius: 0;
