@@ -17,7 +17,7 @@
             <div class="color-preview" :style="{ '--current-color': rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
-              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `hsl(${hue}, 100%, 50%)` }">
+              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `linear-gradient(to right, hsl(${hue}, 0%, 50%), hsl(${hue}, 100%, 50%))` }">
                 <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to bottom, transparent, #000);"></div>
                 <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
               </div>
