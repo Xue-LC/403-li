@@ -143,7 +143,7 @@ export default {
       this.saturation = Math.max(0, Math.min(100, x))
       this.lightness = Math.max(0, Math.min(100, 100 - y))
       
-      // 更新滑块位置
+      // 更新圆点位置
       this.slThumbX = this.saturation
       this.slThumbY = this.lightness
       
@@ -176,6 +176,10 @@ export default {
       
       // 更新透明度滑块位置
       this.alphaThumbX = this.alpha
+      
+      // 更新圆点位置
+      this.slThumbX = this.saturation
+      this.slThumbY = this.lightness
       
       // 使用统一方法更新所有输入
       this.updateAllInputs(rgb.r, rgb.g, rgb.b, this.alpha)
