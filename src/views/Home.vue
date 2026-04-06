@@ -147,10 +147,10 @@ export default {
           id: 6, 
           path: '/tools/hash', 
           name: '哈希计算', 
-          description: '计算 MD5、SHA1、SHA256 等哈希值',
+          description: '计算 MD5、SHA1、SHA256、SHA512 等哈希值',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
-          features: 'MD5 / SHA',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: 'MD5 / SHA1 / SHA256 / SHA512',
           category: 'text' 
         },
         { 
