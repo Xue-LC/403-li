@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './views/Home.vue'
 import Tools from './views/Tools.vue'
-import JsonFormatter from './tools/JsonFormatter.vue'
-import Base64Tool from './views/Base64Tool.vue'
-import QrCodeTool from './tools/QrCodeTool.vue'
-import TimestampTool from './tools/TimestampTool.vue'
-import UrlTool from './tools/UrlTool.vue'
-import HashTool from './tools/HashTool.vue'
-import PasswordTool from './tools/PasswordTool.vue'
-import ColorTool from './tools/ColorTool.vue'
+import JsonTool from './views/tools/JsonTool.vue'
+import Base64Tool from './views/tools/Base64Tool.vue'
+import QrCodeTool from './views/tools/QrCodeTool.vue'
+import TimestampTool from './views/tools/TimestampTool.vue'
+import UrlTool from './views/tools/UrlTool.vue'
+import HashTool from './views/tools/HashTool.vue'
+import PasswordTool from './views/tools/PasswordTool.vue'
+import ColorTool from './views/tools/ColorTool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -25,8 +25,8 @@ const routes = [
   },
   {
     path: '/tools/json',
-    name: 'JsonFormatter',
-    component: JsonFormatter
+    name: 'JsonTool',
+    component: JsonTool
   },
   {
     path: '/tools/base64',

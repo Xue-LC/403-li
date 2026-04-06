@@ -108,8 +108,8 @@ export default {
           path: '/tools/base64', 
           name: 'Base64 编解码', 
           description: '编码解码是高频小工具，适合处理文本和图片',
-          status: 'error',
-          statusText: '异常', statusColor: '#ff8a8a',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -118,8 +118,8 @@ export default {
           path: '/tools/qrcode', 
           name: '二维码生成', 
           description: '输入文本或链接，快速生成二维码图片',
-          status: 'maintenance',
-          statusText: '维护中', statusColor: '#fff3b3',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '生成 / 导出',
           category: 'image' 
         },
@@ -128,8 +128,8 @@ export default {
           path: '/tools/timestamp', 
           name: '时间戳转换', 
           description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
-          status: 'pending',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
           features: 'Unix / ISO',
           category: 'time' 
         },
@@ -139,7 +139,7 @@ export default {
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding' 
         },
@@ -149,7 +149,7 @@ export default {
           name: '哈希计算', 
           description: '计算 MD5、SHA1、SHA256 等哈希值',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '正常', statusColor: '#9dff6b',
           features: 'MD5 / SHA',
           category: 'text' 
         },
@@ -159,7 +159,7 @@ export default {
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '生成 / 复制',
           category: 'text' 
         },
@@ -169,8 +169,8 @@ export default {
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
           status: 'normal',
-          statusText: '正常',
-          features: 'HEX / RGB',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: 'HEX / RGB / HSL',
           category: 'image' 
         }
       ]
@@ -210,7 +210,7 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../assets/styles/index.css';
 
 .tools {
   width: min(var(--max), calc(100vw - 16px));

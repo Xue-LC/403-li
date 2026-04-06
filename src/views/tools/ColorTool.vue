@@ -17,7 +17,7 @@
             <div class="color-preview" :style="{ '--current-color': rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
-              <div class="sl-gradient" @click="selectSaturationLightness" :style="slGradientStyle">
+              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(0,0,0,0.3)), linear-gradient(to right, white, hsl(${hue}, 100%, 50%))` }">
                 <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
               </div>
               <!-- 色相滑块 -->
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import Topbar from '../components/Topbar.vue'
+import Topbar from '../../components/Topbar.vue'
 
 export default {
   name: 'ColorTool',
@@ -129,14 +129,8 @@ export default {
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     },
     slGradientStyle() {
-      // 标准 HSL 饱和度/亮度选择器渐变
-      // 顶层：从上到下 白色→黑色（亮度控制）
-      // 底层：从左到右 白色→纯色（饱和度控制）
       return {
-        background: `
-          linear-gradient(to bottom, #fff, #000),
-          linear-gradient(to right, #fff, hsl(${this.hue}, 100%, 50%))
-        `
+        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(0,0,0,0.3)), linear-gradient(to right, white, hsl(${this.hue}, 100%, 50%))`
       }
     }
   },
@@ -515,7 +509,8 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../../assets/styles/index.css';
+@import '../../assets/styles/tools.css';
 
 .color-tool {
   width: min(var(--max), calc(100vw - 16px));

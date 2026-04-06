@@ -210,7 +210,7 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../assets/styles/index.css';
 
 /* 状态标签 - 使用 CSS 类管理颜色 */
 .status-badge {

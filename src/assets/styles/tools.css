@@ -1,0 +1,352 @@
+/* 403.li - 工具通用样式 (Tool Common Styles) */
+/* 所有工具组件共享的样式规范 */
+
+/* === 工具容器 === */
+.tool-wrapper {
+  width: min(var(--max), calc(100vw - 16px));
+  margin: 0 auto;
+  padding: 12px 0 20px;
+}
+
+@media (max-width: 640px) {
+  .tool-wrapper {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .tool-wrapper {
+    padding: 6px 0 14px;
+  }
+}
+
+/* === Pane 通用样式 === */
+.tool-pane {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+.tool-pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
+.tool-pane-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: rgba(18,22,27,0.94);
+}
+
+.tool-pane-body {
+  padding: 12px;
+}
+
+@media (max-width: 640px) {
+  .tool-pane-body {
+    padding: 10px;
+  }
+}
+
+/* === 工具主体 === */
+.tool-body {
+  margin-top: 1.5rem;
+}
+
+/* === 输入框标签 === */
+.tool-label {
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .tool-label {
+    font-size: 12px;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* === 代码输入框 === */
+.code-input {
+  width: 100%;
+  max-width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px;
+  resize: vertical;
+  border-radius: 0;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.code-input:focus {
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input::placeholder {
+  color: var(--dim);
+}
+
+.code-input.output {
+  background: rgba(157,255,107,0.03);
+  border-color: rgba(157,255,107,0.2);
+}
+
+@media (max-width: 640px) {
+  .code-input {
+    font-size: 14px;
+    padding: 10px;
+    min-height: 180px;
+  }
+}
+
+@media (max-width: 375px) {
+  .code-input {
+    padding: 8px;
+  }
+}
+
+/* === 按钮通用样式 === */
+.tool-button {
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  border-radius: 0;
+}
+
+.tool-button:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
+  color: var(--green);
+}
+
+.tool-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-button.primary {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.tool-button.primary:hover:not(:disabled) {
+  background: rgba(157,255,107,0.2);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.tool-button.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.tool-button.danger:hover:not(:disabled) {
+  background: rgba(255,107,125,0.1);
+  box-shadow: 0 0 15px rgba(255,107,125,0.3);
+}
+
+.tool-button.full-width {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+/* === 按钮组 (Grid) === */
+.button-group {
+  display: grid;
+  gap: 10px;
+  margin: 1rem 0;
+}
+
+.button-group-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.button-group-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.button-group-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .button-group-4,
+  .button-group-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .button-group {
+    margin: 0.75rem 0;
+  }
+  
+  .tool-button {
+    height: 48px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 375px) {
+  .button-group-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-button {
+    height: 48px;
+    font-size: 12px;
+  }
+}
+
+/* === 按钮行 (Flex) === */
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin: 1rem 0;
+}
+
+@media (max-width: 640px) {
+  .button-row {
+    flex-direction: column;
+  }
+}
+
+/* === 状态消息 === */
+.status-error {
+  color: var(--red);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,107,125,0.3);
+  background: rgba(255,107,125,0.05);
+  border-radius: 0;
+}
+
+.status-success {
+  color: var(--green);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(157,255,107,0.3);
+  background: var(--green-soft);
+  border-radius: 0;
+}
+
+@media (max-width: 640px) {
+  .status-error,
+  .status-success {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin-top: 0.75rem;
+  }
+}
+
+/* === 结果显示区 === */
+.result-display {
+  position: relative;
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  padding: 12px 14px;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--green);
+  word-break: break-all;
+  border-radius: 0;
+}
+
+/* === 复制按钮 === */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  transform: scale(1.1);
+}
+
+/* === 输入框带复制按钮 === */
+.input-with-copy {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-copy .code-input {
+  padding-right: 50px;
+}
+
+/* === Footer === */
+.tool-footer {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .tool-footer {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 375px) {
+  .tool-footer {
+    font-size: 11px;
+  }
+}

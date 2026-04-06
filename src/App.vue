@@ -12,7 +12,7 @@ export default {
 
 <style>
 /* 导入全局样式 */
-@import './assets/styles.css';
+@import './assets/styles/index.css';
 
 /* 全局样式 */
 * {

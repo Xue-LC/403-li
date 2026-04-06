@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import Topbar from '../components/Topbar.vue'
+import Topbar from '../../components/Topbar.vue'
 
 export default {
   name: 'UrlTool',
@@ -118,7 +118,8 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../../assets/styles/index.css';
+@import '../../assets/styles/tools.css';
 
 .url-tool {
   width: min(var(--max), calc(100vw - 16px));

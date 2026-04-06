@@ -93,7 +93,7 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../assets/styles/index.css';
 
 .tool-template {
   width: min(var(--max), calc(100vw - 16px));

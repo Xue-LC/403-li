@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import Topbar from '../components/Topbar.vue'
+import Topbar from '../../components/Topbar.vue'
 import QRCode from 'qrcode-generator'
 
 export default {
@@ -601,7 +601,8 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../../assets/styles/index.css';
+@import '../../assets/styles/tools.css';
 
 .qr-code-tool {
   width: min(var(--max), calc(100vw - 16px));

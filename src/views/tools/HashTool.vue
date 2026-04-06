@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import Topbar from '../components/Topbar.vue'
+import Topbar from '../../components/Topbar.vue'
 import { MD5, SHA1, SHA256, SHA512 } from 'crypto-js'
 
 export default {
@@ -103,7 +103,8 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../../assets/styles/index.css';
+@import '../../assets/styles/tools.css';
 
 .hash-tool {
   width: min(var(--max), calc(100vw - 16px));

@@ -88,7 +88,7 @@ export default {
 </script>
 
 <style scoped>
-@import '../assets/styles.css';
+@import '../assets/styles/index.css';
 
 .icons-demo {
   padding: 2rem;
