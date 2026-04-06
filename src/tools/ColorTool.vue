@@ -130,14 +130,12 @@ export default {
     },
     slGradientStyle() {
       // 标准 HSL 饱和度/亮度选择器渐变
-      // 底层：从左到右 灰色→纯色（控制饱和度）
-      // 中层：从上到下 白色→透明（亮度高光）
-      // 顶层：从上到下 透明→黑色（亮度阴影）
+      // 底层：从左到右 白色→纯色（饱和度渐变）
+      // 顶层：从上到下 白色→黑色（亮度渐变）
       return {
         background: `
-          linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1)),
-          linear-gradient(to bottom, rgba(255,255,255,1), rgba(255,255,255,0)),
-          linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))
+          linear-gradient(to bottom, rgba(0,0,0,0), #000),
+          linear-gradient(to right, #fff, hsl(${this.hue}, 100%, 50%))
         `
       }
     }
