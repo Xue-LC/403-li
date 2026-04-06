@@ -130,7 +130,7 @@ export default {
     },
     slGradientStyle() {
       return {
-        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(0,0,0,0.3)), linear-gradient(to right, white, hsl(${this.hue}, 100%, 50%))`
+        backgroundImage: `linear-gradient(to bottom, #fff, #000), linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))`
       }
     }
   },
