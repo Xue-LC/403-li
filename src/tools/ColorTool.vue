@@ -11,17 +11,6 @@
       </div>
       <div class="pane-body">
         <div class="tool-body">
-          <!-- 颜色选择器 -->
-          <div class="color-picker-wrapper">
-            <input 
-              type="color" 
-              v-model="hexColor" 
-              @input="convertFromHex"
-              class="color-input" 
-            />
-            <div class="color-preview" :style="{ backgroundColor: hexColor }"></div>
-          </div>
-          
           <!-- HEX 输入 -->
           <label class="input-label">HEX：</label>
           <div class="input-with-copy">
@@ -256,50 +245,6 @@ export default {
   margin-top: 1.5rem;
 }
 
-/* === Color Picker Wrapper === */
-.color-picker-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid var(--line);
-  border-radius: 0;
-}
-
-.color-input {
-  width: 60px;
-  height: 60px;
-  border: 2px solid var(--line);
-  border-radius: 0;
-  cursor: pointer;
-  background: transparent;
-  padding: 0;
-}
-
-.color-input::-webkit-color-swatch-wrapper {
-  padding: 0;
-}
-
-.color-input::-webkit-color-swatch {
-  border: none;
-  border-radius: 0;
-}
-
-.color-input::-moz-color-swatch {
-  border: none;
-  border-radius: 0;
-}
-
-.color-preview {
-  flex: 1;
-  height: 60px;
-  border: 2px solid var(--line);
-  border-radius: 0;
-  box-shadow: 0 0 20px rgba(157, 255, 107, 0.3);
-}
-
 /* === Input Label === */
 .input-label {
   color: var(--green);
@@ -374,26 +319,6 @@ export default {
   
   .pane-body {
     padding: 10px;
-  }
-  
-  .color-picker-wrapper {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .color-input {
-    width: 100%;
-    height: 50px;
-  }
-  
-  .color-preview {
-    width: 100%;
-  }
-}
-
-@media (max-width: 375px) {
-  .color-picker-wrapper {
-    padding: 0.75rem;
   }
 }
 </style>
