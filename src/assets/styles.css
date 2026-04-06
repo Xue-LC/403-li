@@ -506,12 +506,16 @@ body::after {
   padding: 10px 12px;
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   font-family: var(--mono);
-  font-size: 13px; /* 底栏 13px */
+  font-size: 12px; /* 底栏 12px，确保一行显示 */
   color: var(--dim);
   text-transform: uppercase;
+}
+
+.footer span {
+  white-space: nowrap;
 }
 
 /* === Responsive === */
