@@ -19,16 +19,11 @@
             rows="4"
             class="code-input"
           ></textarea>
+          <!-- 操作按钮 -->
           <div class="button-row">
-            <button class="button primary" @click="encodeUrl" v-if="!isEncoded">🔄 编码</button>
-            <button class="button primary" @click="decodeUrl" v-else>🔄 解码</button>
+            <button class="button" @click="encodeUrl" :disabled="!input.trim()">🔄 编码</button>
+            <button class="button" @click="decodeUrl" :disabled="!input.trim()">🔄 解码</button>
             <button class="button danger" @click="clearAll">🗑️ 清空</button>
-          </div>
-          
-          <!-- 同时显示编码和解码按钮 -->
-          <div class="button-row" v-if="input.trim()">
-            <button class="button" @click="encodeUrl">🔄 编码</button>
-            <button class="button" @click="decodeUrl">🔄 解码</button>
           </div>
           
           <div class="result-display" v-if="result">
@@ -66,12 +61,6 @@ export default {
       error: '',
       success: '',
       copySuccess: ''
-    }
-  },
-  computed: {
-    isEncoded() {
-      // 智能判断：如果输入包含%符号，则认为是 URL 编码格式
-      return this.input.includes('%')
     }
   },
   methods: {
