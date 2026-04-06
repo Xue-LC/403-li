@@ -181,11 +181,23 @@ export default {
         const r = parseInt(hex.slice(1, 3), 16)
         const g = parseInt(hex.slice(3, 5), 16)
         const b = parseInt(hex.slice(5, 7), 16)
-        this.rgbColor = `rgb(${r}, ${g}, ${b})`
+        
+        // RGB 格式：透明度 100% 用 rgb，否则用 rgba
+        if (this.alpha === 100) {
+          this.rgbColor = `rgb(${r}, ${g}, ${b})`
+        } else {
+          this.rgbColor = `rgba(${r}, ${g}, ${b}, ${(this.alpha / 100).toFixed(2)})`
+        }
         
         // HEX → HSL
         const hsl = this.rgbToHsl(r, g, b)
-        this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+        
+        // HSL 格式：透明度 100% 用 hsl，否则用 hsla
+        if (this.alpha === 100) {
+          this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+        } else {
+          this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(this.alpha / 100).toFixed(2)})`
+        }
         
         // 更新 HSL 值和滑块位置
         this.hue = hsl.h
@@ -201,19 +213,45 @@ export default {
     },
     convertFromRgb() {
       try {
-        const match = this.rgbColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
-        if (!match) throw new Error('无效的 RGB 格式')
+        // 支持 rgb 和 rgba 两种格式
+        const rgbaMatch = this.rgbColor.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/)
+        const rgbMatch = this.rgbColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
         
-        const r = parseInt(match[1])
-        const g = parseInt(match[2])
-        const b = parseInt(match[3])
+        let r, g, b, a = 1
+        if (rgbaMatch) {
+          r = parseInt(rgbaMatch[1])
+          g = parseInt(rgbaMatch[2])
+          b = parseInt(rgbaMatch[3])
+          a = parseFloat(rgbaMatch[4])
+          this.alpha = Math.round(a * 100)
+          this.alphaThumbX = this.alpha
+        } else if (rgbMatch) {
+          r = parseInt(rgbMatch[1])
+          g = parseInt(rgbMatch[2])
+          b = parseInt(rgbMatch[3])
+          this.alpha = 100
+          this.alphaThumbX = 100
+        } else {
+          throw new Error('无效的 RGB 格式')
+        }
         
-        // RGB → HEX
-        this.hexColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+        // RGB → HEX (带透明度)
+        if (this.alpha === 100) {
+          this.hexColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+        } else {
+          const alphaHex = Math.round(this.alpha * 255 / 100).toString(16).padStart(2, '0')
+          this.hexColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('') + alphaHex
+        }
         
         // RGB → HSL
         const hsl = this.rgbToHsl(r, g, b)
-        this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+        
+        // HSL 格式：透明度 100% 用 hsl，否则用 hsla
+        if (this.alpha === 100) {
+          this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+        } else {
+          this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(this.alpha / 100).toFixed(2)})`
+        }
         
         // 更新 HSL 值和滑块位置
         this.hue = hsl.h
@@ -229,19 +267,45 @@ export default {
     },
     convertFromHsl() {
       try {
-        const match = this.hslColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/)
-        if (!match) throw new Error('无效的 HSL 格式')
+        // 支持 hsl 和 hsla 两种格式
+        const hslaMatch = this.hslColor.match(/hsla\((\d+),\s*(\d+)%,\s*(\d+)%,\s*([\d.]+)\)/)
+        const hslMatch = this.hslColor.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/)
         
-        const h = parseInt(match[1])
-        const s = parseInt(match[2]) / 100
-        const l = parseInt(match[3]) / 100
+        let h, s, l, a = 1
+        if (hslaMatch) {
+          h = parseInt(hslaMatch[1])
+          s = parseInt(hslaMatch[2]) / 100
+          l = parseInt(hslaMatch[3]) / 100
+          a = parseFloat(hslaMatch[4])
+          this.alpha = Math.round(a * 100)
+          this.alphaThumbX = this.alpha
+        } else if (hslMatch) {
+          h = parseInt(hslMatch[1])
+          s = parseInt(hslMatch[2]) / 100
+          l = parseInt(hslMatch[3]) / 100
+          this.alpha = 100
+          this.alphaThumbX = 100
+        } else {
+          throw new Error('无效的 HSL 格式')
+        }
         
         // HSL → RGB
         const rgb = this.hslToRgb(h, s, l)
-        this.rgbColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
         
-        // HSL → HEX
-        this.hexColor = '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('')
+        // RGB 格式：透明度 100% 用 rgb，否则用 rgba
+        if (this.alpha === 100) {
+          this.rgbColor = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`
+        } else {
+          this.rgbColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${(this.alpha / 100).toFixed(2)})`
+        }
+        
+        // HSL → HEX (带透明度)
+        if (this.alpha === 100) {
+          this.hexColor = '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('')
+        } else {
+          const alphaHex = Math.round(this.alpha * 255 / 100).toString(16).padStart(2, '0')
+          this.hexColor = '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('') + alphaHex
+        }
         
         // 更新 HSL 值和滑块位置
         this.hue = h
@@ -529,6 +593,13 @@ export default {
   position: relative;
   cursor: pointer;
   overflow: hidden;
+  background: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
 .alpha-gradient {
