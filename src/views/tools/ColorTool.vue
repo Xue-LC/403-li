@@ -155,8 +155,8 @@ export default {
       this.slThumbX = this.saturation
       this.slThumbY = 100 - this.lightness
       
-      // 转换为 RGB（hslToRgb 期望 s 和 l 为 0-100 的百分比值）
-      const rgb = this.hslToRgb(this.hue, this.saturation, this.lightness)
+      // 转换为 RGB（hslToRgb 期望 s 和 l 为 0-1 的小数值）
+      const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
       
       // 保持当前透明度
       const alpha = this.alpha
