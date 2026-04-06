@@ -11,38 +11,29 @@
       </div>
       <div class="pane-body">
         <div class="tool-body">
-          <!-- URL 编码 -->
-          <label class="input-label">URL 编码：</label>
+          <!-- 统一输入框 -->
+          <label class="input-label">输入：</label>
           <textarea 
-            v-model="encodeInput" 
-            placeholder="输入要编码的文本或 URL"
+            v-model="input" 
+            placeholder="输入文本或 URL 编码字符串"
             rows="4"
             class="code-input"
           ></textarea>
           <div class="button-row">
-            <button class="button primary" @click="encodeUrl">🔄 编码</button>
-            <button class="button" @click="clearEncode">🗑️ 清空</button>
-          </div>
-          <div class="result-display" v-if="encodeResult">
-            {{ encodeResult }}
-            <button class="copy-btn" @click="copyEncodeResult">📋</button>
+            <button class="button primary" @click="encodeUrl" v-if="!isEncoded">🔄 编码</button>
+            <button class="button primary" @click="decodeUrl" v-else>🔄 解码</button>
+            <button class="button danger" @click="clearAll">🗑️ 清空</button>
           </div>
           
-          <!-- URL 解码 -->
-          <label class="input-label">URL 解码：</label>
-          <textarea 
-            v-model="decodeInput" 
-            placeholder="输入要解码的 URL 编码字符串"
-            rows="4"
-            class="code-input"
-          ></textarea>
-          <div class="button-row">
-            <button class="button primary" @click="decodeUrl">🔄 解码</button>
-            <button class="button" @click="clearDecode">🗑️ 清空</button>
+          <!-- 同时显示编码和解码按钮 -->
+          <div class="button-row" v-if="input.trim()">
+            <button class="button" @click="encodeUrl">🔄 编码</button>
+            <button class="button" @click="decodeUrl">🔄 解码</button>
           </div>
-          <div class="result-display" v-if="decodeResult">
-            {{ decodeResult }}
-            <button class="copy-btn" @click="copyDecodeResult">📋</button>
+          
+          <div class="result-display" v-if="result">
+            {{ result }}
+            <button class="copy-btn" @click="copyResult" title="复制结果">📋</button>
           </div>
           
           <div v-if="error" class="status-error">❌ {{ error }}</div>
@@ -70,13 +61,17 @@ export default {
   },
   data() {
     return {
-      encodeInput: '',
-      encodeResult: '',
-      decodeInput: '',
-      decodeResult: '',
+      input: '',
+      result: '',
       error: '',
       success: '',
       copySuccess: ''
+    }
+  },
+  computed: {
+    isEncoded() {
+      // 智能判断：如果输入包含%符号，则认为是 URL 编码格式
+      return this.input.includes('%')
     }
   },
   methods: {
@@ -84,12 +79,12 @@ export default {
       this.error = ''
       this.success = ''
       
-      if (!this.encodeInput.trim()) {
+      if (!this.input.trim()) {
         this.error = '请输入要编码的内容'
         return
       }
       try {
-        this.encodeResult = encodeURIComponent(this.encodeInput.trim())
+        this.result = encodeURIComponent(this.input.trim())
         this.success = '编码成功！'
         setTimeout(() => {
           this.success = ''
@@ -102,12 +97,12 @@ export default {
       this.error = ''
       this.success = ''
       
-      if (!this.decodeInput.trim()) {
+      if (!this.input.trim()) {
         this.error = '请输入要解码的内容'
         return
       }
       try {
-        this.decodeResult = decodeURIComponent(this.decodeInput.trim())
+        this.result = decodeURIComponent(this.input.trim())
         this.success = '解码成功！'
         setTimeout(() => {
           this.success = ''
@@ -116,29 +111,16 @@ export default {
         this.error = '解码失败：无效的 URL 编码格式'
       }
     },
-    copyEncodeResult() {
-      navigator.clipboard.writeText(this.encodeResult)
-      this.copySuccess = '编码结果'
+    copyResult() {
+      navigator.clipboard.writeText(this.result)
+      this.copySuccess = '复制成功！'
       setTimeout(() => {
         this.copySuccess = ''
       }, 2000)
     },
-    copyDecodeResult() {
-      navigator.clipboard.writeText(this.decodeResult)
-      this.copySuccess = '解码结果'
-      setTimeout(() => {
-        this.copySuccess = ''
-      }, 2000)
-    },
-    clearEncode() {
-      this.encodeInput = ''
-      this.encodeResult = ''
-      this.error = ''
-      this.success = ''
-    },
-    clearDecode() {
-      this.decodeInput = ''
-      this.decodeResult = ''
+    clearAll() {
+      this.input = ''
+      this.result = ''
       this.error = ''
       this.success = ''
     }
