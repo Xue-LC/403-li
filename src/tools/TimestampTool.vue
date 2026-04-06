@@ -16,11 +16,14 @@
             <div class="time-display">
               <span class="label">当前时间戳：</span>
               <span class="value">{{ currentTimestamp }}</span>
+              <button class="copy-btn" @click="copyTimestamp">📋 复制</button>
             </div>
             <div class="time-display">
               <span class="label">当前日期：</span>
               <span class="value">{{ currentDateTime }}</span>
+              <button class="copy-btn" @click="copyDateTime">📋 复制</button>
             </div>
+            <div v-if="copySuccess" class="copy-success">✓ 已复制 {{ copySuccess }}</div>
             <button class="button" @click="updateCurrentTime">🔄 刷新</button>
           </div>
           
@@ -92,6 +95,7 @@ export default {
       dateTimeResult: { seconds: '', milliseconds: '' },
       error: '',
       success: '',
+      copySuccess: '',
       timer: null
     }
   },
@@ -100,6 +104,20 @@ export default {
       const now = Date.now()
       this.currentTimestamp = now
       this.currentDateTime = new Date().toLocaleString('zh-CN')
+    },
+    copyTimestamp() {
+      navigator.clipboard.writeText(this.currentTimestamp)
+      this.copySuccess = '时间戳'
+      setTimeout(() => {
+        this.copySuccess = ''
+      }, 2000)
+    },
+    copyDateTime() {
+      navigator.clipboard.writeText(this.currentDateTime)
+      this.copySuccess = '日期'
+      setTimeout(() => {
+        this.copySuccess = ''
+      }, 2000)
     },
     convertTimestamp() {
       this.error = ''
@@ -246,13 +264,47 @@ export default {
 .current-time {
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 1rem;
   margin-bottom: 1rem;
 }
 
 .time-display {
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.copy-btn {
+  padding: 4px 8px;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.2s;
+  min-height: 32px;
+}
+
+.copy-btn:hover {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.copy-success {
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 12px;
+  margin: 8px 0;
+  padding: 4px 8px;
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  border-radius: 0;
 }
 
 .time-display .label {
@@ -287,6 +339,7 @@ export default {
   font-size: 14px;
   padding: 12px;
   resize: vertical;
+  border-radius: 0;
 }
 
 .code-input:focus {
@@ -299,7 +352,7 @@ export default {
 .result-display {
   background: var(--green-soft);
   border: 1px solid var(--green);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 10px 12px;
   margin: 10px 0;
   font-family: var(--mono);
@@ -326,6 +379,7 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   min-height: 44px;
+  border-radius: 0;
 }
 
 .button:hover:not(:disabled) {
@@ -374,6 +428,7 @@ export default {
   padding: 10px 12px;
   border: 1px solid rgba(255,107,125,.3);
   background: #ff6b7d0d;
+  border-radius: 0;
 }
 
 .status-success {
@@ -384,6 +439,7 @@ export default {
   padding: 10px 12px;
   border: 1px solid rgba(157,255,107,.3);
   background: var(--green-soft);
+  border-radius: 0;
 }
 
 /* === Responsive === */
