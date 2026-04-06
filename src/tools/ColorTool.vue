@@ -14,7 +14,7 @@
           <!-- 颜色预览 -->
           <div class="color-preview-wrapper">
             <label class="input-label">当前颜色：</label>
-            <div class="color-preview" :style="{ backgroundColor: rgbaColor }" @click.stop="togglePicker"></div>
+            <div class="color-preview" :style="{ '--current-color': rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
               <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `hsl(${hue}, 100%, 50%)` }">
@@ -493,6 +493,36 @@ export default {
   cursor: pointer;
   transition: transform 0.2s;
   margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.color-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  z-index: 0;
+}
+
+.color-preview::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--current-color);
+  z-index: 1;
 }
 
 .color-preview:hover {
