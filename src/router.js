@@ -6,6 +6,7 @@ import Base64Tool from './views/Base64Tool.vue'
 import QrCodeTool from './tools/QrCodeTool.vue'
 import TimestampTool from './tools/TimestampTool.vue'
 import UrlTool from './tools/UrlTool.vue'
+import PasswordTool from './tools/PasswordTool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -44,6 +45,11 @@ const routes = [
     path: '/tools/url',
     name: 'UrlTool',
     component: UrlTool
+  },
+  {
+    path: '/tools/password',
+    name: 'PasswordTool',
+    component: PasswordTool
   },
   {
     path: '/games',

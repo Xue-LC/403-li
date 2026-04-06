@@ -159,7 +159,7 @@ export default {
           name: '密码生成', 
           description: '生成安全随机密码，支持自定义长度和字符集',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '生成 / 复制',
           category: 'text' 
         },
