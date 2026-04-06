@@ -16,15 +16,14 @@
             <div class="time-display">
               <span class="label">当前时间戳：</span>
               <span class="value">{{ currentTimestamp }}</span>
-              <button class="copy-btn" @click="copyTimestamp">📋 复制</button>
+              <button class="copy-btn" @click="copyTimestamp">📋</button>
             </div>
             <div class="time-display">
               <span class="label">当前日期：</span>
               <span class="value">{{ currentDateTime }}</span>
-              <button class="copy-btn" @click="copyDateTime">📋 复制</button>
+              <button class="copy-btn" @click="copyDateTime">📋</button>
             </div>
             <div v-if="copySuccess" class="copy-success">✓ 已复制 {{ copySuccess }}</div>
-            <button class="button" @click="updateCurrentTime">🔄 刷新</button>
           </div>
           
           <!-- 时间戳转日期 -->
@@ -278,16 +277,19 @@ export default {
 }
 
 .copy-btn {
-  padding: 4px 8px;
+  padding: 4px 6px;
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 14px;
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--line);
   color: var(--text);
   cursor: pointer;
   border-radius: 0;
   transition: all 0.2s;
-  min-height: 32px;
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copy-btn:hover {
