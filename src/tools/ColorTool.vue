@@ -639,14 +639,6 @@ export default {
   position: relative;
   margin-bottom: 12px;
   cursor: crosshair;
-  /* 标准的 HSL 饱和度/亮度渐变 */
-  background: 
-    /* 顶层：从上到下 白→透明 */
-    linear-gradient(to bottom, #fff, transparent),
-    /* 中层：从左到右 灰色→纯色 */
-    linear-gradient(to right, #808080, hsl(var(--hue), 100%, 50%)),
-    /* 底层：从上到下 黑→白 */
-    linear-gradient(to bottom, #000, #fff);
 }
 
 .sl-overlay {
