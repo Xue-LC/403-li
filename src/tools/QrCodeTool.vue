@@ -26,7 +26,8 @@
                 <div class="color-preview" :style="{ backgroundColor: fgColor }" @click.stop="togglePicker('fg')"></div>
                 <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
                   <!-- 饱和度/亮度区域 -->
-                  <div class="sl-gradient" @click="selectSaturationLightness">
+                  <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `hsl(${fgHue}, 100%, 50%)` }">
+                    <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to top, #000, transparent);"></div>
                     <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
                   </div>
                   <!-- 色相滑块 -->
@@ -62,7 +63,8 @@
                 <div class="color-preview" :style="{ backgroundColor: bgColor }" @click.stop="togglePicker('bg')"></div>
                 <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
                   <!-- 饱和度/亮度区域 -->
-                  <div class="sl-gradient" @click="selectSaturationLightnessBg">
+                  <div class="sl-gradient" @click="selectSaturationLightnessBg" :style="{ background: `hsl(${bgHue}, 100%, 50%)` }">
+                    <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to top, #000, transparent);"></div>
                     <div class="sl-thumb" :style="{ left: slThumbXBg + '%', top: slThumbYBg + '%' }"></div>
                   </div>
                   <!-- 色相滑块 -->
@@ -439,7 +441,10 @@ export default {
       
       try {
         const qr = QRCode(0, 'M')
-        qr.addData(safeInput)
+        // 使用 encodeURIComponent + decodeURIComponent 处理 UTF-8 编码（包括中文）
+        // qrcode-generator 默认使用 ISO-8859-1，需要手动编码为 UTF-8
+        const utf8Input = unescape(encodeURIComponent(safeInput))
+        qr.addData(utf8Input)
         qr.make()
         
         const pixelRatio = 4
@@ -720,13 +725,20 @@ export default {
 .sl-gradient {
   width: 100%;
   height: 150px;
-  background: linear-gradient(to top, #000, transparent),
-              linear-gradient(to right, #fff, transparent);
   border: 2px solid var(--line);
   border-radius: 0;
   position: relative;
   margin-bottom: 12px;
   cursor: crosshair;
+}
+
+.sl-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
 }
 
 .sl-thumb {

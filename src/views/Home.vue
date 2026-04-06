@@ -128,8 +128,8 @@ export default {
           path: '/tools/timestamp', 
           name: '时间戳转换', 
           description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
-          status: 'pending',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
           features: 'Unix / ISO',
           category: 'time' 
         },
