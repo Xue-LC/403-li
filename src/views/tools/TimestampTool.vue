@@ -32,7 +32,7 @@
             type="text" 
             v-model="timestampInput" 
             placeholder="输入时间戳（如：1712345678）"
-            class="code-input"
+            class="code-input-sm"
           />
           <div class="result-display" v-if="timestampResult">
             {{ timestampResult }}
@@ -44,7 +44,7 @@
             type="text" 
             v-model="dateTimeInput" 
             placeholder="输入日期（如：2024-01-01 12:00:00）"
-            class="code-input"
+            class="code-input-sm"
           />
           <div class="result-display" v-if="dateTimeResult && dateTimeResult.seconds">
             秒：{{ dateTimeResult.seconds }}<br>
