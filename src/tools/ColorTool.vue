@@ -142,8 +142,15 @@ export default {
       this.slThumbY = Math.max(0, Math.min(100, y))
       this.saturation = this.slThumbX
       this.lightness = 100 - this.slThumbY
-      this.hexColor = this.hslToHex(this.hue, this.saturation, this.lightness)
-      this.convertFromHex()
+      
+      // 转换为 RGB
+      const rgb = this.hslToRgb(this.hue, this.saturation, this.lightness)
+      
+      // 保持当前透明度
+      const alpha = this.alpha
+      
+      // 更新所有输入框（保持透明度通道）
+      this.updateAllInputs(rgb.r, rgb.g, rgb.b, alpha)
     },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
@@ -156,34 +163,41 @@ export default {
     selectAlpha(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
-      this.alphaThumbX = Math.max(0, Math.min(100, x))
-      this.alpha = Math.round(this.alphaThumbX)
+      this.alpha = Math.max(0, Math.min(100, Math.round(x)))
+      this.alphaThumbX = this.alpha
       this.updateColorFromAlpha()
     },
     updateColorFromAlpha() {
       const rgb = this.hexToRgb(this.hexColor)
       
-      // RGB
-      if (this.alpha === 100) {
-        this.rgbColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+      // 更新透明度滑块位置
+      this.alphaThumbX = this.alpha
+      
+      // 使用统一方法更新所有输入
+      this.updateAllInputs(rgb.r, rgb.g, rgb.b, this.alpha)
+    },
+    updateAllInputs(r, g, b, alpha) {
+      // HEX
+      if (alpha === 100) {
+        this.hexColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
       } else {
-        this.rgbColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${(this.alpha / 100).toFixed(2)})`
+        const alphaHex = Math.round(alpha * 255 / 100).toString(16).padStart(2, '0')
+        this.hexColor = '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('') + alphaHex
+      }
+      
+      // RGB
+      if (alpha === 100) {
+        this.rgbColor = `rgb(${r}, ${g}, ${b})`
+      } else {
+        this.rgbColor = `rgba(${r}, ${g}, ${b}, ${(alpha / 100).toFixed(2)})`
       }
       
       // HSL
-      const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b)
-      if (this.alpha === 100) {
+      const hsl = this.rgbToHsl(r, g, b)
+      if (alpha === 100) {
         this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
       } else {
-        this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(this.alpha / 100).toFixed(2)})`
-      }
-      
-      // HEX
-      if (this.alpha === 100) {
-        this.hexColor = '#' + [rgb.r, rgb.g, rgb.b].map(x => x.toString(16).padStart(2, '0')).join('')
-      } else {
-        const alphaHex = Math.round(this.alpha * 255 / 100).toString(16).padStart(2, '0')
-        this.hexColor = '#' + [rgb.r, rgb.g, rgb.b].map(x => x.toString(16).padStart(2, '0')).join('') + alphaHex
+        this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(alpha / 100).toFixed(2)})`
       }
     },
     validateColor() {
