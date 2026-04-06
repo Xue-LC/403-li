@@ -169,8 +169,8 @@ export default {
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
           status: 'normal',
-          statusText: '正常',
-          features: 'HEX / RGB',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: 'HEX / RGB / HSL',
           category: 'image' 
         }
       ]

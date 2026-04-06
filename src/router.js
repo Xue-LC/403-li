@@ -8,6 +8,7 @@ import TimestampTool from './tools/TimestampTool.vue'
 import UrlTool from './tools/UrlTool.vue'
 import HashTool from './tools/HashTool.vue'
 import PasswordTool from './tools/PasswordTool.vue'
+import ColorTool from './tools/ColorTool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -56,6 +57,11 @@ const routes = [
     path: '/tools/password',
     name: 'PasswordTool',
     component: PasswordTool
+  },
+  {
+    path: '/tools/color',
+    name: 'ColorTool',
+    component: ColorTool
   },
   {
     path: '/games',
