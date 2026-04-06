@@ -139,7 +139,7 @@ export default {
           name: 'URL 编解码', 
           description: 'URL 编码和解码，处理特殊字符和中文',
           status: 'normal',
-          statusText: '待上线', statusColor: '#8a9bb8',
+          statusText: '正常', statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding' 
         },
