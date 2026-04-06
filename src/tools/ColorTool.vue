@@ -143,9 +143,9 @@ export default {
       this.saturation = Math.max(0, Math.min(100, x))
       this.lightness = Math.max(0, Math.min(100, 100 - y))
       
-      // 更新圆点位置
+      // 更新圆点位置（Y 值需要反转）
       this.slThumbX = this.saturation
-      this.slThumbY = this.lightness
+      this.slThumbY = 100 - this.lightness
       
       // 转换为 RGB（hslToRgb 需要 s 和 l 为 0-1 的小数）
       const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
