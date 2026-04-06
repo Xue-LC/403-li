@@ -105,13 +105,13 @@ export default {
   },
   computed: {
     strengthClass() {
-      if (this.strength < 40) return 'weak'
-      if (this.strength < 70) return 'medium'
+      if (this.strength <= 30) return 'weak'
+      if (this.strength <= 60) return 'medium'
       return 'strong'
     },
     strengthText() {
-      if (this.strength < 40) return '弱'
-      if (this.strength < 70) return '中'
+      if (this.strength <= 30) return '弱'
+      if (this.strength <= 60) return '中'
       return '强'
     }
   },
@@ -153,13 +153,28 @@ export default {
     },
     calculateStrength(password) {
       let strength = 0
-      if (password.length >= 8) strength += 20
-      if (password.length >= 12) strength += 20
-      if (/[A-Z]/.test(password)) strength += 15
-      if (/[a-z]/.test(password)) strength += 15
-      if (/[0-9]/.test(password)) strength += 15
-      if (/[^A-Za-z0-9]/.test(password)) strength += 15
-      this.strength = Math.min(100, strength)
+      
+      // 长度评分（最高 40 分）
+      if (password.length >= 8) strength += 10
+      if (password.length >= 12) strength += 15
+      if (password.length >= 16) strength += 10
+      if (password.length >= 20) strength += 5
+      
+      // 字符种类评分（最高 40 分）
+      const hasUpper = /[A-Z]/.test(password)
+      const hasLower = /[a-z]/.test(password)
+      const hasNumber = /[0-9]/.test(password)
+      const hasSymbol = /[^A-Za-z0-9]/.test(password)
+      
+      const charTypes = [hasUpper, hasLower, hasNumber, hasSymbol].filter(Boolean).length
+      strength += charTypes * 10
+      
+      // 连续性惩罚
+      if (/(.)\1{2,}/.test(password)) strength -= 10  // 连续相同字符
+      if (/^(123|abc|qwe)/.test(password.toLowerCase())) strength -= 10  // 常见模式
+      
+      // 确保分数在 0-100 之间
+      this.strength = Math.max(0, Math.min(100, strength))
     }
   }
 }
