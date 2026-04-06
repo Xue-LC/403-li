@@ -51,7 +51,7 @@
               v-model="hexColor" 
               @input="convertFromHex"
               placeholder="#9dff6b80"
-              class="code-input"
+              class="code-input-sm"
             />
             <button class="copy-btn" @click="copyHex" title="复制 HEX">📋</button>
           </div>
@@ -64,7 +64,7 @@
               v-model="rgbColor" 
               @input="convertFromRgb"
               placeholder="rgb(157, 255, 107)"
-              class="code-input"
+              class="code-input-sm"
             />
             <button class="copy-btn" @click="copyRgb" title="复制 RGB">📋</button>
           </div>
@@ -77,7 +77,7 @@
               v-model="hslColor" 
               @input="convertFromHsl"
               placeholder="hsl(106, 100%, 71%)"
-              class="code-input"
+              class="code-input-sm"
             />
             <button class="copy-btn" @click="copyHsl" title="复制 HSL">📋</button>
           </div>
@@ -767,40 +767,23 @@ export default {
   align-items: center;
 }
 
-.code-input {
-  width: 100%;
-  height: 44px;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 14px;
-  padding: 0 50px 0 12px;
-  border-radius: 0;
-  box-sizing: border-box;
-}
-
-.code-input:focus {
-  outline: 0;
-  border-color: var(--line-strong);
-  box-shadow: 0 0 20px var(--green-glow);
-}
-
 .copy-btn {
   position: absolute;
   right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
   background: transparent;
   border: none;
   color: var(--green);
   cursor: pointer;
-  font-size: 18px;
-  padding: 8px;
+  font-size: 16px;
+  padding: 4px 8px;
   transition: all 0.2s;
 }
 
 .copy-btn:hover {
   color: var(--text);
-  transform: scale(1.1);
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* === Status Messages === */

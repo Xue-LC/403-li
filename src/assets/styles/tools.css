@@ -103,6 +103,7 @@
   border-radius: 0;
   box-sizing: border-box;
   transition: all 0.2s;
+  min-height: 200px;
 }
 
 .code-input:focus {
@@ -125,6 +126,43 @@
     font-size: 14px;
     padding: 10px;
     min-height: 180px;
+  }
+}
+
+/* === 小代码输入框 (单行) === */
+.code-input-sm {
+  width: 100%;
+  max-width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 44px 0 12px;
+  resize: none;
+  border-radius: 0;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.code-input-sm:focus {
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input-sm::placeholder {
+  color: var(--dim);
+}
+
+@media (max-width: 640px) {
+  .code-input-sm {
+    font-size: 14px;
+    padding: 0 40px 0 10px;
+    height: 38px;
+    line-height: 38px;
   }
 }
 
