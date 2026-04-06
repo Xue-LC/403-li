@@ -32,6 +32,14 @@
                   <div class="alpha-gradient"></div>
                   <div class="alpha-thumb" :style="{ left: alphaThumbX + '%' }"></div>
                 </div>
+                <input 
+                  type="range" 
+                  v-model="alpha" 
+                  @input="updateColorFromAlpha"
+                  min="0" 
+                  max="100" 
+                  class="alpha-range-input"
+                />
               </div>
             </div>
           </div>
@@ -43,7 +51,7 @@
               type="text" 
               v-model="hexColor" 
               @input="convertFromHex"
-              placeholder="#9dff6b"
+              placeholder="#9dff6b80"
               class="code-input"
             />
             <button class="copy-btn" @click="copyHex" title="复制 HEX">📋</button>
@@ -150,9 +158,36 @@ export default {
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.alphaThumbX = Math.max(0, Math.min(100, x))
       this.alpha = Math.round(this.alphaThumbX)
+      this.updateColorFromAlpha()
+    },
+    updateColorFromAlpha() {
+      const rgb = this.hexToRgb(this.hexColor)
+      
+      // RGB
+      if (this.alpha === 100) {
+        this.rgbColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`
+      } else {
+        this.rgbColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${(this.alpha / 100).toFixed(2)})`
+      }
+      
+      // HSL
+      const hsl = this.rgbToHsl(rgb.r, rgb.g, rgb.b)
+      if (this.alpha === 100) {
+        this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
+      } else {
+        this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(this.alpha / 100).toFixed(2)})`
+      }
+      
+      // HEX
+      if (this.alpha === 100) {
+        this.hexColor = '#' + [rgb.r, rgb.g, rgb.b].map(x => x.toString(16).padStart(2, '0')).join('')
+      } else {
+        const alphaHex = Math.round(this.alpha * 255 / 100).toString(16).padStart(2, '0')
+        this.hexColor = '#' + [rgb.r, rgb.g, rgb.b].map(x => x.toString(16).padStart(2, '0')).join('') + alphaHex
+      }
     },
     validateColor() {
-      if (!/^#[0-9A-Fa-f]{6}$/.test(this.hexColor)) {
+      if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(this.hexColor)) {
         this.hexColor = this.hslToHex(this.hue, this.saturation, this.lightness)
       } else {
         const hsl = this.hexToHsl(this.hexColor)
@@ -173,7 +208,8 @@ export default {
     convertFromHex() {
       try {
         const hex = this.hexColor.trim()
-        if (!/^#[0-9A-Fa-f]{6}$/.test(hex)) {
+        // 支持 6 位和 8 位 HEX
+        if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(hex)) {
           throw new Error('无效的 HEX 格式')
         }
         
@@ -181,6 +217,13 @@ export default {
         const r = parseInt(hex.slice(1, 3), 16)
         const g = parseInt(hex.slice(3, 5), 16)
         const b = parseInt(hex.slice(5, 7), 16)
+        
+        // 如果是 8 位 HEX，提取透明度
+        if (hex.length === 9) {
+          const alphaHex = hex.slice(7, 9)
+          this.alpha = Math.round(parseInt(alphaHex, 16) / 255 * 100)
+          this.alphaThumbX = this.alpha
+        }
         
         // RGB 格式：透明度 100% 用 rgb，否则用 rgba
         if (this.alpha === 100) {
@@ -351,6 +394,13 @@ export default {
       const g = hue2rgb(p, q, h / 360)
       const b = hue2rgb(p, q, h / 360 - 1/3)
       return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
+    },
+    hexToRgb(hex) {
+      // 支持 6 位和 8 位 HEX
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return { r, g, b }
     },
     hexToHsl(hex) {
       let r = parseInt(hex.slice(1, 3), 16) / 255
@@ -604,6 +654,18 @@ export default {
 
 .alpha-slider-wrapper {
   margin-bottom: 8px;
+  position: relative;
+}
+
+.alpha-range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
 }
 
 .slider-label {
