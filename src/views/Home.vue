@@ -165,7 +165,7 @@ export default {
         },
         { 
           id: 8, 
-          path: '/tools/color', 
+          path: '/tools/color-convert', 
           name: '颜色转换', 
           description: 'HEX、RGB、HSL 颜色格式互相转换',
           status: 'normal',

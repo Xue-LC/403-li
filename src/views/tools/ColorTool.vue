@@ -768,14 +768,16 @@ export default {
 }
 
 .code-input {
-  flex: 1;
+  width: 100%;
+  height: 44px;
   background: var(--panel-2);
   border: 1px solid var(--line);
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px;
-  padding: 12px 50px 12px 12px;
+  padding: 0 50px 0 12px;
   border-radius: 0;
+  box-sizing: border-box;
 }
 
 .code-input:focus {
