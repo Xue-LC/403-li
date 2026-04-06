@@ -17,7 +17,7 @@
             <div class="color-preview" :style="{ '--current-color': rgbaColor }" @click.stop="togglePicker"></div>
             <div v-if="showPicker" class="color-picker-panel" @click.stop>
               <!-- 饱和度/亮度区域 -->
-              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `linear-gradient(to right, hsl(${hue}, 0%, 50%), hsl(${hue}, 100%, 50%))` }">
+              <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `linear-gradient(to bottom, #fff, transparent), linear-gradient(to right, #808080, hsl(${hue}, 100%, 50%)), linear-gradient(to bottom, #000, #fff)` }"> 50%))` }">
                 <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to bottom, transparent, #000);"></div>
                 <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
               </div>
@@ -143,9 +143,9 @@ export default {
       this.saturation = Math.max(0, Math.min(100, x))
       this.lightness = Math.max(0, Math.min(100, 100 - y))
       
-      // 更新圆点位置（Y 值需要反转）
+      // 更新圆点位置
       this.slThumbX = this.saturation
-      this.slThumbY = 100 - this.lightness
+      this.slThumbY = y
       
       // 转换为 RGB（hslToRgb 需要 s 和 l 为 0-1 的小数）
       const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
@@ -179,7 +179,7 @@ export default {
       
       // 更新圆点位置
       this.slThumbX = this.saturation
-      this.slThumbY = this.lightness
+      this.slThumbY = 100 - this.lightness
       
       // 使用统一方法更新所有输入
       this.updateAllInputs(rgb.r, rgb.g, rgb.b, this.alpha)
@@ -625,6 +625,14 @@ export default {
   position: relative;
   margin-bottom: 12px;
   cursor: crosshair;
+  /* 标准的 HSL 饱和度/亮度渐变 */
+  background: 
+    /* 顶层：从上到下 白→透明 */
+    linear-gradient(to bottom, #fff, transparent),
+    /* 中层：从左到右 灰色→纯色 */
+    linear-gradient(to right, #808080, hsl(var(--hue), 100%, 50%)),
+    /* 底层：从上到下 黑→白 */
+    linear-gradient(to bottom, #000, #fff);
 }
 
 .sl-overlay {
