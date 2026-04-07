@@ -129,8 +129,11 @@ export default {
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     },
     slGradientStyle() {
+      // 使用单层渐变正确模拟 HSL 饱和度/亮度选择器
+      // 左->右: 灰色到纯色 (饱和度变化)
+      // 上->下: 白色到黑色叠加 (亮度变化)
       return {
-        backgroundImage: `linear-gradient(to bottom, #fff, #000), linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))`
+        backgroundImage: `linear-gradient(to bottom, rgba(255,255,255,0), rgba(0,0,0,1)), linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))`
       }
     }
   },
@@ -626,7 +629,6 @@ export default {
   position: relative;
   margin-bottom: 12px;
   cursor: crosshair;
-  background-blend-mode: multiply;
 }
 
 .sl-overlay {

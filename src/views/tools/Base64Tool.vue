@@ -145,4 +145,261 @@ export default {
 <style scoped>
 @import '../../assets/styles/index.css';
 @import '../../assets/styles/tools.css';
+
+.base64-tool {
+  width: min(var(--max), calc(100vw - 16px));
+  margin: 0 auto;
+  padding: 12px 0 20px;
+}
+
+/* === Pane === */
+.pane {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+.pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
+.pane-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: rgba(18,22,27,0.94);
+}
+
+.pane-body {
+  padding: 12px;
+}
+
+.tool-body {
+  margin-top: 1rem;
+}
+
+.input-label {
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.code-input {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(18,22,27,0.94);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px;
+  resize: vertical;
+  transition: all 0.2s;
+  border-radius: 0;
+  box-sizing: border-box;
+  min-height: 200px;
+}
+
+.code-input:focus {
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input::placeholder {
+  color: var(--dim);
+}
+
+.code-input.output {
+  background: rgba(157,255,107,0.03);
+  border-color: rgba(157,255,107,0.2);
+}
+
+.button-group {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 1rem 0;
+}
+
+.button {
+  border: 1px solid var(--line-strong);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  border-radius: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.button.full-width {
+  grid-column: 1 / -1;
+}
+
+.button:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+  box-shadow: 0 0 15px var(--green-glow);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button.primary {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.button.primary:hover:not(:disabled) {
+  background: rgba(157,255,107,0.2);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.button.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: rgba(255,107,125,0.1);
+  box-shadow: 0 0 15px rgba(255,107,125,0.3);
+}
+
+.status-error {
+  color: var(--red);
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255,107,125,0.3);
+  background: rgba(255,107,125,0.05);
+}
+
+.status-success {
+  color: var(--green);
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 10px 12px;
+  border: 1px solid rgba(157,255,107,0.3);
+  background: var(--green-soft);
+}
+
+/* === Footer === */
+.footer {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .base64-tool {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+  
+  .pane-body {
+    padding: 12px;
+  }
+  
+  .code-input {
+    font-size: 14px;
+    padding: 10px;
+    min-height: 180px;
+  }
+  
+  .button-group {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 0.75rem 0;
+  }
+  
+  .button {
+    height: 48px;
+    font-size: 13px;
+  }
+  
+  .input-label {
+    font-size: 12px;
+    margin-bottom: 0.4rem;
+  }
+  
+  .status-error, .status-success {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin-top: 0.75rem;
+  }
+  
+  .footer {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+/* 超小屏幕 */
+@media (max-width: 375px) {
+  .base64-tool {
+    padding: 6px 0 14px;
+  }
+  
+  .pane-body {
+    padding: 8px;
+  }
+  
+  .code-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+  
+  .button {
+    height: 48px;
+    font-size: 12px;
+  }
+  
+  .footer {
+    font-size: 11px;
+  }
+}
 </style>
