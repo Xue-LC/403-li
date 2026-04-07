@@ -218,7 +218,7 @@ export default {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
     startProgressSimulation(totalFiles) {
-      this.progress = 0
+      this.progress = 5
       this.progressText = `正在初始化...`
       
       let currentFile = 0
