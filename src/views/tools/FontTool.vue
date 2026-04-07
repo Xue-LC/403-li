@@ -104,7 +104,7 @@
 
 <script>
 import Topbar from '../../components/Topbar.vue'
-import { compress } from 'wawoff2'
+import { compress } from 'woff2-encoder'
 
 export default {
   name: 'FontTool',
@@ -204,9 +204,9 @@ export default {
         
         try {
           const buffer = await fileInfo.file.arrayBuffer()
-          const inputData = new Uint8Array(buffer)
           
-          // 使用 wawoff2 压缩
+          // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
+          const inputData = new Uint8Array(buffer)
           const compressed = await compress(inputData)
           
           fileInfo.result = compressed
@@ -217,8 +217,11 @@ export default {
           const baseName = fileInfo.name.replace(/\.[^.]+$/, '')
           fileInfo.outputName = baseName + '.woff2'
         } catch (err) {
+          console.error('Font conversion error:', err)
           fileInfo.status = 'error'
-          fileInfo.error = err.message
+          fileInfo.error = err.message || '转换失败，请检查字体文件是否有效'
+          // 显示总体错误信息
+          this.error = `${fileInfo.name}: ${fileInfo.error}`
         }
       }
       

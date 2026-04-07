@@ -16,7 +16,7 @@
     "qrcodejs": "^1.0.0",
     "vue": "^3.4.0",
     "vue-router": "^5.0.4",
-    "wawoff2": "^2.0.1"
+    "woff2-encoder": "^2.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.0",
