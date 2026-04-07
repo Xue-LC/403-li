@@ -304,37 +304,39 @@ export default {
     },
     validateColor() {
       if (!/^#[0-9A-Fa-f]{6}$/.test(this.fgColor)) {
-        this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+        this.fgColor = this.hsvToHex(this.fgHue, this.fgSaturation, this.fgValue)
       } else {
-        const hsl = this.hexToHsl(this.fgColor)
-        this.fgHue = hsl.h
-        this.fgSaturation = hsl.s
-        this.fgLightness = hsl.l
+        const hsv = this.hexToHsv(this.fgColor)
+        this.fgHue = hsv.h
+        this.fgSaturation = hsv.s
+        this.fgValue = hsv.v
         this.updateSlThumb('fg')
         this.updateHueThumb('fg')
       }
     },
     validateColorBg() {
       if (!/^#[0-9A-Fa-f]{6}$/.test(this.bgColor)) {
-        this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+        this.bgColor = this.hsvToHex(this.bgHue, this.bgSaturation, this.bgValue)
       } else {
-        const hsl = this.hexToHsl(this.bgColor)
-        this.bgHue = hsl.h
-        this.bgSaturation = hsl.s
-        this.bgLightness = hsl.l
+        const hsv = this.hexToHsv(this.bgColor)
+        this.bgHue = hsv.h
+        this.bgSaturation = hsv.s
+        this.bgValue = hsv.v
         this.updateSlThumb('bg')
         this.updateHueThumb('bg')
       }
     },
+    // HSV 模型：X轴=饱和度(0-100), Y轴=100-明度(0-100)
     selectSaturationLightness(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       const y = ((e.clientY - rect.top) / rect.height) * 100
       this.slThumbX = Math.max(0, Math.min(100, x))
       this.slThumbY = Math.max(0, Math.min(100, y))
+      // HSV 模型：X=Saturation, Y=100-Value
       this.fgSaturation = this.slThumbX
-      this.fgLightness = 100 - this.slThumbY
-      this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+      this.fgValue = 100 - this.slThumbY
+      this.fgColor = this.hsvToHex(this.fgHue, this.fgSaturation, this.fgValue)
     },
     selectSaturationLightnessBg(e) {
       const rect = e.currentTarget.getBoundingClientRect()
@@ -342,31 +344,33 @@ export default {
       const y = ((e.clientY - rect.top) / rect.height) * 100
       this.slThumbXBg = Math.max(0, Math.min(100, x))
       this.slThumbYBg = Math.max(0, Math.min(100, y))
+      // HSV 模型：X=Saturation, Y=100-Value
       this.bgSaturation = this.slThumbXBg
-      this.bgLightness = 100 - this.slThumbYBg
-      this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+      this.bgValue = 100 - this.slThumbYBg
+      this.bgColor = this.hsvToHex(this.bgHue, this.bgSaturation, this.bgValue)
     },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbX = Math.max(0, Math.min(100, x))
       this.fgHue = (this.hueThumbX / 100) * 360
-      this.fgColor = this.hslToHex(this.fgHue, this.fgSaturation, this.fgLightness)
+      this.fgColor = this.hsvToHex(this.fgHue, this.fgSaturation, this.fgValue)
     },
     selectHueBg(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbXBg = Math.max(0, Math.min(100, x))
       this.bgHue = (this.hueThumbXBg / 100) * 360
-      this.bgColor = this.hslToHex(this.bgHue, this.bgSaturation, this.bgLightness)
+      this.bgColor = this.hsvToHex(this.bgHue, this.bgSaturation, this.bgValue)
     },
+    // HSV 模型：X=Saturation, Y=100-Value
     updateSlThumb(type) {
       if (type === 'fg') {
         this.slThumbX = this.fgSaturation
-        this.slThumbY = 100 - this.fgLightness
+        this.slThumbY = 100 - this.fgValue
       } else {
         this.slThumbXBg = this.bgSaturation
-        this.slThumbYBg = 100 - this.bgLightness
+        this.slThumbYBg = 100 - this.bgValue
       }
     },
     updateHueThumb(type) {
@@ -376,51 +380,75 @@ export default {
         this.hueThumbXBg = (this.bgHue / 360) * 100
       }
     },
-    hexToHsl(hex) {
+    // HSV/HSB 模型转换函数
+    hexToHsv(hex) {
       let r = parseInt(hex.slice(1, 3), 16) / 255
       let g = parseInt(hex.slice(3, 5), 16) / 255
       let b = parseInt(hex.slice(5, 7), 16) / 255
       let max = Math.max(r, g, b), min = Math.min(r, g, b)
-      let h, s, l = (max + min) / 2
-      if (max === min) {
-        h = s = 0
-      } else {
-        let d = max - min
-        s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+      const d = max - min
+      let h = 0
+      const s = max === 0 ? 0 : d / max
+      const v = max
+      if (d !== 0) {
         switch (max) {
-          case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break
-          case g: h = ((b - r) / d + 2) / 6; break
-          case b: h = ((r - g) / d + 4) / 6; break
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break
+          case g: h = ((b - r) / d + 2) * 60; break
+          case b: h = ((r - g) / d + 4) * 60; break
         }
       }
-      return { h: h * 360, s: s * 100, l: l * 100 }
+      return { h, s: s * 100, v: v * 100 }
     },
-    hslToHex(h, s, l) {
-      h /= 360
+    hsvToHex(h, s, v) {
+      // HSV/HSB 转 RGB
       s /= 100
-      l /= 100
+      v /= 100
+      const c = v * s
+      const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+      const m = v - c
       let r, g, b
-      if (s === 0) {
-        r = g = b = l
-      } else {
-        const hue2rgb = (p, q, t) => {
-          if (t < 0) t += 1
-          if (t > 1) t -= 1
-          if (t < 1/6) return p + (q - p) * 6 * t
-          if (t < 1/2) return q
-          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
-          return p
+      if (h < 60) { r = c; g = x; b = 0 }
+      else if (h < 120) { r = x; g = c; b = 0 }
+      else if (h < 180) { r = 0; g = c; b = x }
+      else if (h < 240) { r = 0; g = x; b = c }
+      else if (h < 300) { r = x; g = 0; b = c }
+      else { r = c; g = 0; b = x }
+      return '#' + [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+        .map(x => x.toString(16).padStart(2, '0')).join('')
+    },
+    hsvToRgb(h, s, v) {
+      // HSV/HSB 转 RGB
+      // h: 0-360, s: 0-100, v: 0-100
+      s /= 100
+      v /= 100
+      const c = v * s
+      const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+      const m = v - c
+      let r, g, b
+      if (h < 60) { r = c; g = x; b = 0 }
+      else if (h < 120) { r = x; g = c; b = 0 }
+      else if (h < 180) { r = 0; g = c; b = x }
+      else if (h < 240) { r = 0; g = x; b = c }
+      else if (h < 300) { r = x; g = 0; b = c }
+      else { r = c; g = 0; b = x }
+      return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+    },
+    rgbToHsv(r, g, b) {
+      // RGB 转 HSV/HSB
+      r /= 255; g /= 255; b /= 255
+      const max = Math.max(r, g, b), min = Math.min(r, g, b)
+      const d = max - min
+      let h = 0
+      const s = max === 0 ? 0 : d / max
+      const v = max
+      if (d !== 0) {
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break
+          case g: h = ((b - r) / d + 2) * 60; break
+          case b: h = ((r - g) / d + 4) * 60; break
         }
-        const q = l < 0.5 ? l * (1 + s) : l + s - l * s
-        const p = 2 * l - q
-        r = hue2rgb(p, q, h + 1/3)
-        g = hue2rgb(p, q, h)
-        b = hue2rgb(p, q, h - 1/3)
       }
-      return '#' + [r, g, b].map(x => {
-        const hex = Math.round(x * 255).toString(16)
-        return hex.length === 1 ? '0' + hex : hex
-      }).join('')
+      return { h, s: s * 100, v: v * 100 }
     },
     drawSmartRoundedRect(ctx, x, y, width, height, radius, corners) {
       ctx.beginPath()
@@ -603,17 +631,17 @@ export default {
       this.showBgPicker = false
     })
     // 初始化滑块位置
-    const fgHsl = this.hexToHsl(this.fgColor)
-    this.fgHue = fgHsl.h
-    this.fgSaturation = fgHsl.s
-    this.fgLightness = fgHsl.l
+    const fgHsv = this.hexToHsv(this.fgColor)
+    this.fgHue = fgHsv.h
+    this.fgSaturation = fgHsv.s
+    this.fgValue = fgHsv.v
     this.updateSlThumb('fg')
     this.updateHueThumb('fg')
     
-    const bgHsl = this.hexToHsl(this.bgColor)
-    this.bgHue = bgHsl.h
-    this.bgSaturation = bgHsl.s
-    this.bgLightness = bgHsl.l
+    const bgHsv = this.hexToHsv(this.bgColor)
+    this.bgHue = bgHsv.h
+    this.bgSaturation = bgHsv.s
+    this.bgValue = bgHsv.v
     this.updateSlThumb('bg')
     this.updateHueThumb('bg')
   }
