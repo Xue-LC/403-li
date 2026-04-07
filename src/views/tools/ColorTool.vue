@@ -33,7 +33,7 @@
                 </div>
                 <input 
                   type="range" 
-                  v-model="alpha" 
+                  v-model.number="alpha" 
                   @input="updateColorFromAlpha"
                   min="0" 
                   max="100" 
