@@ -246,7 +246,7 @@ export default {
         ['#fa709a', '#fee140'],  // 粉黄渐变
         ['#a8edea', '#fed6e3']   // 青粉渐变
       ],
-      bgGradientIndex: -1,  // 当前选择的渐变索引，-1 表示纯色,
+      bgGradientIndex: -1,  // 当前选择的渐变索引，-1 表示纯色
       // 前景色 HSV (使用 HSV/HSB 模型，与 ColorTool 一致)
       fgHue: 96,
       fgSaturation: 100,  // HSV Saturation (0-100)
@@ -254,7 +254,6 @@ export default {
       slThumbX: 100,
       slThumbY: 0,
       hueThumbX: 27,
-      fgAlpha: 100,       // 前景色透明度 (0-100)
       fgAlphaThumbX: 100, // 前景色透明度滑块位置
       // 背景色 HSV
       bgHue: 210,
@@ -661,18 +660,22 @@ export default {
           ctx.fillRect(0, 0, size, size)
         }
         
-        // 如果选择了渐变，使用 Canvas 渐变绘制背景
+        // 如果选择了渐变，使用 Canvas 渐变绘制背景（支持透明度）
         if (this.bgGradientIndex >= 2 && this.bgGradients[this.bgGradientIndex]) {
           const gradient = this.bgGradients[this.bgGradientIndex]
           const grad = ctx.createLinearGradient(0, 0, size, size)
-          grad.addColorStop(0, gradient[0])
-          grad.addColorStop(1, gradient[1])
+          // 解析渐变颜色并应用透明度
+          const rgb1 = this.hexToRgb(gradient[0])
+          const rgb2 = this.hexToRgb(gradient[1])
+          const alpha = this.bgAlpha / 100
+          grad.addColorStop(0, `rgba(${rgb1.r}, ${rgb1.g}, ${rgb1.b}, ${alpha})`)
+          grad.addColorStop(1, `rgba(${rgb2.r}, ${rgb2.g}, ${rgb2.b}, ${alpha})`)
           ctx.fillStyle = grad
           ctx.fillRect(0, 0, size, size)
         }
         
-        // 设置前景色（支持透明度）
-        ctx.fillStyle = this.fgAlpha < 100 ? this.fgRgbaColor : this.fgColor
+        // 设置前景色（始终使用 RGBA 以支持透明度）
+        ctx.fillStyle = this.fgRgbaColor
         
         let squareCount = 0, dotsCount = 0, roundedCount = 0
         
