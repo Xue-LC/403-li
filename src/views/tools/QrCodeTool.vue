@@ -25,9 +25,8 @@
               <div class="color-preview-wrapper">
                 <div class="color-preview" :style="{ backgroundColor: fgColor }" @click.stop="togglePicker('fg')"></div>
                 <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
-                  <!-- 饱和度/亮度区域 -->
-                  <div class="sl-gradient" @click="selectSaturationLightness" :style="{ background: `hsl(${fgHue}, 100%, 50%)` }">
-                    <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to top, #000, transparent);"></div>
+                  <!-- 饱和度/亮度区域 (HSV 模型) -->
+                  <div class="sl-gradient" @click="selectSaturationLightness" :style="fgSlGradientStyle">
                     <div class="sl-thumb" :style="{ left: slThumbX + '%', top: slThumbY + '%' }"></div>
                   </div>
                   <!-- 色相滑块 -->
@@ -62,9 +61,8 @@
               <div class="color-preview-wrapper">
                 <div class="color-preview" :style="{ backgroundColor: bgColor }" @click.stop="togglePicker('bg')"></div>
                 <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
-                  <!-- 饱和度/亮度区域 -->
-                  <div class="sl-gradient" @click="selectSaturationLightnessBg" :style="{ background: `hsl(${bgHue}, 100%, 50%)` }">
-                    <div class="sl-overlay" style="background: linear-gradient(to right, #fff, transparent), linear-gradient(to top, #000, transparent);"></div>
+                  <!-- 饱和度/亮度区域 (HSV 模型) -->
+                  <div class="sl-gradient" @click="selectSaturationLightnessBg" :style="bgSlGradientStyle">
                     <div class="sl-thumb" :style="{ left: slThumbXBg + '%', top: slThumbYBg + '%' }"></div>
                   </div>
                   <!-- 色相滑块 -->
@@ -215,20 +213,42 @@ export default {
         ['#a8edea', '#fed6e3']   // 青粉渐变
       ],
       bgGradientIndex: -1,  // 当前选择的渐变索引，-1 表示纯色,
-      // 前景色 HSL
-      fgHue: 120,
-      fgSaturation: 100,
-      fgLightness: 50,
+      // 前景色 HSV (使用 HSV/HSB 模型，与 ColorTool 一致)
+      fgHue: 96,
+      fgSaturation: 100,  // HSV Saturation (0-100)
+      fgValue: 100,       // HSV Value/Brightness (0-100)
       slThumbX: 100,
       slThumbY: 0,
-      hueThumbX: 33,
-      // 背景色 HSL
+      hueThumbX: 27,
+      // 背景色 HSV
       bgHue: 210,
-      bgSaturation: 20,
-      bgLightness: 7,
-      slThumbXBg: 20,
-      slThumbYBg: 86,
-      hueThumbXBg: 70
+      bgSaturation: 18,
+      bgValue: 9,
+      slThumbXBg: 18,
+      slThumbYBg: 91,
+      hueThumbXBg: 58
+    }
+  },
+  computed: {
+    // 前景色选择器渐变样式 (HSV 模型)
+    fgSlGradientStyle() {
+      const pureColor = this.hsvToHex(this.fgHue, 100, 100)
+      return {
+        backgroundImage: `
+          linear-gradient(to bottom, transparent, #000),
+          linear-gradient(to right, #808080, ${pureColor})
+        `
+      }
+    },
+    // 背景色选择器渐变样式 (HSV 模型)
+    bgSlGradientStyle() {
+      const pureColor = this.hsvToHex(this.bgHue, 100, 100)
+      return {
+        backgroundImage: `
+          linear-gradient(to bottom, transparent, #000),
+          linear-gradient(to right, #808080, ${pureColor})
+        `
+      }
     }
   },
   methods: {
@@ -245,19 +265,19 @@ export default {
       if (type === 'fg') {
         this.fgColor = color
         this.showFgPicker = false
-        const hsl = this.hexToHsl(color)
-        this.fgHue = hsl.h
-        this.fgSaturation = hsl.s
-        this.fgLightness = hsl.l
+        const hsv = this.hexToHsv(color)
+        this.fgHue = hsv.h
+        this.fgSaturation = hsv.s
+        this.fgValue = hsv.v
         this.updateSlThumb('fg')
         this.updateHueThumb('fg')
       } else {
         this.bgColor = color
         this.showBgPicker = false
-        const hsl = this.hexToHsl(color)
-        this.bgHue = hsl.h
-        this.bgSaturation = hsl.s
-        this.bgLightness = hsl.l
+        const hsv = this.hexToHsv(color)
+        this.bgHue = hsv.h
+        this.bgSaturation = hsv.s
+        this.bgValue = hsv.v
         this.updateSlThumb('bg')
         this.updateHueThumb('bg')
       }
@@ -275,10 +295,10 @@ export default {
       }
       
       this.showBgPicker = false
-      const hsl = this.hexToHsl(this.bgColor)
-      this.bgHue = hsl.h
-      this.bgSaturation = hsl.s
-      this.bgLightness = hsl.l
+      const hsv = this.hexToHsv(this.bgColor)
+      this.bgHue = hsv.h
+      this.bgSaturation = hsv.s
+      this.bgValue = hsv.v
       this.updateSlThumb('bg')
       this.updateHueThumb('bg')
     },
