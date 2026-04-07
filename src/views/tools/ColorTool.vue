@@ -777,16 +777,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to right, 
-    rgba(255,255,255,0), 
-    rgba(255,255,255,1));
-  background-image: 
-    linear-gradient(45deg, #ccc 25%, transparent 25%), 
-    linear-gradient(-45deg, #ccc 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #ccc 75%), 
-    linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 10px 10px;
-  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  background: linear-gradient(to right, transparent, #000);
 }
 
 .alpha-thumb {
