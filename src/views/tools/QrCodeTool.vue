@@ -205,6 +205,8 @@ export default {
       input: '',
       fgColor: '#9dff6b',
       bgColor: '#0d1117',
+      fgAlpha: 100,
+      bgAlpha: 100,
       qrStyle: 'square',
       error: '',
       success: '',
@@ -382,7 +384,7 @@ export default {
       // HSV 模型：X=Saturation, Y=100-Value
       this.fgSaturation = this.slThumbX
       this.fgValue = 100 - this.slThumbY
-      this.fgColor = this.hsvToHex(this.fgHue, this.fgSaturation, this.fgValue)
+      this.fgColor = this.hsvToHexWithAlpha(this.fgHue, this.fgSaturation, this.fgValue, this.fgAlpha)
     },
     selectSaturationLightnessBg(e) {
       const rect = e.currentTarget.getBoundingClientRect()
@@ -393,21 +395,21 @@ export default {
       // HSV 模型：X=Saturation, Y=100-Value
       this.bgSaturation = this.slThumbXBg
       this.bgValue = 100 - this.slThumbYBg
-      this.bgColor = this.hsvToHex(this.bgHue, this.bgSaturation, this.bgValue)
+      this.bgColor = this.hsvToHexWithAlpha(this.bgHue, this.bgSaturation, this.bgValue, this.bgAlpha)
     },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbX = Math.max(0, Math.min(100, x))
       this.fgHue = (this.hueThumbX / 100) * 360
-      this.fgColor = this.hsvToHex(this.fgHue, this.fgSaturation, this.fgValue)
+      this.fgColor = this.hsvToHexWithAlpha(this.fgHue, this.fgSaturation, this.fgValue, this.fgAlpha)
     },
     selectHueBg(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbXBg = Math.max(0, Math.min(100, x))
       this.bgHue = (this.hueThumbXBg / 100) * 360
-      this.bgColor = this.hsvToHex(this.bgHue, this.bgSaturation, this.bgValue)
+      this.bgColor = this.hsvToHexWithAlpha(this.bgHue, this.bgSaturation, this.bgValue, this.bgAlpha)
     },
     // HSV 模型：X=Saturation, Y=100-Value
     updateSlThumb(type) {
@@ -641,6 +643,24 @@ export default {
         ctx.fillStyle = this.bgColor
         ctx.fillRect(0, 0, size, size)
         
+        // 如果背景透明度不为100%，先填充棋盘格背景
+        if (this.bgAlpha < 100) {
+          // 绘制棋盘格背景
+          const gridSize = 20 * pixelRatio
+          ctx.fillStyle = '#ccc'
+          for (let gx = 0; gx < size; gx += gridSize) {
+            for (let gy = 0; gy < size; gy += gridSize) {
+              const isEven = ((gx / gridSize) + (gy / gridSize)) % 2 === 0
+              if (isEven) {
+                ctx.fillRect(gx, gy, gridSize, gridSize)
+              }
+            }
+          }
+          // 再填充带透明度的背景色
+          ctx.fillStyle = this.bgRgbaColor
+          ctx.fillRect(0, 0, size, size)
+        }
+        
         // 如果选择了渐变，使用 Canvas 渐变绘制背景
         if (this.bgGradientIndex >= 2 && this.bgGradients[this.bgGradientIndex]) {
           const gradient = this.bgGradients[this.bgGradientIndex]
@@ -651,7 +671,8 @@ export default {
           ctx.fillRect(0, 0, size, size)
         }
         
-        ctx.fillStyle = this.fgColor
+        // 设置前景色（支持透明度）
+        ctx.fillStyle = this.fgAlpha < 100 ? this.fgRgbaColor : this.fgColor
         
         let squareCount = 0, dotsCount = 0, roundedCount = 0
         
@@ -873,6 +894,36 @@ export default {
   border-radius: 0;
   cursor: pointer;
   transition: transform 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.color-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  z-index: 0;
+}
+
+.color-preview::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--current-color);
+  z-index: 1;
 }
 
 .color-preview:hover {
@@ -943,6 +994,71 @@ export default {
   top: 50%;
   width: 18px;
   height: 18px;
+  background: #fff;
+  border: 2px solid #000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+/* === Alpha Slider === */
+.alpha-slider-wrapper {
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.alpha-range-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.slider-label {
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.alpha-slider {
+  width: 100%;
+  height: 20px;
+  border: 2px solid var(--line);
+  border-radius: 0;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  background: 
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.alpha-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, transparent, #000);
+}
+
+.alpha-thumb {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
   background: #fff;
   border: 2px solid #000;
   border-radius: 50%;
