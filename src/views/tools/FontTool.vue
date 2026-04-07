@@ -247,23 +247,26 @@ export default {
     async convertAll() {
       this.converting = true
       this.error = ''
-      this.progress = 5
-      this.progressText = '正在初始化...'
       
       const pendingFiles = this.files.filter(f => f.status === 'pending')
       const totalFiles = pendingFiles.length
-      const stepPerFile = 90 / totalFiles
       
       for (let i = 0; i < pendingFiles.length; i++) {
         const fileInfo = pendingFiles[i]
         fileInfo.status = 'converting'
         
-        // 更新进度
-        this.progress = Math.round(5 + i * stepPerFile)
+        // 模拟单个文件的转换进度
+        this.progress = 5
         this.progressText = `正在转换: ${fileInfo.name}`
         
-        // 让出主线程，给 UI 渲染时间
-        await new Promise(resolve => setTimeout(resolve, 50))
+        // 启动进度模拟
+        let fakeProgress = 5
+        const progressInterval = setInterval(() => {
+          if (fakeProgress < 90) {
+            fakeProgress += Math.random() * 10
+            this.progress = Math.min(Math.round(fakeProgress), 90)
+          }
+        }, 100)
         
         try {
           const buffer = await fileInfo.file.arrayBuffer()
@@ -271,6 +274,8 @@ export default {
           // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
           const inputData = new Uint8Array(buffer)
           const compressed = await compress(inputData)
+          
+          clearInterval(progressInterval)
           
           fileInfo.result = compressed
           fileInfo.convertedSize = compressed.length
@@ -280,6 +285,7 @@ export default {
           const baseName = fileInfo.name.replace(/\.[^.]+$/, '')
           fileInfo.outputName = baseName + '.woff2'
         } catch (err) {
+          clearInterval(progressInterval)
           console.error('Font conversion error:', err)
           fileInfo.status = 'error'
           fileInfo.error = err.message || '转换失败，请检查字体文件是否有效'
