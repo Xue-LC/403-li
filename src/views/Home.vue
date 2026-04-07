@@ -90,7 +90,7 @@
     <!-- Footer -->
     <footer class="footer">
       <span>403.li // 中文终端工具站</span>
-      <span>纯前端 · 无追踪 · 开源</span>
+      <span>纯前端 · 无追踪 · <a href="https://github.com/Xue-LC/403-li" target="_blank" style="color: var(--green);">开源</a></span>
     </footer>
   </div>
 </template>
