@@ -256,6 +256,8 @@ export default {
         
         try {
           progressController.nextFile()
+          // 让出主线程，给进度条渲染时间
+          await new Promise(resolve => setTimeout(resolve, 100))
           const buffer = await fileInfo.file.arrayBuffer()
           
           // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
