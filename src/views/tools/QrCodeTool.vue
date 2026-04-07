@@ -23,7 +23,7 @@
             <div class="color-picker">
               <label class="input-label">前景色：</label>
               <div class="color-preview-wrapper">
-                <div class="color-preview" :style="{ backgroundColor: fgColor }" @click.stop="togglePicker('fg')"></div>
+                <div class="color-preview" :style="{ '--current-color': fgRgbaColor }" @click.stop="togglePicker('fg')"></div>
                 <div v-if="showFgPicker" class="color-picker-panel" @click.stop>
                   <!-- 饱和度/亮度区域 (HSV 模型) -->
                   <div class="sl-gradient" @click="selectSaturationLightness" :style="fgSlGradientStyle">
@@ -33,14 +33,30 @@
                   <div class="hue-slider" @click="selectHue">
                     <div class="hue-thumb" :style="{ left: hueThumbX + '%' }"></div>
                   </div>
+                  <!-- 透明度滑块 -->
+                  <div class="alpha-slider-wrapper">
+                    <label class="slider-label">透明度：{{ fgAlpha }}%</label>
+                    <div class="alpha-slider" @click="selectAlpha">
+                      <div class="alpha-gradient"></div>
+                      <div class="alpha-thumb" :style="{ left: fgAlphaThumbX + '%' }"></div>
+                    </div>
+                    <input 
+                      type="range" 
+                      v-model.number="fgAlpha" 
+                      @input="updateColorFromAlpha('fg')"
+                      min="0" 
+                      max="100" 
+                      class="alpha-range-input"
+                    />
+                  </div>
                   <!-- HEX 输入 -->
                   <div class="hex-input-wrapper">
                     <input 
                       type="text" 
                       v-model="fgColor" 
-                      @change="validateColor"
+                      @input="convertFromHex('fg')"
                       class="hex-input"
-                      placeholder="#9dff6b"
+                      placeholder="#9dff6bff"
                     />
                   </div>
                   <!-- 预设颜色 -->
@@ -59,7 +75,7 @@
             <div class="color-picker">
               <label class="input-label">背景色：</label>
               <div class="color-preview-wrapper">
-                <div class="color-preview" :style="{ backgroundColor: bgColor }" @click.stop="togglePicker('bg')"></div>
+                <div class="color-preview" :style="{ '--current-color': bgRgbaColor }" @click.stop="togglePicker('bg')"></div>
                 <div v-if="showBgPicker" class="color-picker-panel" @click.stop>
                   <!-- 饱和度/亮度区域 (HSV 模型) -->
                   <div class="sl-gradient" @click="selectSaturationLightnessBg" :style="bgSlGradientStyle">
@@ -69,14 +85,30 @@
                   <div class="hue-slider" @click="selectHueBg">
                     <div class="hue-thumb" :style="{ left: hueThumbXBg + '%' }"></div>
                   </div>
+                  <!-- 透明度滑块 -->
+                  <div class="alpha-slider-wrapper">
+                    <label class="slider-label">透明度：{{ bgAlpha }}%</label>
+                    <div class="alpha-slider" @click="selectAlphaBg">
+                      <div class="alpha-gradient"></div>
+                      <div class="alpha-thumb" :style="{ left: bgAlphaThumbX + '%' }"></div>
+                    </div>
+                    <input 
+                      type="range" 
+                      v-model.number="bgAlpha" 
+                      @input="updateColorFromAlpha('bg')"
+                      min="0" 
+                      max="100" 
+                      class="alpha-range-input"
+                    />
+                  </div>
                   <!-- HEX 输入 -->
                   <div class="hex-input-wrapper">
                     <input 
                       type="text" 
                       v-model="bgColor" 
-                      @change="validateColorBg"
+                      @input="convertFromHex('bg')"
                       class="hex-input"
-                      placeholder="#0d1117"
+                      placeholder="#0d1117ff"
                     />
                   </div>
                   <!-- 预设颜色（包含渐变） -->
@@ -220,13 +252,17 @@ export default {
       slThumbX: 100,
       slThumbY: 0,
       hueThumbX: 27,
+      fgAlpha: 100,       // 前景色透明度 (0-100)
+      fgAlphaThumbX: 100, // 前景色透明度滑块位置
       // 背景色 HSV
       bgHue: 210,
       bgSaturation: 18,
       bgValue: 9,
       slThumbXBg: 18,
       slThumbYBg: 91,
-      hueThumbXBg: 58
+      hueThumbXBg: 58,
+      bgAlpha: 100,       // 背景色透明度 (0-100)
+      bgAlphaThumbX: 100  // 背景色透明度滑块位置
     }
   },
   computed: {
@@ -249,6 +285,16 @@ export default {
           linear-gradient(to right, #808080, ${pureColor})
         `
       }
+    },
+    // 前景色带透明度 (用于预览)
+    fgRgbaColor() {
+      const rgb = this.hexToRgb(this.fgColor)
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this.fgAlpha / 100})`
+    },
+    // 背景色带透明度 (用于预览)
+    bgRgbaColor() {
+      const rgb = this.hexToRgb(this.bgColor)
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${this.bgAlpha / 100})`
     }
   },
   methods: {
@@ -379,6 +425,83 @@ export default {
       } else {
         this.hueThumbXBg = (this.bgHue / 360) * 100
       }
+    },
+    // 透明度滑块选择
+    selectAlpha(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      this.fgAlpha = Math.max(0, Math.min(100, Math.round(x)))
+      this.fgAlphaThumbX = this.fgAlpha
+    },
+    selectAlphaBg(e) {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const x = ((e.clientX - rect.left) / rect.width) * 100
+      this.bgAlpha = Math.max(0, Math.min(100, Math.round(x)))
+      this.bgAlphaThumbX = this.bgAlpha
+    },
+    // 从透明度滑块更新颜色
+    updateColorFromAlpha(type) {
+      if (type === 'fg') {
+        this.fgAlphaThumbX = this.fgAlpha
+        this.fgColor = this.hsvToHexWithAlpha(this.fgHue, this.fgSaturation, this.fgValue, this.fgAlpha)
+      } else {
+        this.bgAlphaThumbX = this.bgAlpha
+        this.bgColor = this.hsvToHexWithAlpha(this.bgHue, this.bgSaturation, this.bgValue, this.bgAlpha)
+      }
+    },
+    // 从 HEX 输入更新（支持8位）
+    convertFromHex(type) {
+      if (type === 'fg') {
+        const hex = this.fgColor.trim()
+        if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(hex)) return
+        const hsv = this.hexToHsv(hex)
+        this.fgHue = hsv.h
+        this.fgSaturation = hsv.s
+        this.fgValue = hsv.v
+        this.updateSlThumb('fg')
+        this.updateHueThumb('fg')
+        // 如果是8位hex，提取透明度
+        if (hex.length === 9) {
+          const alphaHex = hex.slice(7, 9)
+          this.fgAlpha = Math.round(parseInt(alphaHex, 16) / 255 * 100)
+          this.fgAlphaThumbX = this.fgAlpha
+        } else {
+          this.fgAlpha = 100
+          this.fgAlphaThumbX = 100
+        }
+      } else {
+        const hex = this.bgColor.trim()
+        if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(hex)) return
+        const hsv = this.hexToHsv(hex)
+        this.bgHue = hsv.h
+        this.bgSaturation = hsv.s
+        this.bgValue = hsv.v
+        this.updateSlThumb('bg')
+        this.updateHueThumb('bg')
+        // 如果是8位hex，提取透明度
+        if (hex.length === 9) {
+          const alphaHex = hex.slice(7, 9)
+          this.bgAlpha = Math.round(parseInt(alphaHex, 16) / 255 * 100)
+          this.bgAlphaThumbX = this.bgAlpha
+        } else {
+          this.bgAlpha = 100
+          this.bgAlphaThumbX = 100
+        }
+      }
+    },
+    // HSV 转 HEX（带透明度）
+    hsvToHexWithAlpha(h, s, v, alpha) {
+      const hex = this.hsvToHex(h, s, v)
+      if (alpha === 100) return hex
+      const alphaHex = Math.round(alpha * 255 / 100).toString(16).padStart(2, '0')
+      return hex + alphaHex
+    },
+    // HEX 转 RGB（支持6位和8位）
+    hexToRgb(hex) {
+      const r = parseInt(hex.slice(1, 3), 16)
+      const g = parseInt(hex.slice(3, 5), 16)
+      const b = parseInt(hex.slice(5, 7), 16)
+      return { r, g, b }
     },
     // HSV/HSB 模型转换函数
     hexToHsv(hex) {
