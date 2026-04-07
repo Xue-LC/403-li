@@ -247,17 +247,25 @@ export default {
     async convertAll() {
       this.converting = true
       this.error = ''
+      this.progress = 5
+      this.progressText = '正在初始化...'
       
       const pendingFiles = this.files.filter(f => f.status === 'pending')
-      const progressController = this.startProgressSimulation(pendingFiles.length)
+      const totalFiles = pendingFiles.length
+      const stepPerFile = 90 / totalFiles
       
-      for (const fileInfo of pendingFiles) {
+      for (let i = 0; i < pendingFiles.length; i++) {
+        const fileInfo = pendingFiles[i]
         fileInfo.status = 'converting'
         
+        // 更新进度
+        this.progress = Math.round(5 + i * stepPerFile)
+        this.progressText = `正在转换: ${fileInfo.name}`
+        
+        // 让出主线程，给 UI 渲染时间
+        await new Promise(resolve => setTimeout(resolve, 50))
+        
         try {
-          progressController.nextFile()
-          // 让出主线程，给进度条渲染时间
-          await new Promise(resolve => setTimeout(resolve, 100))
           const buffer = await fileInfo.file.arrayBuffer()
           
           // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
@@ -275,12 +283,12 @@ export default {
           console.error('Font conversion error:', err)
           fileInfo.status = 'error'
           fileInfo.error = err.message || '转换失败，请检查字体文件是否有效'
-          // 显示总体错误信息
           this.error = `${fileInfo.name}: ${fileInfo.error}`
         }
       }
       
-      progressController.complete()
+      this.progress = 100
+      this.progressText = '转换完成!'
       this.converting = false
     },
     downloadFile(fileInfo) {
