@@ -111,10 +111,10 @@ export default {
       alpha: 100,
       error: '',
       showPicker: false,
-      // HSL 值
+      // HSV 值 (使用 HSV/HSB 模型)
       hue: 120,
-      saturation: 100,
-      lightness: 50,
+      saturation: 100,  // HSV Saturation (0-100)
+      value: 100,       // HSV Value/Brightness (0-100)
       slThumbX: 100,
       slThumbY: 0,
       hueThumbX: 33,
@@ -129,15 +129,16 @@ export default {
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     },
     slGradientStyle() {
-      // 三层渐变叠加，与 selectSaturationLightness 计算逻辑匹配
+      // 三层渐变叠加 - HSV/HSB 模型
       // 底层(左->右): 灰色到纯色 (饱和度从 0% 到 100%)
-      // 中层(上->下): 白色到透明 (顶部变亮)
+      // 中层(上->下): 白色到透明 (顶部变亮，HSV顶部是纯色)
       // 顶层(上->下): 透明到黑色 (底部变暗)
+      const pureColor = this.hsvToHex(this.hue, 100, 100)
       return {
         backgroundImage: `
           linear-gradient(to bottom, transparent, #000),
           linear-gradient(to bottom, #fff, transparent),
-          linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))
+          linear-gradient(to right, #808080, ${pureColor})
         `
       }
     }
@@ -159,44 +160,17 @@ export default {
       this.slThumbX = xPct
       this.slThumbY = yPct
       
-      // 计算与三层渐变叠加效果匹配的颜色
-      // 底层：灰色 -> 纯色（水平饱和度）
-      // 中层：白色 -> 透明（顶部变亮）
-      // 顶层：透明 -> 黑色（底部变暗）
+      // HSV/HSB 模型计算
+      // X 轴: 饱和度 Saturation (0% = 灰色, 100% = 纯色)
+      // Y 轴: 明度 Value/Brightness (0% = 黑色, 100% = 纯色)
+      // 右上角 (100%, 0%) = 纯色 (V=100%, S=100%)
+      // 左下角 (0%, 100%) = 黑色
       
-      // 1. 计算底层颜色：从灰色 #808080 到纯色 hsl(hue, 100%, 50%) 的插值
-      const pureColor = this.hslToRgb(this.hue, 1, 0.5) // 纯色 (S=100%, L=50%)
-      const gray = [128, 128, 128] // #808080
-      const satFactor = xPct / 100 // 0 = 灰色, 1 = 纯色
+      this.saturation = xPct
+      this.value = 100 - yPct
       
-      let r = Math.round(gray[0] + (pureColor[0] - gray[0]) * satFactor)
-      let g = Math.round(gray[1] + (pureColor[1] - gray[1]) * satFactor)
-      let b = Math.round(gray[2] + (pureColor[2] - gray[2]) * satFactor)
-      
-      // 2. 应用中层：顶部(y=0)混合白色，底部(y=100)保持原色
-      // yPct = 0 (顶部) -> 混合 100% 白色
-      // yPct = 100 (底部) -> 混合 0% 白色
-      const whiteFactor = 1 - (yPct / 100) // 1 at top, 0 at bottom
-      const whiteBlend = whiteFactor * 0.7 // 最大 70% 白色混合，保持色彩可见
-      
-      r = Math.round(r + (255 - r) * whiteBlend)
-      g = Math.round(g + (255 - g) * whiteBlend)
-      b = Math.round(b + (255 - b) * whiteBlend)
-      
-      // 3. 应用顶层：底部(y=100)混合黑色，顶部(y=0)保持原色
-      // yPct = 0 (顶部) -> 混合 0% 黑色
-      // yPct = 100 (底部) -> 混合 100% 黑色
-      const blackFactor = yPct / 100 // 0 at top, 1 at bottom
-      const blackBlend = blackFactor * 0.85 // 最大 85% 黑色混合
-      
-      r = Math.round(r * (1 - blackBlend))
-      g = Math.round(g * (1 - blackBlend))
-      b = Math.round(b * (1 - blackBlend))
-      
-      // 反向计算 HSL 用于内部状态（从 RGB 转 HSL）
-      const hsl = this.rgbToHsl(r, g, b)
-      this.saturation = hsl.s
-      this.lightness = hsl.l
+      // 使用 HSV→RGB 转换计算颜色
+      const [r, g, b] = this.hsvToRgb(this.hue, this.saturation / 100, this.value / 100)
       
       // 保持当前透明度
       const alpha = this.alpha
@@ -204,12 +178,50 @@ export default {
       // 更新所有输入框（保持透明度通道）
       this.updateAllInputs(r, g, b, alpha)
     },
+    hsvToRgb(h, s, v) {
+      // HSV/HSB 转 RGB
+      // h: 0-360, s: 0-1, v: 0-1
+      const c = v * s
+      const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+      const m = v - c
+      let r, g, b
+      if (h < 60) { r = c; g = x; b = 0 }
+      else if (h < 120) { r = x; g = c; b = 0 }
+      else if (h < 180) { r = 0; g = c; b = x }
+      else if (h < 240) { r = 0; g = x; b = c }
+      else if (h < 300) { r = x; g = 0; b = c }
+      else { r = c; g = 0; b = x }
+      return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
+    },
+    rgbToHsv(r, g, b) {
+      // RGB 转 HSV/HSB
+      r /= 255; g /= 255; b /= 255
+      const max = Math.max(r, g, b), min = Math.min(r, g, b)
+      const d = max - min
+      let h = 0
+      const s = max === 0 ? 0 : d / max
+      const v = max
+      
+      if (d !== 0) {
+        switch (max) {
+          case r: h = ((g - b) / d + (g < b ? 6 : 0)) * 60; break
+          case g: h = ((b - r) / d + 2) * 60; break
+          case b: h = ((r - g) / d + 4) * 60; break
+        }
+      }
+      return { h, s: s * 100, v: v * 100 }
+    },
+    hsvToHex(h, s, v) {
+      const [r, g, b] = this.hsvToRgb(h, s / 100, v / 100)
+      return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')
+    },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbX = Math.max(0, Math.min(100, x))
       this.hue = (this.hueThumbX / 100) * 360
-      this.hexColor = this.hslToHex(this.hue, this.saturation, this.lightness)
+      // 使用 HSV 模型
+      this.hexColor = this.hsvToHex(this.hue, this.saturation, this.value)
       this.convertFromHex()
     },
     selectAlpha(e) {
@@ -225,9 +237,9 @@ export default {
       // 更新透明度滑块位置
       this.alphaThumbX = this.alpha
       
-      // 更新圆点位置
+      // 更新圆点位置 (HSV: X=饱和度, Y=100-明度)
       this.slThumbX = this.saturation
-      this.slThumbY = 100 - this.lightness
+      this.slThumbY = 100 - this.value
       
       // 使用统一方法更新所有输入
       this.updateAllInputs(rgb.r, rgb.g, rgb.b, this.alpha)
@@ -258,19 +270,20 @@ export default {
     },
     validateColor() {
       if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(this.hexColor)) {
-        this.hexColor = this.hslToHex(this.hue, this.saturation, this.lightness)
+        this.hexColor = this.hsvToHex(this.hue, this.saturation, this.value)
       } else {
-        const hsl = this.hexToHsl(this.hexColor)
-        this.hue = hsl.h
-        this.saturation = hsl.s
-        this.lightness = hsl.l
+        const hsv = this.hexToHsv(this.hexColor)
+        this.hue = hsv.h
+        this.saturation = hsv.s
+        this.value = hsv.v
         this.updateSlThumb()
         this.updateHueThumb()
       }
     },
     updateSlThumb() {
+      // HSV: X=饱和度, Y=100-明度
       this.slThumbX = this.saturation
-      this.slThumbY = 100 - this.lightness
+      this.slThumbY = 100 - this.value
     },
     updateHueThumb() {
       this.hueThumbX = (this.hue / 360) * 100
@@ -464,6 +477,20 @@ export default {
       const g = hue2rgb(p, q, h / 360)
       const b = hue2rgb(p, q, h / 360 - 1/3)
       return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
+    },
+    // HSV 转 RGB（用于饱和度/亮度选择器）
+    hsvToRgb(h, s, v) {
+      const c = v * s
+      const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+      const m = v - c
+      let r, g, b
+      if (h < 60) { r = c; g = x; b = 0 }
+      else if (h < 120) { r = x; g = c; b = 0 }
+      else if (h < 180) { r = 0; g = c; b = x }
+      else if (h < 240) { r = 0; g = x; b = c }
+      else if (h < 300) { r = x; g = 0; b = c }
+      else { r = c; g = 0; b = x }
+      return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)]
     },
     hexToRgb(hex) {
       // 支持 6 位和 8 位 HEX
