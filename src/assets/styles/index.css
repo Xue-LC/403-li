@@ -518,6 +518,15 @@ body::after {
   white-space: nowrap;
 }
 
+.footer a {
+  color: var(--dim);
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: var(--green);
+}
+
 /* === Responsive === */
 @media (max-width: 640px) {
   .app {
