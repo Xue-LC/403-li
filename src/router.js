@@ -59,7 +59,7 @@ const routes = [
     component: PasswordTool
   },
   {
-    path: '/tools/color-convert',
+    path: '/tools/color',
     name: 'ColorTool',
     component: ColorTool
   },

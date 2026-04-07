@@ -129,15 +129,13 @@ export default {
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     },
     slGradientStyle() {
-      // 三层渐变叠加 - HSV/HSB 模型
+      // 两层渐变叠加 - HSV/HSB 模型
       // 底层(左->右): 灰色到纯色 (饱和度从 0% 到 100%)
-      // 中层(上->下): 白色到透明 (顶部变亮，HSV顶部是纯色)
-      // 顶层(上->下): 透明到黑色 (底部变暗)
+      // 顶层(上->下): 透明到黑色 (明度从 100% 到 0%)
       const pureColor = this.hsvToHex(this.hue, 100, 100)
       return {
         backgroundImage: `
           linear-gradient(to bottom, transparent, #000),
-          linear-gradient(to bottom, #fff, transparent),
           linear-gradient(to right, #808080, ${pureColor})
         `
       }
