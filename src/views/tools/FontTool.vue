@@ -56,14 +56,14 @@
           </div>
 
           <!-- 转换进度条 -->
-          <div v-if="progress > 0" class="progress-section">
+          <div v-if="progress > 0 || isAnimating" class="progress-section">
             <div class="progress-header">
               <span class="progress-label">{{ progressText }}</span>
-              <span class="progress-percent">{{ progress }}%</span>
+              <span class="progress-percent">{{ isAnimating ? '...' : progress + '%' }}</span>
             </div>
             <div class="progress-bar-container">
               <span class="progress-bracket">[</span>
-              <span class="progress-blocks">{{ progressBlocks }}</span>
+              <span class="progress-blocks" :class="{ 'progress-animated': isAnimating }">{{ progressBlocks }}</span>
               <span class="progress-bracket">]</span>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default {
       nextId: 1,
       progress: 0,
       progressText: '',
-      progressInterval: null
+      isAnimating: false
     }
   },
   computed: {
@@ -255,18 +255,9 @@ export default {
         const fileInfo = pendingFiles[i]
         fileInfo.status = 'converting'
         
-        // 模拟单个文件的转换进度
-        this.progress = 5
+        // 开始 CSS 动画进度条
+        this.isAnimating = true
         this.progressText = `正在转换: ${fileInfo.name}`
-        
-        // 启动进度模拟
-        let fakeProgress = 5
-        const progressInterval = setInterval(() => {
-          if (fakeProgress < 90) {
-            fakeProgress += Math.random() * 10
-            this.progress = Math.min(Math.round(fakeProgress), 90)
-          }
-        }, 100)
         
         try {
           const buffer = await fileInfo.file.arrayBuffer()
@@ -274,8 +265,6 @@ export default {
           // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
           const inputData = new Uint8Array(buffer)
           const compressed = await compress(inputData)
-          
-          clearInterval(progressInterval)
           
           fileInfo.result = compressed
           fileInfo.convertedSize = compressed.length
@@ -285,7 +274,6 @@ export default {
           const baseName = fileInfo.name.replace(/\.[^.]+$/, '')
           fileInfo.outputName = baseName + '.woff2'
         } catch (err) {
-          clearInterval(progressInterval)
           console.error('Font conversion error:', err)
           fileInfo.status = 'error'
           fileInfo.error = err.message || '转换失败，请检查字体文件是否有效'
@@ -293,8 +281,17 @@ export default {
         }
       }
       
+      // 停止动画，显示完成
+      this.isAnimating = false
       this.progress = 100
       this.progressText = '转换完成!'
+      
+      // 1.5秒后隐藏进度条
+      setTimeout(() => {
+        this.progress = 0
+        this.progressText = ''
+      }, 1500)
+      
       this.converting = false
     },
     downloadFile(fileInfo) {
@@ -525,6 +522,32 @@ export default {
   color: var(--green);
   letter-spacing: 0;
   line-height: 1;
+}
+
+/* CSS 动画进度条 - 模拟流动效果 */
+.progress-animated {
+  background: linear-gradient(
+    90deg,
+    var(--green) 0%,
+    var(--green) 30%,
+    rgba(157, 255, 107, 0.3) 50%,
+    var(--green) 70%,
+    var(--green) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: progress-flow 1.2s linear infinite;
+}
+
+@keyframes progress-flow {
+  0% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: -100% 0%;
+  }
 }
 
 /* === Convert Section === */
