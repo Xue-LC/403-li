@@ -218,9 +218,9 @@ export default {
       const x = ((e.clientX - rect.left) / rect.width) * 100
       this.hueThumbX = Math.max(0, Math.min(100, x))
       this.hue = (this.hueThumbX / 100) * 360
-      // 使用 HSV 模型
-      this.hexColor = this.hsvToHex(this.hue, this.saturation, this.value)
-      this.convertFromHex()
+      // 使用 HSV→RGB 转换，保持当前透明度
+      const [r, g, b] = this.hsvToRgb(this.hue, this.saturation / 100, this.value / 100)
+      this.updateAllInputs(r, g, b, this.alpha)
     },
     selectAlpha(e) {
       const rect = e.currentTarget.getBoundingClientRect()
