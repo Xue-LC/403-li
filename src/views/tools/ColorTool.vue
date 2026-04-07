@@ -293,43 +293,32 @@ export default {
         if (!/^#[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(hex)) {
           throw new Error('无效的 HEX 格式')
         }
-        
+
         // HEX → RGB
         const r = parseInt(hex.slice(1, 3), 16)
         const g = parseInt(hex.slice(3, 5), 16)
         const b = parseInt(hex.slice(5, 7), 16)
-        
-        // 如果是 8 位 HEX，提取透明度
+
+        // 如果是 8 位 HEX，提取透明度；如果是 6 位，重置透明度为 100%
         if (hex.length === 9) {
           const alphaHex = hex.slice(7, 9)
           this.alpha = Math.round(parseInt(alphaHex, 16) / 255 * 100)
-          this.alphaThumbX = this.alpha
-        }
-        
-        // RGB 格式：透明度 100% 用 rgb，否则用 rgba
-        if (this.alpha === 100) {
-          this.rgbColor = `rgb(${r}, ${g}, ${b})`
         } else {
-          this.rgbColor = `rgba(${r}, ${g}, ${b}, ${(this.alpha / 100).toFixed(2)})`
+          this.alpha = 100
         }
-        
-        // HEX → HSL
-        const hsl = this.rgbToHsl(r, g, b)
-        
-        // HSL 格式：透明度 100% 用 hsl，否则用 hsla
-        if (this.alpha === 100) {
-          this.hslColor = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`
-        } else {
-          this.hslColor = `hsla(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%, ${(this.alpha / 100).toFixed(2)})`
-        }
-        
-        // 更新 HSL 值和滑块位置
-        this.hue = hsl.h
-        this.saturation = hsl.s
-        this.lightness = hsl.l
+        this.alphaThumbX = this.alpha
+
+        // 使用统一方法更新所有输入格式
+        this.updateAllInputs(r, g, b, this.alpha)
+
+        // 更新 HSV 值和滑块位置
+        const hsv = this.rgbToHsv(r, g, b)
+        this.hue = hsv.h
+        this.saturation = hsv.s
+        this.value = hsv.v
         this.updateSlThumb()
         this.updateHueThumb()
-        
+
         this.error = ''
       } catch (e) {
         this.error = e.message
