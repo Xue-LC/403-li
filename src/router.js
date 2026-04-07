@@ -9,6 +9,7 @@ import UrlTool from './views/tools/UrlTool.vue'
 import HashTool from './views/tools/HashTool.vue'
 import PasswordTool from './views/tools/PasswordTool.vue'
 import ColorTool from './views/tools/ColorTool.vue'
+import FontTool from './views/tools/FontTool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -62,6 +63,11 @@ const routes = [
     path: '/tools/color',
     name: 'ColorTool',
     component: ColorTool
+  },
+  {
+    path: '/tools/font',
+    name: 'FontTool',
+    component: FontTool
   },
   {
     path: '/games',

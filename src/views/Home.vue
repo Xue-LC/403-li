@@ -187,6 +187,16 @@ export default {
           statusText: '正常', statusColor: '#9dff6b',
           features: 'HEX / RGB / HSL',
           category: 'format'
+        },
+        {
+          id: 9,
+          path: '/tools/font',
+          name: '字体转换',
+          description: 'TTF/OTF 字体转换为 WOFF2 格式，纯前端处理',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: 'TTF / OTF → WOFF2',
+          category: 'format'
         }
       ]
     }
