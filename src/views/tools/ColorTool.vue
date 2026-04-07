@@ -129,13 +129,14 @@ export default {
       return `rgba(${r}, ${g}, ${b}, ${this.alpha / 100})`
     },
     slGradientStyle() {
-      // HSL 饱和度/亮度选择器 - 标准两层渐变叠加
+      // 三层渐变叠加，与 selectSaturationLightness 计算逻辑匹配
       // 底层(左->右): 灰色到纯色 (饱和度从 0% 到 100%)
-      // 顶层(上->下): 白色到黑色 (亮度从 100% 到 0%)
-      // 这样右上角在亮度=100% 时总是白色，与 HSL 计算一致
+      // 中层(上->下): 白色到透明 (顶部变亮)
+      // 顶层(上->下): 透明到黑色 (底部变暗)
       return {
         backgroundImage: `
-          linear-gradient(to bottom, #fff, #000),
+          linear-gradient(to bottom, transparent, #000),
+          linear-gradient(to bottom, #fff, transparent),
           linear-gradient(to right, #808080, hsl(${this.hue}, 100%, 50%))
         `
       }
@@ -151,25 +152,57 @@ export default {
       const y = ((event.clientY - rect.top) / rect.height) * 100
       
       // 限制在 0-100 范围内
-      // X 轴：从左到右 = 饱和度 0% → 100%
-      // Y 轴：从上到下 = 亮度 100% → 0%（上白下黑）
-      this.saturation = Math.max(0, Math.min(100, x))
-      this.lightness = Math.max(0, Math.min(100, 100 - y))
+      const xPct = Math.max(0, Math.min(100, x))
+      const yPct = Math.max(0, Math.min(100, y))
       
       // 更新圆点位置
-      // slThumbX = 饱和度百分比
-      // slThumbY = (100 - 亮度) 百分比，因为 CSS top 是向下的
-      this.slThumbX = this.saturation
-      this.slThumbY = 100 - this.lightness
+      this.slThumbX = xPct
+      this.slThumbY = yPct
       
-      // 转换为 RGB（hslToRgb 期望 s 和 l 为 0-1 的小数值）
-      const rgb = this.hslToRgb(this.hue, this.saturation / 100, this.lightness / 100)
+      // 计算与三层渐变叠加效果匹配的颜色
+      // 底层：灰色 -> 纯色（水平饱和度）
+      // 中层：白色 -> 透明（顶部变亮）
+      // 顶层：透明 -> 黑色（底部变暗）
+      
+      // 1. 计算底层颜色：从灰色 #808080 到纯色 hsl(hue, 100%, 50%) 的插值
+      const pureColor = this.hslToRgb(this.hue, 1, 0.5) // 纯色 (S=100%, L=50%)
+      const gray = [128, 128, 128] // #808080
+      const satFactor = xPct / 100 // 0 = 灰色, 1 = 纯色
+      
+      let r = Math.round(gray[0] + (pureColor[0] - gray[0]) * satFactor)
+      let g = Math.round(gray[1] + (pureColor[1] - gray[1]) * satFactor)
+      let b = Math.round(gray[2] + (pureColor[2] - gray[2]) * satFactor)
+      
+      // 2. 应用中层：顶部(y=0)混合白色，底部(y=100)保持原色
+      // yPct = 0 (顶部) -> 混合 100% 白色
+      // yPct = 100 (底部) -> 混合 0% 白色
+      const whiteFactor = 1 - (yPct / 100) // 1 at top, 0 at bottom
+      const whiteBlend = whiteFactor * 0.7 // 最大 70% 白色混合，保持色彩可见
+      
+      r = Math.round(r + (255 - r) * whiteBlend)
+      g = Math.round(g + (255 - g) * whiteBlend)
+      b = Math.round(b + (255 - b) * whiteBlend)
+      
+      // 3. 应用顶层：底部(y=100)混合黑色，顶部(y=0)保持原色
+      // yPct = 0 (顶部) -> 混合 0% 黑色
+      // yPct = 100 (底部) -> 混合 100% 黑色
+      const blackFactor = yPct / 100 // 0 at top, 1 at bottom
+      const blackBlend = blackFactor * 0.85 // 最大 85% 黑色混合
+      
+      r = Math.round(r * (1 - blackBlend))
+      g = Math.round(g * (1 - blackBlend))
+      b = Math.round(b * (1 - blackBlend))
+      
+      // 反向计算 HSL 用于内部状态（从 RGB 转 HSL）
+      const hsl = this.rgbToHsl(r, g, b)
+      this.saturation = hsl.s
+      this.lightness = hsl.l
       
       // 保持当前透明度
       const alpha = this.alpha
       
       // 更新所有输入框（保持透明度通道）
-      this.updateAllInputs(rgb[0], rgb[1], rgb[2], alpha)
+      this.updateAllInputs(r, g, b, alpha)
     },
     selectHue(e) {
       const rect = e.currentTarget.getBoundingClientRect()
