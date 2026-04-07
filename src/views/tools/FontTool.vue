@@ -55,6 +55,19 @@
             </div>
           </div>
 
+          <!-- 转换进度条 -->
+          <div v-if="progress > 0" class="progress-section">
+            <div class="progress-header">
+              <span class="progress-label">{{ progressText }}</span>
+              <span class="progress-percent">{{ progress }}%</span>
+            </div>
+            <div class="progress-bar-container">
+              <span class="progress-bracket">[</span>
+              <span class="progress-blocks">{{ progressBlocks }}</span>
+              <span class="progress-bracket">]</span>
+            </div>
+          </div>
+
           <!-- 转换按钮 -->
           <div v-if="hasPendingFiles" class="convert-section">
             <button class="convert-btn" @click="convertAll" :disabled="converting">
@@ -117,7 +130,10 @@ export default {
       dragOver: false,
       converting: false,
       error: '',
-      nextId: 1
+      nextId: 1,
+      progress: 0,
+      progressText: '',
+      progressInterval: null
     }
   },
   computed: {
@@ -144,6 +160,14 @@ export default {
       if (this.totalOriginalSize === 0) return 0
       const ratio = (this.totalConvertedSize / this.totalOriginalSize) * 100
       return ratio.toFixed(1)
+    },
+    progressBarWidth() {
+      return `${this.progress}%`
+    },
+    progressBlocks() {
+      const totalBlocks = 20
+      const filledBlocks = Math.floor((this.progress / 100) * totalBlocks)
+      return '█'.repeat(filledBlocks) + '░'.repeat(totalBlocks - filledBlocks)
     }
   },
   methods: {
@@ -193,16 +217,45 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
+    startProgressSimulation(totalFiles) {
+      this.progress = 0
+      this.progressText = `正在初始化...`
+      
+      let currentFile = 0
+      const stepPerFile = 90 / totalFiles
+      
+      this.progressInterval = setInterval(() => {
+        // 每个文件模拟渐进增长
+        const fileProgress = (currentFile * stepPerFile) + (Math.random() * stepPerFile * 0.3)
+        this.progress = Math.min(Math.floor(fileProgress), 90)
+        this.progressText = `正在转换文件 ${currentFile + 1}/${totalFiles}...`
+      }, 200)
+      
+      return {
+        nextFile: () => { currentFile++ },
+        complete: () => {
+          clearInterval(this.progressInterval)
+          this.progress = 100
+          this.progressText = '转换完成!'
+          setTimeout(() => {
+            this.progress = 0
+            this.progressText = ''
+          }, 1500)
+        }
+      }
+    },
     async convertAll() {
       this.converting = true
       this.error = ''
       
       const pendingFiles = this.files.filter(f => f.status === 'pending')
+      const progressController = this.startProgressSimulation(pendingFiles.length)
       
       for (const fileInfo of pendingFiles) {
         fileInfo.status = 'converting'
         
         try {
+          progressController.nextFile()
           const buffer = await fileInfo.file.arrayBuffer()
           
           // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
@@ -225,6 +278,7 @@ export default {
         }
       }
       
+      progressController.complete()
       this.converting = false
     },
     downloadFile(fileInfo) {
@@ -411,6 +465,50 @@ export default {
 
 .download-btn:hover {
   background: rgba(157, 255, 107, 0.1);
+}
+
+/* === Progress Section === */
+.progress-section {
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.progress-label {
+  color: var(--text);
+}
+
+.progress-percent {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.progress-bracket {
+  color: var(--muted);
+}
+
+.progress-blocks {
+  color: var(--green);
+  letter-spacing: 0;
+  line-height: 1;
 }
 
 /* === Convert Section === */
