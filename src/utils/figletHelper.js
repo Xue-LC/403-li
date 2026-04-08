@@ -133,49 +133,22 @@ class FigletParser {
   }
 }
 
-// 使用 figlet npm 包（如果可用）或降级到简化版
+// 生成 ASCII 艺术
 export async function generateAsciiArt(text, fontName = 'Standard') {
   if (!text || text.trim() === '') {
     return '';
   }
 
   try {
-    // 尝试动态导入 figlet 包
-    const figlet = await import('figlet');
-    
     // 加载字体数据
     const fontData = await loadFontFile(fontName);
     
-    // 使用 figlet 的 parseFont 和 text 方法
-    return new Promise((resolve, reject) => {
-      try {
-        // 解析字体
-        const font = figlet.parseFont(fontName, fontData);
-        
-        // 生成文本
-        figlet.text(text, { font: fontName }, (err, data) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(data);
-          }
-        });
-      } catch (e) {
-        // 降级到简化版解析器
-        const parser = new FigletParser(fontData);
-        resolve(parser.render(text));
-      }
-    });
+    // 使用自定义解析器
+    const parser = new FigletParser(fontData);
+    return parser.render(text);
   } catch (error) {
     console.error('Error generating ASCII art:', error);
-    // 降级处理：使用简化版
-    try {
-      const fontData = await loadFontFile(fontName);
-      const parser = new FigletParser(fontData);
-      return parser.render(text);
-    } catch (e) {
-      throw new Error(`无法生成 ASCII 艺术: ${error.message}`);
-    }
+    throw new Error(`无法生成 ASCII 艺术: ${error.message}`);
   }
 }
 
