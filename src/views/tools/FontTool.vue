@@ -6,7 +6,7 @@
     <!-- 工具主体 -->
     <section class="pane">
       <div class="pane-head">
-        <span>🔤 字体转换</span>
+        <span>🔤 字体压缩</span>
         <span>TTF/OTF → WOFF2</span>
       </div>
       <div class="pane-body">
@@ -132,7 +132,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <span>403.li // 字体转换工具</span>
+      <span>403.li // 字体压缩工具</span>
       <span>纯前端处理 · 数据不会上传</span>
     </footer>
   </div>
