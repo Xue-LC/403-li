@@ -61,101 +61,55 @@ class FigletParser {
   }
 
   parseFont() {
-    console.log('[Figlet Debug] Starting font parsing');
-    // 处理 Windows 换行符 (CRLF -> LF)
+    // 处理 Windows 换行符
     const normalizedData = this.fontData.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalizedData.split('\n');
-    console.log('[Figlet Debug] Total lines:', lines.length);
     
-    // 解析头部
+    // 解析头部: flf2a$ height baseline ...
     const header = lines[0];
-    console.log('[Figlet Debug] Header line:', JSON.stringify(header));
-    
-    // 修复：原正则表达式 /^flf2a\$(\d+)/ 期望 $ 后面直接跟数字
-    // 但实际格式是 "flf2a$ 6 5..."，$ 后面有空格
-    // 修正后的正则：/^flf2a\$\s*(\d+)/
     const headerMatch = header.match(/^flf2a\$\s*(\d+)\s+(\d+)/);
-    console.log('[Figlet Debug] Header match result:', headerMatch);
-    
     if (!headerMatch) {
-      console.error('[Figlet Debug] Invalid header format. Expected pattern: /^flf2a\\$\\s*(\\d+)\\s+(\\d+)/');
-      throw new Error('Invalid FIGlet font header: ' + header);
+      throw new Error('Invalid FIGlet font header');
     }
     
     this.height = parseInt(headerMatch[1], 10);
     this.baseline = parseInt(headerMatch[2], 10);
-    console.log('[Figlet Debug] Parsed height:', this.height, 'baseline:', this.baseline);
     
-    // 查找结束标记（通常是 @@ 或 @ 结尾）
-    let currentChar = 32; // 从空格开始 (ASCII 32)
-    let currentLines = [];
-    let lineIndex = 1;
+    // 解析头部：flf2a$ height baseline maxLength oldLayout commentLines ...
+    // commentLines 是注释行数，需要跳过
+    const commentLines = parseInt(headerMatch[6], 10) || 0;
+    let lineIndex = 1 + commentLines; // 跳过注释行
     
-    // 跳过头部注释行（直到遇到第一个以 @ 结尾的行）
-    console.log('[Figlet Debug] Skipping header comments...');
-    while (lineIndex < lines.length && !lines[lineIndex].includes('@')) {
-      lineIndex++;
-    }
-    console.log('[Figlet Debug] First data line at index:', lineIndex, 'content:', JSON.stringify(lines[lineIndex]));
+    // 简化的解析逻辑：每个字符 height 行，每行以 @ 结尾，字符结束标记是 @@
+    let currentChar = 32; // 从空格开始
     
-    // 解析字符
-    let charCount = 0;
     while (lineIndex < lines.length && currentChar <= 126) {
-      const line = lines[lineIndex];
+      const charLines = [];
       
-      if (line.endsWith('@@')) {
-        // 字符结束，@@ 是结束标记
-        currentLines.push(line.slice(0, -2));
-        if (currentLines.length === this.height) {
-          this.characters.set(currentChar, [...currentLines]);
-          currentChar++;
-          currentLines = [];
-          charCount++;
+      // 读取 height 行
+      for (let i = 0; i < this.height && lineIndex < lines.length; i++) {
+        let line = lines[lineIndex];
+        
+        // 去掉行尾的 @ 或 @@
+        if (line.endsWith('@@')) {
+          line = line.slice(0, -2);
+        } else if (line.endsWith('@')) {
+          line = line.slice(0, -1);
         }
-      } else if (line.endsWith('@')) {
-        // 单行结束标记
-        currentLines.push(line.slice(0, -1));
-        if (currentLines.length === this.height) {
-          this.characters.set(currentChar, [...currentLines]);
-          currentChar++;
-          currentLines = [];
-          charCount++;
-        }
-      } else if (line.includes('@')) {
-        // 行中包含 @ 但不是结尾
-        const atIndex = line.indexOf('@');
-        currentLines.push(line.slice(0, atIndex));
-        if (currentLines.length === this.height) {
-          this.characters.set(currentChar, [...currentLines]);
-          currentChar++;
-          currentLines = [];
-          charCount++;
-        }
-      } else {
-        // 普通行（可能是字符的中间行）
-        if (line.trim() !== '' || currentLines.length > 0) {
-          currentLines.push(line);
-        }
+        
+        // $ 是 figlet hardblank，替换为空格
+        line = line.replace(/\$/g, ' ');
+        
+        charLines.push(line);
+        lineIndex++;
       }
       
-      lineIndex++;
-    }
-    
-    console.log('[Figlet Debug] Parsed', charCount, 'characters');
-    console.log('[Figlet Debug] Characters parsed from', 32, 'to', currentChar - 1);
-    
-    // 验证空格字符 (ASCII 32) 是否被正确解析
-    if (this.characters.has(32)) {
-      console.log('[Figlet Debug] Space character parsed:', this.characters.get(32));
-    } else {
-      console.warn('[Figlet Debug] Space character NOT parsed!');
-    }
-    
-    // 验证 'H' 字符 (ASCII 72) 是否被正确解析
-    if (this.characters.has(72)) {
-      console.log('[Figlet Debug] "H" character parsed:', this.characters.get(72));
-    } else {
-      console.warn('[Figlet Debug] "H" character NOT parsed!');
+      if (charLines.length === this.height) {
+        this.characters.set(currentChar, charLines);
+        currentChar++;
+      } else {
+        break; // 解析完成或出错
+      }
     }
   }
 
@@ -169,7 +123,8 @@ class FigletParser {
       
       if (charLines) {
         for (let i = 0; i < this.height; i++) {
-          result[i] += charLines[i] || '';
+          // 字符之间加空格避免重叠（简化版，不做 smush）
+          result[i] += (charLines[i] || '') + ' ';
         }
       } else {
         // 对于未定义的字符，使用空格
