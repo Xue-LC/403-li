@@ -1,8 +1,21 @@
 // figletHelper.js - 浏览器中加载 figlet 字体并生成 ASCII 艺术
-// 从 unpkg CDN 动态加载字体文件
+// 使用内嵌字体文件，避免 CORS 问题
 
-// 字体 CDN 基础路径
-const FONT_BASE_URL = 'https://unpkg.com/figlet@1.7.0/fonts';
+// 直接导入本地字体文件（作为文本）
+import StandardFont from '../assets/fonts/figlet/Standard.flf?raw';
+import SlantFont from '../assets/fonts/figlet/Slant.flf?raw';
+import BannerFont from '../assets/fonts/figlet/Banner.flf?raw';
+import BlockFont from '../assets/fonts/figlet/Block.flf?raw';
+import BigFont from '../assets/fonts/figlet/Big.flf?raw';
+
+// 字体映射表
+const FONT_MAP = {
+  Standard: StandardFont,
+  Slant: SlantFont,
+  Banner: BannerFont,
+  Block: BlockFont,
+  Big: BigFont
+};
 
 // 支持的字体列表
 export const AVAILABLE_FONTS = [
@@ -10,14 +23,7 @@ export const AVAILABLE_FONTS = [
   { name: 'Slant', label: 'Slant - 斜体', description: '优雅斜体风格' },
   { name: 'Banner', label: 'Banner - 横幅', description: '大横幅风格' },
   { name: 'Block', label: 'Block - 方块', description: '方块填充风格' },
-  { name: 'Big', label: 'Big - 大号', description: '超大号字体' },
-  { name: 'Small', label: 'Small - 小号', description: '紧凑小号字体' },
-  { name: 'Shadow', label: 'Shadow - 阴影', description: '带阴影效果' },
-  { name: 'Bubble', label: 'Bubble - 泡泡', description: '圆形泡泡风格' },
-  { name: 'Digital', label: 'Digital - 数码', description: '数码显示风格' },
-  { name: 'Script', label: 'Script - 手写', description: '手写体风格' },
-  { name: 'Graffiti', label: 'Graffiti - 涂鸦', description: '街头涂鸦风格' },
-  { name: 'Isometric1', label: 'Isometric - 等角', description: '3D 等角投影' }
+  { name: 'Big', label: 'Big - 大号', description: '超大号字体' }
 ];
 
 // 缓存已加载的字体
@@ -30,19 +36,14 @@ async function loadFontFile(fontName) {
     return fontCache.get(fontName);
   }
 
-  try {
-    const response = await fetch(`${FONT_BASE_URL}/${fontName}.flf`);
-    if (!response.ok) {
-      throw new Error(`Failed to load font: ${fontName}`);
-    }
-    const fontData = await response.text();
-    // 缓存字体数据
+  // 检查是否是本地可用字体
+  if (FONT_MAP[fontName]) {
+    const fontData = FONT_MAP[fontName];
     fontCache.set(fontName, fontData);
     return fontData;
-  } catch (error) {
-    console.error(`Error loading font ${fontName}:`, error);
-    throw error;
   }
+
+  throw new Error(`Font not available: ${fontName}`);
 }
 
 // 简单的 FIGlet 解析器（简化版）
