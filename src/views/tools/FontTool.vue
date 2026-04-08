@@ -117,7 +117,6 @@
 
 <script>
 import Topbar from '../../components/Topbar.vue'
-import { compress } from 'woff2-encoder'
 
 export default {
   name: 'FontTool',
@@ -133,7 +132,21 @@ export default {
       nextId: 1,
       progress: 0,
       progressText: '',
-      isAnimating: false
+      isAnimating: false,
+      completedCountCurrent: 0,
+      totalCountCurrent: 0,
+      worker: null
+    }
+  },
+  mounted() {
+    // Initialize Web Worker
+    this.initWorker()
+  },
+  beforeUnmount() {
+    // Clean up worker
+    if (this.worker) {
+      this.worker.terminate()
+      this.worker = null
     }
   },
   computed: {
@@ -221,82 +234,124 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
-    startProgressSimulation(totalFiles) {
-      this.progress = 5
-      this.progressText = `正在初始化...`
+    initWorker() {
+      // Create Web Worker using Vite's worker import pattern
+      this.worker = new Worker(
+        new URL('../../workers/fontConverter.worker.js', import.meta.url),
+        { type: 'module' }
+      )
       
-      let currentFile = 0
-      const stepPerFile = 90 / totalFiles
-      
-      this.progressInterval = setInterval(() => {
-        // 每个文件模拟渐进增长
-        const fileProgress = (currentFile * stepPerFile) + (Math.random() * stepPerFile * 0.3)
-        this.progress = Math.min(Math.floor(fileProgress), 90)
-        this.progressText = `正在转换文件 ${currentFile + 1}/${totalFiles}...`
-      }, 200)
-      
-      return {
-        nextFile: () => { currentFile++ },
-        complete: () => {
-          clearInterval(this.progressInterval)
-          this.progress = 100
-          this.progressText = '转换完成!'
-          setTimeout(() => {
-            this.progress = 0
-            this.progressText = ''
-          }, 1500)
-        }
-      }
-    },
-    async convertAll() {
-      this.converting = true
-      this.error = ''
-      
-      const pendingFiles = this.files.filter(f => f.status === 'pending')
-      const totalFiles = pendingFiles.length
-      
-      for (let i = 0; i < pendingFiles.length; i++) {
-        const fileInfo = pendingFiles[i]
-        fileInfo.status = 'converting'
+      this.worker.onmessage = (e) => {
+        const { type, id, fileName, fileIndex, totalFiles, result, compressedSize, error, message } = e.data
         
-        // 开始 CSS 动画进度条
-        this.isAnimating = true
-        this.progressText = `正在转换: ${fileInfo.name}`
+        const fileInfo = this.files.find(f => f.id === id)
+        if (!fileInfo) return
         
-        try {
-          const buffer = await fileInfo.file.arrayBuffer()
-          
-          // 使用 woff2-encoder 压缩 (浏览器兼容 WASM)
-          const inputData = new Uint8Array(buffer)
-          const compressed = await compress(inputData)
-          
-          fileInfo.result = compressed
-          fileInfo.convertedSize = compressed.length
+        if (type === 'start') {
+          fileInfo.status = 'converting'
+          this.progressText = `正在转换 (${fileIndex + 1}/${totalFiles}): ${fileName}`
+        } else if (type === 'success') {
+          fileInfo.result = new Uint8Array(result)
+          fileInfo.convertedSize = compressedSize
           fileInfo.status = 'done'
+          this.completedCountCurrent++
           
-          // 生成下载文件名
+          // Update progress
+          this.progress = Math.floor((this.completedCountCurrent / this.totalCountCurrent) * 100)
+          this.progressText = `已完成 ${this.completedCountCurrent} / 共 ${this.totalCountCurrent} 个文件`
+          
+          // Generate output filename
           const baseName = fileInfo.name.replace(/\.[^.]+$/, '')
           fileInfo.outputName = baseName + '.woff2'
-        } catch (err) {
-          console.error('Font conversion error:', err)
+          
+          // Check if all files completed
+          if (this.completedCountCurrent >= this.totalCountCurrent) {
+            this.finishConversion()
+          }
+        } else if (type === 'error') {
           fileInfo.status = 'error'
-          fileInfo.error = err.message || '转换失败，请检查字体文件是否有效'
-          this.error = `${fileInfo.name}: ${fileInfo.error}`
+          fileInfo.error = error || '转换失败'
+          this.error = `${fileName}: ${fileInfo.error}`
+          this.completedCountCurrent++
+          
+          // Check if all files completed (even with errors)
+          if (this.completedCountCurrent >= this.totalCountCurrent) {
+            this.finishConversion()
+          }
         }
       }
       
-      // 停止动画，显示完成
+      this.worker.onerror = (err) => {
+        console.error('Worker error:', err)
+        this.error = 'Worker 发生错误: ' + err.message
+        this.converting = false
+        this.isAnimating = false
+      }
+    },
+    finishConversion() {
+      this.converting = false
       this.isAnimating = false
       this.progress = 100
       this.progressText = '转换完成!'
       
-      // 1.5秒后隐藏进度条
+      // Clear after 1.5 seconds
       setTimeout(() => {
         this.progress = 0
         this.progressText = ''
+        this.completedCountCurrent = 0
+        this.totalCountCurrent = 0
       }, 1500)
+    },
+    async convertAll() {
+      if (!this.worker) {
+        this.error = 'Worker 未初始化'
+        return
+      }
       
-      this.converting = false
+      this.converting = true
+      this.error = ''
+      this.completedCountCurrent = 0
+      
+      const pendingFiles = this.files.filter(f => f.status === 'pending')
+      this.totalCountCurrent = pendingFiles.length
+      
+      if (this.totalCountCurrent === 0) {
+        this.converting = false
+        return
+      }
+      
+      // Start animation
+      this.isAnimating = true
+      this.progress = 0
+      this.progressText = `准备转换 ${this.totalCountCurrent} 个文件...`
+      
+      // Process all pending files through worker
+      for (let i = 0; i < pendingFiles.length; i++) {
+        const fileInfo = pendingFiles[i]
+        
+        try {
+          const buffer = await fileInfo.file.arrayBuffer()
+          
+          // Send to worker
+          this.worker.postMessage({
+            id: fileInfo.id,
+            fileData: buffer,
+            fileName: fileInfo.name,
+            fileIndex: i,
+            totalFiles: this.totalCountCurrent
+          }, [buffer]) // Transfer buffer for performance
+        } catch (err) {
+          console.error('Error sending file to worker:', err)
+          fileInfo.status = 'error'
+          fileInfo.error = err.message || '发送文件失败'
+          this.error = `${fileInfo.name}: ${fileInfo.error}`
+          this.completedCountCurrent++
+          
+          if (this.completedCountCurrent >= this.totalCountCurrent) {
+            this.finishConversion()
+          }
+        }
+      }
     },
     downloadFile(fileInfo) {
       if (!fileInfo.result) return
