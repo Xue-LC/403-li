@@ -40,7 +40,6 @@
           <!-- 实时生成 -->
           <div class="ascii-output" v-if="asciiArt">
             <pre class="ascii-pre">{{ asciiArt }}</pre>
-            <button class="copy-btn" @click="copyToClipboard" title="复制结果">📋</button>
           </div>
           
           <!-- 操作按钮 -->
@@ -317,7 +316,7 @@ export default {
   position: relative;
   background: var(--panel-2);
   border: 1px solid var(--line);
-  padding: 20px;
+  padding: 28px;
   margin: 1.5rem 0 1rem;
   border-radius: 0;
   overflow-x: auto;
@@ -327,7 +326,7 @@ export default {
   margin: 0;
   padding: 0;
   font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.2;
   color: var(--green);
   white-space: pre;
@@ -456,7 +455,7 @@ export default {
   }
   
   .ascii-pre {
-    font-size: 10px;
+    font-size: 12px;
   }
   
   .action-buttons {
@@ -468,9 +467,9 @@ export default {
   }
 }
 
-@media (max-width: 375px) {
+@media (max-width: 480px) {
   .ascii-pre {
-    font-size: 8px;
+    font-size: 10px;
   }
 }
 </style>
