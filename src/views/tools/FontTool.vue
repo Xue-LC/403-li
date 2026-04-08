@@ -55,6 +55,25 @@
             </div>
           </div>
 
+          <!-- 转换步骤详情 -->
+          <div v-if="conversionSteps.length > 0" class="steps-section">
+            <div class="steps-title">转换进度</div>
+            <div class="steps-list">
+              <div v-for="step in conversionSteps" :key="step.id" 
+                   class="step-item" 
+                   :class="{ 'step-active': step.status === 'active', 'step-done': step.status === 'done', 'step-error': step.status === 'error' }">
+                <span class="step-indicator">
+                  <span v-if="step.status === 'pending'" class="step-dot">○</span>
+                  <span v-else-if="step.status === 'active'" class="step-spinner">⏳</span>
+                  <span v-else-if="step.status === 'done'" class="step-check">✓</span>
+                  <span v-else-if="step.status === 'error'" class="step-error-icon">✗</span>
+                </span>
+                <span class="step-name">{{ step.name }}</span>
+                <span v-if="step.detail" class="step-detail">({{ step.detail }})</span>
+              </div>
+            </div>
+          </div>
+
           <!-- 转换进度条 -->
           <div v-if="progress > 0 || isAnimating" class="progress-section">
             <div class="progress-header">
@@ -135,7 +154,9 @@ export default {
       isAnimating: false,
       completedCountCurrent: 0,
       totalCountCurrent: 0,
-      worker: null
+      worker: null,
+      conversionSteps: [],
+      currentFileId: null
     }
   },
   mounted() {
@@ -234,6 +255,28 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
+    initSteps(fileId, fileSize) {
+      // Initialize steps for a new file conversion
+      const sizeStr = this.formatSize(fileSize)
+      this.currentFileId = fileId
+      this.conversionSteps = [
+        { id: 'init', name: '初始化 Worker', status: 'done', detail: '' },
+        { id: 'wasm', name: '加载 WASM 模块', status: 'done', detail: '' },
+        { id: 'read', name: '读取文件', status: 'pending', detail: sizeStr },
+        { id: 'preprocess', name: '预处理字体数据', status: 'pending', detail: '' },
+        { id: 'compress', name: 'Brotli 压缩', status: 'pending', detail: '' },
+        { id: 'complete', name: '完成', status: 'pending', detail: '' }
+      ]
+    },
+
+    updateStep(stepId, status, detail = '') {
+      const step = this.conversionSteps.find(s => s.id === stepId)
+      if (step) {
+        step.status = status
+        if (detail) step.detail = detail
+      }
+    },
+
     initWorker() {
       // Create Web Worker using Vite's worker import pattern
       this.worker = new Worker(
@@ -242,12 +285,18 @@ export default {
       )
       
       this.worker.onmessage = (e) => {
-        const { type, id, fileName, fileIndex, totalFiles, result, compressedSize, error, message } = e.data
+        const { type, id, fileName, fileIndex, totalFiles, result, compressedSize, error, message, stepId, stepName, status: stepStatus, detail } = e.data
         
         const fileInfo = this.files.find(f => f.id === id)
-        if (!fileInfo) return
+        if (!fileInfo && type !== 'ready') return
         
-        if (type === 'start') {
+        if (type === 'ready') {
+          // Worker initialized
+          console.log('Worker ready')
+        } else if (type === 'step') {
+          // Update step status
+          this.updateStep(stepId, stepStatus, detail)
+        } else if (type === 'start') {
           fileInfo.status = 'converting'
           this.progressText = `正在转换 (${fileIndex + 1}/${totalFiles}): ${fileName}`
         } else if (type === 'success') {
@@ -263,6 +312,13 @@ export default {
           // Generate output filename
           const baseName = fileInfo.name.replace(/\.[^.]+$/, '')
           fileInfo.outputName = baseName + '.woff2'
+          
+          // Clear steps after a delay
+          setTimeout(() => {
+            if (this.completedCountCurrent >= this.totalCountCurrent) {
+              this.conversionSteps = []
+            }
+          }, 1000)
           
           // Check if all files completed
           if (this.completedCountCurrent >= this.totalCountCurrent) {
@@ -320,6 +376,11 @@ export default {
         return
       }
       
+      // Initialize steps for first file
+      if (pendingFiles.length > 0) {
+        this.initSteps(pendingFiles[0].id, pendingFiles[0].size)
+      }
+      
       // Start animation
       this.isAnimating = true
       this.progress = 0
@@ -328,6 +389,9 @@ export default {
       // Process all pending files through worker
       for (let i = 0; i < pendingFiles.length; i++) {
         const fileInfo = pendingFiles[i]
+        
+        // Initialize steps for each file
+        this.initSteps(fileInfo.id, fileInfo.size)
         
         try {
           const buffer = await fileInfo.file.arrayBuffer()
