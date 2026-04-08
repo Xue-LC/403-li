@@ -53,28 +53,25 @@
             ✅ {{ success }}
           </div>
           
-          <!-- 字体选择区域 -->
-          <div class="font-section">
-            <div class="font-search-wrapper">
-              <span class="search-icon">🔍</span>
+          <!-- 字体列表 -->
+          <div class="font-list-section">
+            <div class="font-list-head">
+              <label class="input-label">所有字体：</label>
               <input 
                 type="text" 
                 v-model="fontSearch" 
-                placeholder="搜索字体..."
-                class="search-input"
+                placeholder="🔍 搜索字体..."
+                class="font-search"
               />
-              <span class="font-count">{{ filteredFonts.length }} / {{ fontOptions.length }}</span>
             </div>
-            
-            <!-- 字体列表 -->
-            <div class="font-grid">
-              <button
-                v-for="font in filteredFonts"
+            <div class="font-list">
+              <button 
+                v-for="font in filteredFonts" 
                 :key="font.name"
-                :class="['font-card', { active: selectedFont === font.name }]"
-                @click="selectFont(font.name)"
+                :class="['font-item', { active: selectedFont === font.name }]"
+                @click="selectedFont = font.name"
               >
-                {{ font.name }}
+                {{ font.label }}
               </button>
             </div>
           </div>
