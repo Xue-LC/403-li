@@ -29,18 +29,10 @@
           <div class="select-wrapper">
             <select v-model="selectedFont" class="font-select">
               <option value="standard">Standard - 标准</option>
-              <option value="slant">Slant - 倾斜</option>
-              <option value="block">Block - 方块</option>
-              <option value="big">Big - 大号</option>
-              <option value="small">Small - 小号</option>
-              <option value="shadow">Shadow - 阴影</option>
-              <option value="banner">Banner - 横幅</option>
-              <option value="bubble">Bubble - 气泡</option>
-              <option value="digital">Digital - 数码</option>
-              <option value="doom">Doom - 毁灭</option>
-              <option value="graceful">Graceful - 优雅</option>
-              <option value="roman">Roman - 罗马</option>
             </select>
+          </div>
+          <div class="font-note">
+            <span>💡 提示：当前使用纯前端实现的 Standard 字体，支持 A-Z, 0-9 和常见符号</span>
           </div>
           
           <!-- 实时生成 -->
@@ -86,7 +78,306 @@
 
 <script>
 import Topbar from '../../components/Topbar.vue'
-import figlet from 'figlet'
+
+// 预定义的简单 ASCII 字体映射（standard 风格）
+const asciiFonts = {
+  standard: {
+    'A': [
+      "  ##  ",
+      " #  # ",
+      "######",
+      "#    #",
+      "#    #"
+    ],
+    'B': [
+      "##### ",
+      "#    #",
+      "##### ",
+      "#    #",
+      "##### "
+    ],
+    'C': [
+      " #####",
+      "#     ",
+      "#     ",
+      "#     ",
+      " #####"
+    ],
+    'D': [
+      "##### ",
+      "#    #",
+      "#    #",
+      "#    #",
+      "##### "
+    ],
+    'E': [
+      "######",
+      "#     ",
+      "##### ",
+      "#     ",
+      "######"
+    ],
+    'F': [
+      "######",
+      "#     ",
+      "##### ",
+      "#     ",
+      "#     "
+    ],
+    'G': [
+      " #####",
+      "#     ",
+      "#  ###",
+      "#    #",
+      " #####"
+    ],
+    'H': [
+      "#    #",
+      "#    #",
+      "######",
+      "#    #",
+      "#    #"
+    ],
+    'I': [
+      "######",
+      "  ##  ",
+      "  ##  ",
+      "  ##  ",
+      "######"
+    ],
+    'J': [
+      "     #",
+      "     #",
+      "     #",
+      "#    #",
+      " #### "
+    ],
+    'K': [
+      "#    #",
+      "#   # ",
+      "##### ",
+      "#   # ",
+      "#    #"
+    ],
+    'L': [
+      "#     ",
+      "#     ",
+      "#     ",
+      "#     ",
+      "######"
+    ],
+    'M': [
+      "#    #",
+      "##  ##",
+      "# ## #",
+      "#    #",
+      "#    #"
+    ],
+    'N': [
+      "#    #",
+      "##   #",
+      "# #  #",
+      "#  # #",
+      "#   ##"
+    ],
+    'O': [
+      " #### ",
+      "#    #",
+      "#    #",
+      "#    #",
+      " #### "
+    ],
+    'P': [
+      "##### ",
+      "#    #",
+      "##### ",
+      "#     ",
+      "#     "
+    ],
+    'Q': [
+      " #### ",
+      "#    #",
+      "#    #",
+      "#  # #",
+      " #### "
+    ],
+    'R': [
+      "##### ",
+      "#    #",
+      "##### ",
+      "#   # ",
+      "#    #"
+    ],
+    'S': [
+      " #####",
+      "#     ",
+      " #### ",
+      "     #",
+      "##### "
+    ],
+    'T': [
+      "######",
+      "  ##  ",
+      "  ##  ",
+      "  ##  ",
+      "  ##  "
+    ],
+    'U': [
+      "#    #",
+      "#    #",
+      "#    #",
+      "#    #",
+      " #### "
+    ],
+    'V': [
+      "#    #",
+      "#    #",
+      "#    #",
+      " #  # ",
+      "  ##  "
+    ],
+    'W': [
+      "#    #",
+      "#    #",
+      "# ## #",
+      "##  ##",
+      "#    #"
+    ],
+    'X': [
+      "#    #",
+      " #  # ",
+      "  ##  ",
+      " #  # ",
+      "#    #"
+    ],
+    'Y': [
+      "#    #",
+      " #  # ",
+      "  ##  ",
+      "  ##  ",
+      "  ##  "
+    ],
+    'Z': [
+      "######",
+      "    # ",
+      "   #  ",
+      "  #   ",
+      "######"
+    ],
+    '0': [
+      " #### ",
+      "#   ##",
+      "# #  #",
+      "##   #",
+      " #### "
+    ],
+    '1': [
+      "  ##  ",
+      " ###  ",
+      "  ##  ",
+      "  ##  ",
+      "######"
+    ],
+    '2': [
+      " #### ",
+      "#    #",
+      "   ## ",
+      " ##   ",
+      "######"
+    ],
+    '3': [
+      " #### ",
+      "     #",
+      " #### ",
+      "     #",
+      " #### "
+    ],
+    '4': [
+      "   ## ",
+      "  # # ",
+      " #  # ",
+      "######",
+      "    # "
+    ],
+    '5': [
+      "######",
+      "#     ",
+      "##### ",
+      "     #",
+      "##### "
+    ],
+    '6': [
+      " #### ",
+      "#     ",
+      "##### ",
+      "#    #",
+      " #### "
+    ],
+    '7': [
+      "######",
+      "    # ",
+      "   #  ",
+      "  #   ",
+      " #    "
+    ],
+    '8': [
+      " #### ",
+      "#    #",
+      " #### ",
+      "#    #",
+      " #### "
+    ],
+    '9': [
+      " #### ",
+      "#    #",
+      " #####",
+      "     #",
+      " #### "
+    ],
+    ' ': [
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "      "
+    ],
+    '!': [
+      "  #   ",
+      "  #   ",
+      "  #   ",
+      "      ",
+      "  #   "
+    ],
+    '?': [
+      " #### ",
+      "#    #",
+      "   ## ",
+      "      ",
+      "  ##  "
+    ],
+    '.': [
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "  #   "
+    ],
+    '-': [
+      "      ",
+      "      ",
+      "######",
+      "      ",
+      "      "
+    ],
+    '_': [
+      "      ",
+      "      ",
+      "      ",
+      "      ",
+      "######"
+    ]
+  }
+}
 
 export default {
   name: 'AsciiTool',
@@ -95,7 +386,7 @@ export default {
   },
   data() {
     return {
-      inputText: 'hello',
+      inputText: 'HELLO',
       selectedFont: 'standard',
       asciiArt: '',
       error: '',
@@ -105,16 +396,13 @@ export default {
   watch: {
     inputText() {
       this.generateAscii()
-    },
-    selectedFont() {
-      this.generateAscii()
     }
   },
   mounted() {
     this.generateAscii()
   },
   methods: {
-    async generateAscii() {
+    generateAscii() {
       this.error = ''
       this.success = ''
       
@@ -124,21 +412,22 @@ export default {
       }
       
       try {
-        // 使用 figlet 生成 ASCII 艺术
-        const result = await new Promise((resolve, reject) => {
-          figlet(this.inputText, {
-            font: this.selectedFont,
-            horizontalLayout: 'default',
-            verticalLayout: 'default'
-          }, (err, data) => {
-            if (err) reject(err)
-            else resolve(data)
-          })
-        })
-        this.asciiArt = result
+        // 使用内置字体生成 ASCII 艺术
+        const text = this.inputText.toUpperCase()
+        const font = asciiFonts.standard
+        const lines = ['', '', '', '', '']
+        
+        for (const char of text) {
+          const charArt = font[char] || font['?']
+          for (let i = 0; i < 5; i++) {
+            lines[i] += charArt[i] + '  '
+          }
+        }
+        
+        this.asciiArt = lines.join('\n')
       } catch (err) {
-        this.error = '生成失败，请尝试其他文本或字体'
-        console.error('Figlet error:', err)
+        this.error = '生成失败，请尝试其他文本'
+        console.error('ASCII error:', err)
         this.asciiArt = ''
       }
     },
@@ -307,6 +596,13 @@ export default {
 .font-select option {
   background: var(--panel-2);
   color: var(--text);
+}
+
+.font-note {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
 }
 
 /* === ASCII Output === */
