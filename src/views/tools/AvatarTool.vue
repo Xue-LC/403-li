@@ -31,7 +31,7 @@
                 v-model.number="gridSize" 
                 min="4" 
                 max="20" 
-                class="range-slider"
+                class="range-input"
                 @input="generateAvatar"
               />
               <span class="range-value">{{ gridSize }}</span>
@@ -57,7 +57,7 @@
                 v-model.number="hue" 
                 min="0" 
                 max="360" 
-                class="hue-range"
+                class="range-input hue-input"
                 @input="generateAvatar"
               />
               <div class="hue-preview" :style="{ backgroundColor: `hsl(${hue}, 80%, 60%)` }"></div>
@@ -140,11 +140,16 @@ export default {
         for (let y = 0; y < this.gridSize; y++) {
           // 50% 概率绘制该像素块
           if (Math.random() > 0.5) {
+            // 使用整数坐标避免亚像素缝隙
+            const x1 = Math.floor(x * pixelSize)
+            const y1 = Math.floor(y * pixelSize)
+            const x2 = Math.floor((this.gridSize - 1 - x) * pixelSize)
+            const size = Math.ceil(pixelSize)
+            
             // 绘制左半边
-            ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize)
+            ctx.fillRect(x1, y1, size, size)
             // 绘制右半边（镜像对称）
-            const mirrorX = this.gridSize - 1 - x
-            ctx.fillRect(mirrorX * pixelSize, y * pixelSize, pixelSize, pixelSize)
+            ctx.fillRect(x2, y1, size, size)
           }
         }
       }
