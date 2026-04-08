@@ -1,4 +1,4 @@
-flf2a 3 2 6 1 11 0 16513
+flf2a$ 3 2 6 1 11 0 16513
 Digital by Glenn Chappell 1/94 -- based on Bubble
 Includes characters 128-255
 Enhanced for Latin-2,3,4 by John Cowan <cowan@ccil.org>
@@ -10,9 +10,9 @@ modifier's name is placed on a comment line.
 Modified by Paul Burton <solution@earthlink.net> 12/96 to include new parameter
 supported by FIGlet and FIGWin.  May also be slightly modified for better use
 of new full-width/kern/smush alternatives, but default output is NOT changed.
- @
- @
- @@
+ $@
+ $@
+ $@@
  +-+@
  |!|@
  +-+@@
