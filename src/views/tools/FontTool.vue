@@ -166,6 +166,10 @@ export default {
     },
     progressBlocks() {
       const totalBlocks = 20
+      // 当动画激活时，显示满的进度块以配合流动动画效果
+      if (this.isAnimating) {
+        return '█'.repeat(totalBlocks)
+      }
       const filledBlocks = Math.floor((this.progress / 100) * totalBlocks)
       return '█'.repeat(filledBlocks) + '░'.repeat(totalBlocks - filledBlocks)
     }
