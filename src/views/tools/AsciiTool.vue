@@ -24,32 +24,19 @@
             <span>{{ inputText.length }} / 20</span>
           </div>
           
-          <!-- 字体选择 -->
-          <label class="input-label">选择字体：</label>
-          <div class="select-wrapper">
-            <select v-model="selectedFont" class="font-select">
-              <option v-for="font in fontOptions" :key="font.name" :value="font.name">
-                {{ font.label }}
-              </option>
-            </select>
-          </div>
-          <div class="font-note">
-            <span>💡 提示：{{ currentFontInfo.description }}</span>
+          <!-- 操作按钮 -->
+          <div class="action-buttons">
+            <button class="button primary" @click="copyToClipboard" :disabled="!asciiArt">
+              📋 复制
+            </button>
+            <button class="button" @click="downloadArt" :disabled="!asciiArt">
+              💾 下载
+            </button>
           </div>
           
           <!-- 实时生成 -->
           <div class="ascii-output" v-if="asciiArt">
             <pre class="ascii-pre">{{ asciiArt }}</pre>
-          </div>
-          
-          <!-- 操作按钮 -->
-          <div class="action-buttons" v-if="asciiArt">
-            <button class="button primary" @click="copyToClipboard">
-              📋 复制
-            </button>
-            <button class="button" @click="downloadArt">
-              💾 下载
-            </button>
           </div>
           
           <!-- 空状态 -->
@@ -64,6 +51,32 @@
           
           <div v-if="success" class="status-success">
             ✅ {{ success }}
+          </div>
+          
+          <!-- 字体选择区域 -->
+          <div class="font-section">
+            <div class="font-search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                v-model="fontSearch" 
+                placeholder="搜索字体..."
+                class="search-input"
+              />
+              <span class="font-count">{{ filteredFonts.length }} / {{ fontOptions.length }}</span>
+            </div>
+            
+            <!-- 字体列表 -->
+            <div class="font-grid">
+              <button
+                v-for="font in filteredFonts"
+                :key="font.name"
+                :class="['font-card', { active: selectedFont === font.name }]"
+                @click="selectFont(font.name)"
+              >
+                {{ font.name }}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -94,12 +107,23 @@ export default {
       error: '',
       success: '',
       isGenerating: false,
-      fontOptions: AVAILABLE_FONTS
+      fontOptions: AVAILABLE_FONTS,
+      fontSearch: ''
     }
   },
   computed: {
     currentFontInfo() {
       return this.fontOptions.find(f => f.name === this.selectedFont) || this.fontOptions[0]
+    },
+    filteredFonts() {
+      if (!this.fontSearch.trim()) {
+        return this.fontOptions
+      }
+      const query = this.fontSearch.toLowerCase()
+      return this.fontOptions.filter(font => 
+        font.label.toLowerCase().includes(query) ||
+        font.name.toLowerCase().includes(query)
+      )
     }
   },
   watch: {
@@ -309,6 +333,87 @@ export default {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--muted);
+}
+
+/* === Font List Section === */
+.font-list-section {
+  margin-top: 1.5rem;
+}
+
+.font-list-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.font-list-head .input-label {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.font-search {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.font-search:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+.font-search::placeholder {
+  color: var(--muted);
+}
+
+.font-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.font-item {
+  padding: 10px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-item:hover {
+  border-color: var(--green);
+  background: var(--panel-3);
+}
+
+.font-item.active {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+@media (max-width: 640px) {
+  .font-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  
+  .font-list-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* === ASCII Output === */
