@@ -332,8 +332,8 @@ export const AVAILABLE_FONTS = [
   { name: 'Whimsy', label: 'Whimsy' },
   { name: 'WideTerm', label: 'WideTerm' },
   { name: 'Wow', label: 'Wow' },
-  { name: 'miniwi', label: 'miniwi' },
-  { name: 's Cheese', label: 's Cheese' }
+  { name: 'miniwi', label: 'miniwi' }
+  // 's Cheese' - 不可用 (404)
 ];
 
 // 缓存已加载的字体
