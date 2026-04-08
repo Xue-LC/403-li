@@ -23,17 +23,20 @@ self.onmessage = async function(e) {
     // Perform compression (this is blocking in the worker, but not in main thread)
     const compressed = await compress(new Uint8Array(fileData))
 
-    // Send success result
+    // Send success result with transferable buffer for performance
+    // Note: When using Transferable, the ArrayBuffer ownership transfers to main thread
+    // and the Uint8Array becomes detached, so we send the buffer directly
+    const resultBuffer = compressed.buffer.slice(compressed.byteOffset, compressed.byteOffset + compressed.byteLength)
     self.postMessage({
       type: 'success',
       id,
       fileName,
       fileIndex,
       totalFiles,
-      result: compressed,
+      result: resultBuffer,  // ArrayBuffer, not Uint8Array
       compressedSize: compressed.length,
       message: `完成: ${fileName}`
-    }, [compressed.buffer]) // Transfer ownership for performance
+    }, [resultBuffer]) // Transfer ownership for performance
 
   } catch (error) {
     // Send error

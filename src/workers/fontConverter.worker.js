@@ -40,18 +40,18 @@ self.onmessage = async function(e) {
     // Step 4: Complete
     sendStep(id, fileName, 'complete', '完成', 'done')
 
-    // Send success result with transferable buffer for performance
+    // Send success result (copy to avoid Transferable issues)
     self.postMessage({
       type: 'success',
       id,
       fileName,
       fileIndex,
       totalFiles,
-      result: compressed,
+      result: compressed.slice(),  // Copy buffer
       compressedSize: compressed.length,
       originalSize: fileData.byteLength,
       message: `完成: ${fileName}`
-    }, [compressed.buffer])
+    })
 
   } catch (error) {
     // Mark current step as error

@@ -300,7 +300,8 @@ export default {
           fileInfo.status = 'converting'
           this.progressText = `正在转换 (${fileIndex + 1}/${totalFiles}): ${fileName}`
         } else if (type === 'success') {
-          fileInfo.result = new Uint8Array(result)
+          // result is already a Uint8Array (sliced copy from worker)
+          fileInfo.result = result instanceof Uint8Array ? result : new Uint8Array(result)
           fileInfo.convertedSize = compressedSize
           fileInfo.status = 'done'
           this.completedCountCurrent++
@@ -751,6 +752,86 @@ export default {
 
 .stat-value.saved {
   color: var(--green);
+}
+
+/* === Steps Section === */
+.steps-section {
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.steps-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0.25rem 0;
+}
+
+.step-item.step-done {
+  color: var(--green);
+}
+
+.step-item.step-active {
+  color: var(--text);
+}
+
+.step-item.step-error {
+  color: var(--red);
+}
+
+.step-indicator {
+  width: 16px;
+  text-align: center;
+}
+
+.step-dot {
+  color: var(--muted);
+}
+
+.step-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+.step-check {
+  color: var(--green);
+}
+
+.step-error-icon {
+  color: var(--red);
+}
+
+.step-name {
+  flex: 1;
+}
+
+.step-detail {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* === Status Error === */
