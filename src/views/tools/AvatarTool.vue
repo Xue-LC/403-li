@@ -347,13 +347,6 @@ canvas {
   border: 2px solid var(--line);
 }
 
-.footer {
-  margin-top: 12px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.02);
-  padding: 10px 12px;
-}
-
 @media (max-width: 640px) {
   .avatar-tool {
     width: 100%;

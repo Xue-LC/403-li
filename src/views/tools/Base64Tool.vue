@@ -316,22 +316,6 @@ export default {
   background: var(--green-soft);
 }
 
-/* === Footer === */
-.footer {
-  margin-top: 12px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.02);
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--dim);
-  text-transform: uppercase;
-}
-
 /* === Responsive === */
 @media (max-width: 640px) {
   .base64-tool {
