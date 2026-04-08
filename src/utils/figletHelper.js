@@ -59,20 +59,13 @@ export const AVAILABLE_FONTS = [
   { name: 'Digital', label: 'Digital - 数码', description: 'LED 数码管风格' },
   { name: 'Script', label: 'Script - 手写', description: '手写体风格' },
   { name: 'Graffiti', label: 'Graffiti - 涂鸦', description: '街头涂鸦风格' },
-  { name: 'Isometric1', label: 'Isometric1 - 等距', description: '3D 等距投影' },
-  { name: '3-D', label: '3-D - 立体', description: '3D 立体效果' },
-  { name: '3x5', label: '3x5 - 点阵', description: '3x5 点阵字体' },
+  // 以下字体已移除（oldLayout=-1，全宽模式不兼容）:
+  // Isometric1, 3-D, 3x5, Alphabet, Banner3, Banner4, Barbwire, Basic, Bell
   // 5lineoblique 已移除（字体文件不可用）
   { name: 'Acrobatic', label: 'Acrobatic - 杂技', description: '杂技表演风格' },
   { name: 'Alligator', label: 'Alligator - 鳄鱼', description: '鳄鱼纹理风格' },
-  { name: 'Alphabet', label: 'Alphabet - 字母', description: '纯字母风格' },
   { name: 'ANSI Shadow', label: 'ANSI Shadow - ANSI阴影', description: 'ANSI 阴影效果' },
-  { name: 'Avatar', label: 'Avatar - 头像', description: '阿凡达风格' },
-  { name: 'Banner3', label: 'Banner3 - 横幅3', description: '横幅风格变种3' },
-  { name: 'Banner4', label: 'Banner4 - 横幅4', description: '横幅风格变种4' },
-  { name: 'Barbwire', label: 'Barbwire - 铁丝网', description: '带刺铁丝网风格' },
-  { name: 'Basic', label: 'Basic - 基础', description: '基础简洁风格' },
-  { name: 'Bell', label: 'Bell - 铃铛', description: '铃铛形状风格' }
+  { name: 'Avatar', label: 'Avatar - 头像', description: '阿凡达风格' }
 ];
 
 // 缓存已加载的字体
@@ -100,12 +93,16 @@ async function loadFontFile(fontName) {
   throw new Error(`Font not available: ${fontName}`);
 }
 
-// 简单的 FIGlet 解析器（简化版）
+// FIGlet 解析器（完整版，支持所有布局模式）
 class FigletParser {
   constructor(fontData) {
     console.log('[Figlet Debug] Creating FigletParser');
     this.fontData = fontData;
     this.characters = new Map();
+    this.height = 0;
+    this.baseline = 0;
+    this.hardblank = '$';
+    this.oldLayout = 0;
     this.parseFont();
   }
 
@@ -114,56 +111,85 @@ class FigletParser {
     const normalizedData = this.fontData.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalizedData.split('\n');
     
-    // 解析头部: flf2a$ height baseline maxLength oldLayout commentLines ...
+    // 解析头部: flf2a$ hardblank height baseline maxLength oldLayout commentLines ...
+    // 注意：hardblank 是 flf2a 后面的那个字符，通常是 $
     const header = lines[0];
-    // 匹配所有数字: height baseline maxLength oldLayout commentLines ...
-    const headerMatch = header.match(/^flf2a\$\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
+    
+    // 匹配头部: flf2a<hardblank> height baseline maxLength oldLayout commentLines ...
+    // oldLayout 可能是负数（-1 表示全宽模式）
+    const headerMatch = header.match(/^flf2a(.)\s+(\d+)\s+(\d+)\s+(\d+)\s+(-?\d+)\s+(\d+)/);
     if (!headerMatch) {
-      throw new Error('Invalid FIGlet font header');
+      throw new Error('Invalid FIGlet font header: ' + header);
     }
     
-    this.height = parseInt(headerMatch[1], 10);
-    this.baseline = parseInt(headerMatch[2], 10);
+    this.hardblank = headerMatch[1]; // 通常是 '$'
+    this.height = parseInt(headerMatch[2], 10);
+    this.baseline = parseInt(headerMatch[3], 10);
+    const maxLength = parseInt(headerMatch[4], 10);
+    this.oldLayout = parseInt(headerMatch[5], 10);
+    const commentLines = parseInt(headerMatch[6], 10) || 0;
     
-    // commentLines 是第5个数字，需要跳过这些注释行
-    const commentLines = parseInt(headerMatch[5], 10) || 0;
+    console.log('[Figlet Debug] Font header parsed:', {
+      hardblank: this.hardblank,
+      height: this.height,
+      baseline: this.baseline,
+      maxLength,
+      oldLayout: this.oldLayout,
+      commentLines
+    });
+    
     let lineIndex = 1 + commentLines; // 跳过注释行
     
-    // 简化的解析逻辑：每个字符 height 行，每行以 @ 结尾，字符结束标记是 @@
-    let currentChar = 32; // 从空格开始
+    // 解析字符：每个字符 height 行，每行以 @ 结尾，字符结束标记是 @@
+    let currentChar = 32; // 从空格开始 (ASCII 32-126 是可打印字符)
     
     while (lineIndex < lines.length && currentChar <= 126) {
       const charLines = [];
       
       // 读取 height 行
       for (let i = 0; i < this.height && lineIndex < lines.length; i++) {
-        let line = lines[lineIndex];
+        let line = lines[lineIndex] || '';
         
-        // 去掉行尾的 @ 或 @@
+        // 去掉行尾的 @ 或 @@（结束标记）
         if (line.endsWith('@@')) {
           line = line.slice(0, -2);
         } else if (line.endsWith('@')) {
           line = line.slice(0, -1);
         }
         
-        // $ 是 figlet hardblank，替换为空格
-        line = line.replace(/\$/g, ' ');
+        // hardblank 需要替换为空格，而不是删除
+        // 这很重要：$ 在 figlet 中是 "硬空格"，表示必须保留的位置
+        if (this.hardblank) {
+          line = line.replace(new RegExp('\\' + this.hardblank, 'g'), ' ');
+        }
         
         charLines.push(line);
         lineIndex++;
       }
       
       if (charLines.length === this.height) {
+        // 存储字符时保留原始宽度，不做 trimEnd
+        // trimEnd 会导致字符间距问题
         this.characters.set(currentChar, charLines);
         currentChar++;
       } else {
         break; // 解析完成或出错
       }
     }
+    
+    console.log('[Figlet Debug] Parsed characters:', this.characters.size, 'from', lineIndex, 'lines');
   }
 
   render(text) {
-    console.log('[Figlet Debug] Rendering text:', text);
+    console.log('[Figlet Debug] Rendering text:', text, 'with oldLayout:', this.oldLayout);
+    
+    // 根据布局模式决定字符间距
+    // oldLayout = -1: 全宽模式，字符间无重叠
+    // oldLayout = 0: 仅 kerning，无 smush
+    // oldLayout > 0: smush 模式，字符可以重叠
+    const spacing = this.oldLayout === -1 ? 0 : 1; // 全宽模式不加额外空格
+    
+    // 初始化结果数组
     const result = new Array(this.height).fill('');
     
     for (const char of text) {
@@ -172,19 +198,25 @@ class FigletParser {
       
       if (charLines) {
         for (let i = 0; i < this.height; i++) {
-          // 字符之间加空格避免重叠（简化版，不做 smush）
-          result[i] += (charLines[i] || '') + ' ';
+          // 将每行追加到结果
+          result[i] += charLines[i] || '';
+          // 字符之间添加间距（全宽模式不加）
+          if (spacing > 0) {
+            result[i] += ' ';
+          }
         }
       } else {
-        // 对于未定义的字符，使用空格
+        // 对于未定义的字符，使用空格替代
         console.warn('[Figlet Debug] Character not found:', char, '(code:', charCode + ')');
+        const spaceWidth = this.characters.get(32) ? this.characters.get(32)[0]?.length || 4 : 4;
         for (let i = 0; i < this.height; i++) {
-          result[i] += '    ';
+          result[i] += ' '.repeat(spaceWidth + spacing);
         }
       }
     }
     
-    const output = result.join('\n');
+    // 去除每行末尾的空白（只去除末尾，不影响字符内部）
+    const output = result.map(line => line.trimEnd()).join('\n');
     console.log('[Figlet Debug] Rendered output length:', output.length);
     return output;
   }
