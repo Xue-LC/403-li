@@ -44,7 +44,7 @@
                 <span class="file-name">{{ file.status === 'done' ? file.outputName : file.name }}</span>
                 <span v-if="file.status === 'done' && file.convertedSize" class="file-size">
                   {{ formatSize(file.convertedSize) }}
-                  <span class="file-size-original">(原 {{ formatSize(file.size) }})</span>
+                  <span class="file-size-original">{{ formatSize(file.size) }}</span>
                 </span>
                 <span v-else class="file-size">{{ formatSize(file.size) }}</span>
               </div>
