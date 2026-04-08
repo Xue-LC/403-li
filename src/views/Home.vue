@@ -73,13 +73,13 @@
             @click="navigateTo(tool.path)"
           >
             <div class="tool-top">
-              <span class="tool-id">[{{ tool.id.toString().padStart(2, '0') }}]</span>
+              <span class="tool-id">[{{ tool.id.toString().padStart(2，'0') }}]</span>
               <span>{{ tool.path }}</span>
             </div>
             <h3>{{ tool.name }}</h3>
             <p>{{ tool.description }}</p>
             <div class="tool-foot">
-              <span class="tag" :style="{ color: tool.statusColor, fontSize: '11px', borderColor: tool.statusColor, backgroundColor: tool.statusColor + '20' }">{{ tool.statusText }}</span>
+              <span class="tag" :style="{ color: tool.statusColor，fontSize: '11px'，borderColor: tool.statusColor，backgroundColor: tool.statusColor + '20' }">{{ tool.statusText }}</span>
               <span>{{ tool.features }}</span>
             </div>
           </article>
@@ -114,7 +114,7 @@ export default {
           name: 'JSON 格式化',
           description: '用于格式化、压缩和校验 JSON 数据',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '格式化 / 校验',
           category: 'format'
         },
@@ -122,9 +122,9 @@ export default {
           id: 2,
           path: '/tools/base64',
           name: 'Base64 编解码',
-          description: '编码解码是高频小工具,适合处理文本和图片',
+          description: '编码解码是高频小工具，适合处理文本和图片',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding'
         },
@@ -132,9 +132,9 @@ export default {
           id: 3,
           path: '/tools/qrcode',
           name: '二维码生成',
-          description: '输入文本或链接,快速生成二维码图片',
+          description: '输入文本或链接，快速生成二维码图片',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '生成 / 下载',
           category: 'image'
         },
@@ -142,9 +142,9 @@ export default {
           id: 4,
           path: '/tools/timestamp',
           name: '时间戳转换',
-          description: '时间戳和日期格式互相转换,支持 Unix 和 ISO 格式',
+          description: '时间戳和日期格式互相转换，支持 Unix 和 ISO 格式',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: 'Unix / ISO',
           category: 'format'
         },
@@ -152,9 +152,9 @@ export default {
           id: 5,
           path: '/tools/url',
           name: 'URL 编解码',
-          description: 'URL 编码和解码,处理特殊字符和中文',
+          description: 'URL 编码和解码，处理特殊字符和中文',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '编码 / 解码',
           category: 'encoding'
         },
@@ -164,7 +164,7 @@ export default {
           name: '哈希计算',
           description: '计算 MD5、SHA1、SHA256、SHA512 等哈希值',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: 'MD5 / SHA1 / SHA256 / SHA512',
           category: 'security'
         },
@@ -172,9 +172,9 @@ export default {
           id: 7,
           path: '/tools/password',
           name: '密码生成',
-          description: '生成安全随机密码,支持自定义长度和字符集',
+          description: '生成安全随机密码，支持自定义长度和字符集',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '生成 / 复制',
           category: 'security'
         },
@@ -184,7 +184,7 @@ export default {
           name: '颜色转换',
           description: 'HEX、RGB、HSL 颜色格式互相转换',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: 'HEX / RGB / HSL',
           category: 'format'
         },
@@ -194,7 +194,7 @@ export default {
           name: '字体压缩',
           description: 'TTF/OTF 字体转换为 WOFF2 格式，基于 WASM 的纯前端处理',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: 'TTF / OTF → WOFF2',
           category: 'format'
         },
@@ -204,7 +204,7 @@ export default {
           name: '像素头像生成器',
           description: '生成对称的像素风格随机头像，可调整网格和色调',
           status: 'normal',
-          statusText: '正常', statusColor: '#9dff6b',
+          statusText: '正常'，statusColor: '#9dff6b',
           features: '生成 / 下载',
           category: 'image'
         }
@@ -238,7 +238,7 @@ export default {
       this.$router.push(path)
     },
     handleSearch() {
-      console.log('搜索:', this.searchQuery)
+      console.log('搜索:'，this.searchQuery)
     }
   }
 }
