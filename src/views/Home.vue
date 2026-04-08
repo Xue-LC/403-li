@@ -207,6 +207,16 @@ export default {
           statusText: '正常', statusColor: '#9dff6b',
           features: '生成 / 下载',
           category: 'image'
+        },
+        {
+          id: 11,
+          path: '/tools/ascii',
+          name: 'ASCII 艺术生成器',
+          description: '输入文本，实时生成多种风格的 ASCII 字符艺术',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: '实时生成 / 复制 / 下载',
+          category: 'text'
         }
       ]
     }

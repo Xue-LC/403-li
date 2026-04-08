@@ -10,6 +10,7 @@
   "dependencies": {
     "@sparticuz/chromium": "^143.0.4",
     "crypto-js": "^4.2.0",
+    "figlet": "^1.11.0",
     "puppeteer-core": "^24.39.1",
     "qrcode": "^1.5.4",
     "qrcode-generator": "^2.0.4",

@@ -11,6 +11,7 @@ import PasswordTool from './views/tools/PasswordTool.vue'
 import ColorTool from './views/tools/ColorTool.vue'
 import FontTool from './views/tools/FontTool.vue'
 import AvatarTool from './views/tools/AvatarTool.vue'
+import AsciiTool from './views/tools/AsciiTool.vue'
 import Icons from './views/Icons.vue'
 import NotFound from './views/NotFound.vue'
 
@@ -74,6 +75,11 @@ const routes = [
     path: '/tools/avatar',
     name: 'AvatarTool',
     component: AvatarTool
+  },
+  {
+    path: '/tools/ascii',
+    name: 'AsciiTool',
+    component: AsciiTool
   },
   {
     path: '/games',
