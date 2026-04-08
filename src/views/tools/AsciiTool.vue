@@ -28,11 +28,13 @@
           <label class="input-label">选择字体：</label>
           <div class="select-wrapper">
             <select v-model="selectedFont" class="font-select">
-              <option value="standard">Standard - 标准</option>
+              <option v-for="font in fontOptions" :key="font.name" :value="font.name">
+                {{ font.label }}
+              </option>
             </select>
           </div>
           <div class="font-note">
-            <span>💡 提示：当前使用纯前端实现的 Standard 字体，支持 A-Z, 0-9 和常见符号</span>
+            <span>💡 提示：{{ currentFontInfo.description }}</span>
           </div>
           
           <!-- 实时生成 -->
@@ -78,10 +80,11 @@
 
 <script>
 import Topbar from '../../components/Topbar.vue'
+import { AVAILABLE_FONTS, generateAsciiArt } from '../../utils/figletHelper.js'
 
-// 预定义的简单 ASCII 字体映射（standard 风格）
-const asciiFonts = {
-  standard: {
+// 预定义的简单 ASCII 字体映射（Standard 风格 - 作为降级方案）
+const fallbackFonts = {
+  Standard: {
     'A': [
       "  ##  ",
       " #  # ",
@@ -257,13 +260,6 @@ const asciiFonts = {
       "  ##  ",
       "  ##  "
     ],
-    'Z': [
-      "######",
-      "    # ",
-      "   #  ",
-      "  #   ",
-      "######"
-    ],
     '0': [
       " #### ",
       "#   ##",
@@ -369,14 +365,7 @@ const asciiFonts = {
       "      ",
       "      "
     ],
-    '_': [
-      "      ",
-      "      ",
-      "      ",
-      "      ",
-      "######"
-    ]
-  }
+}
 }
 
 export default {
@@ -387,14 +376,24 @@ export default {
   data() {
     return {
       inputText: 'HELLO',
-      selectedFont: 'standard',
+      selectedFont: 'Standard',
       asciiArt: '',
       error: '',
-      success: ''
+      success: '',
+      isGenerating: false,
+      fontOptions: AVAILABLE_FONTS
+    }
+  },
+  computed: {
+    currentFontInfo() {
+      return this.fontOptions.find(f => f.name === this.selectedFont) || this.fontOptions[0]
     }
   },
   watch: {
     inputText() {
+      this.generateAscii()
+    },
+    selectedFont() {
       this.generateAscii()
     }
   },
@@ -402,7 +401,7 @@ export default {
     this.generateAscii()
   },
   methods: {
-    generateAscii() {
+    async generateAscii() {
       this.error = ''
       this.success = ''
       
@@ -411,24 +410,18 @@ export default {
         return
       }
       
+      this.isGenerating = true
+      
       try {
-        // 使用内置字体生成 ASCII 艺术
-        const text = this.inputText.toUpperCase()
-        const font = asciiFonts.standard
-        const lines = ['', '', '', '', '']
-        
-        for (const char of text) {
-          const charArt = font[char] || font['?']
-          for (let i = 0; i < 5; i++) {
-            lines[i] += charArt[i] + '  '
-          }
-        }
-        
-        this.asciiArt = lines.join('\n')
+        // 使用 figletHelper 从 CDN 加载字体并生成 ASCII 艺术
+        const result = await generateAsciiArt(this.inputText, this.selectedFont)
+        this.asciiArt = result
       } catch (err) {
-        this.error = '生成失败，请尝试其他文本'
+        this.error = '生成失败，请尝试其他文本或字体'
         console.error('ASCII error:', err)
         this.asciiArt = ''
+      } finally {
+        this.isGenerating = false
       }
     },
     copyToClipboard() {
