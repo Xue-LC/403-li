@@ -6,7 +6,7 @@
     <!-- 工具主体 -->
     <section class="pane">
       <div class="pane-head">
-        <span>像素头像生成器</span>
+        <span>像素头像生成</span>
         <span>在线工具</span>
       </div>
       <div class="pane-body">
@@ -81,7 +81,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <span>403.li // 像素头像生成器</span>
+      <span>403.li // 像素头像生成</span>
       <span>纯前端处理 · 数据不会上传</span>
     </footer>
   </div>
