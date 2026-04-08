@@ -31,14 +31,19 @@ const fontCache = new Map();
 
 // 加载字体文件
 async function loadFontFile(fontName) {
+  console.log('[Figlet Debug] Loading font:', fontName);
+  
   // 检查缓存
   if (fontCache.has(fontName)) {
+    console.log('[Figlet Debug] Font found in cache');
     return fontCache.get(fontName);
   }
 
   // 检查是否是本地可用字体
   if (FONT_MAP[fontName]) {
     const fontData = FONT_MAP[fontName];
+    console.log('[Figlet Debug] Font data loaded, length:', fontData.length);
+    console.log('[Figlet Debug] Font data first 100 chars:', fontData.substring(0, 100));
     fontCache.set(fontName, fontData);
     return fontData;
   }
@@ -49,69 +54,113 @@ async function loadFontFile(fontName) {
 // 简单的 FIGlet 解析器（简化版）
 class FigletParser {
   constructor(fontData) {
+    console.log('[Figlet Debug] Creating FigletParser');
     this.fontData = fontData;
     this.characters = new Map();
     this.parseFont();
   }
 
   parseFont() {
-    const lines = this.fontData.split('\n');
+    console.log('[Figlet Debug] Starting font parsing');
+    // 处理 Windows 换行符 (CRLF -> LF)
+    const normalizedData = this.fontData.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalizedData.split('\n');
+    console.log('[Figlet Debug] Total lines:', lines.length);
     
     // 解析头部
     const header = lines[0];
-    const headerMatch = header.match(/^flf2a\$(\d+)\s+(\d+)/);
+    console.log('[Figlet Debug] Header line:', JSON.stringify(header));
+    
+    // 修复：原正则表达式 /^flf2a\$(\d+)/ 期望 $ 后面直接跟数字
+    // 但实际格式是 "flf2a$ 6 5..."，$ 后面有空格
+    // 修正后的正则：/^flf2a\$\s*(\d+)/
+    const headerMatch = header.match(/^flf2a\$\s*(\d+)\s+(\d+)/);
+    console.log('[Figlet Debug] Header match result:', headerMatch);
+    
     if (!headerMatch) {
-      throw new Error('Invalid FIGlet font header');
+      console.error('[Figlet Debug] Invalid header format. Expected pattern: /^flf2a\\$\\s*(\\d+)\\s+(\\d+)/');
+      throw new Error('Invalid FIGlet font header: ' + header);
     }
     
     this.height = parseInt(headerMatch[1], 10);
     this.baseline = parseInt(headerMatch[2], 10);
+    console.log('[Figlet Debug] Parsed height:', this.height, 'baseline:', this.baseline);
     
     // 查找结束标记（通常是 @@ 或 @ 结尾）
     let currentChar = 32; // 从空格开始 (ASCII 32)
     let currentLines = [];
     let lineIndex = 1;
     
-    // 跳过头部注释行
-    while (lineIndex < lines.length && !lines[lineIndex].startsWith('@')) {
+    // 跳过头部注释行（直到遇到第一个以 @ 结尾的行）
+    console.log('[Figlet Debug] Skipping header comments...');
+    while (lineIndex < lines.length && !lines[lineIndex].includes('@')) {
       lineIndex++;
     }
+    console.log('[Figlet Debug] First data line at index:', lineIndex, 'content:', JSON.stringify(lines[lineIndex]));
     
     // 解析字符
+    let charCount = 0;
     while (lineIndex < lines.length && currentChar <= 126) {
       const line = lines[lineIndex];
       
       if (line.endsWith('@@')) {
-        // 字符结束
+        // 字符结束，@@ 是结束标记
         currentLines.push(line.slice(0, -2));
         if (currentLines.length === this.height) {
-          this.characters.set(currentChar, currentLines);
+          this.characters.set(currentChar, [...currentLines]);
           currentChar++;
           currentLines = [];
+          charCount++;
         }
       } else if (line.endsWith('@')) {
+        // 单行结束标记
         currentLines.push(line.slice(0, -1));
         if (currentLines.length === this.height) {
-          this.characters.set(currentChar, currentLines);
+          this.characters.set(currentChar, [...currentLines]);
           currentChar++;
           currentLines = [];
+          charCount++;
         }
       } else if (line.includes('@')) {
-        // 处理特殊情况
+        // 行中包含 @ 但不是结尾
         const atIndex = line.indexOf('@');
         currentLines.push(line.slice(0, atIndex));
         if (currentLines.length === this.height) {
-          this.characters.set(currentChar, currentLines);
+          this.characters.set(currentChar, [...currentLines]);
           currentChar++;
           currentLines = [];
+          charCount++;
+        }
+      } else {
+        // 普通行（可能是字符的中间行）
+        if (line.trim() !== '' || currentLines.length > 0) {
+          currentLines.push(line);
         }
       }
       
       lineIndex++;
     }
+    
+    console.log('[Figlet Debug] Parsed', charCount, 'characters');
+    console.log('[Figlet Debug] Characters parsed from', 32, 'to', currentChar - 1);
+    
+    // 验证空格字符 (ASCII 32) 是否被正确解析
+    if (this.characters.has(32)) {
+      console.log('[Figlet Debug] Space character parsed:', this.characters.get(32));
+    } else {
+      console.warn('[Figlet Debug] Space character NOT parsed!');
+    }
+    
+    // 验证 'H' 字符 (ASCII 72) 是否被正确解析
+    if (this.characters.has(72)) {
+      console.log('[Figlet Debug] "H" character parsed:', this.characters.get(72));
+    } else {
+      console.warn('[Figlet Debug] "H" character NOT parsed!');
+    }
   }
 
   render(text) {
+    console.log('[Figlet Debug] Rendering text:', text);
     const result = new Array(this.height).fill('');
     
     for (const char of text) {
@@ -124,19 +173,25 @@ class FigletParser {
         }
       } else {
         // 对于未定义的字符，使用空格
+        console.warn('[Figlet Debug] Character not found:', char, '(code:', charCode + ')');
         for (let i = 0; i < this.height; i++) {
-          result[i] += ' ';
+          result[i] += '    ';
         }
       }
     }
     
-    return result.join('\n');
+    const output = result.join('\n');
+    console.log('[Figlet Debug] Rendered output length:', output.length);
+    return output;
   }
 }
 
 // 生成 ASCII 艺术
 export async function generateAsciiArt(text, fontName = 'Standard') {
+  console.log('[Figlet Debug] generateAsciiArt called with text:', text, 'font:', fontName);
+  
   if (!text || text.trim() === '') {
+    console.log('[Figlet Debug] Empty text, returning empty string');
     return '';
   }
 
@@ -146,9 +201,12 @@ export async function generateAsciiArt(text, fontName = 'Standard') {
     
     // 使用自定义解析器
     const parser = new FigletParser(fontData);
-    return parser.render(text);
+    const result = parser.render(text);
+    console.log('[Figlet Debug] Generated ASCII art successfully');
+    return result;
   } catch (error) {
-    console.error('Error generating ASCII art:', error);
+    console.error('[Figlet Debug] Error generating ASCII art:', error);
+    console.error('[Figlet Debug] Error stack:', error.stack);
     throw new Error(`无法生成 ASCII 艺术: ${error.message}`);
   }
 }
