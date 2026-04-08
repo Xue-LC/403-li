@@ -65,9 +65,10 @@ class FigletParser {
     const normalizedData = this.fontData.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalizedData.split('\n');
     
-    // 解析头部: flf2a$ height baseline ...
+    // 解析头部: flf2a$ height baseline maxLength oldLayout commentLines ...
     const header = lines[0];
-    const headerMatch = header.match(/^flf2a\$\s*(\d+)\s+(\d+)/);
+    // 匹配所有数字: height baseline maxLength oldLayout commentLines ...
+    const headerMatch = header.match(/^flf2a\$\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/);
     if (!headerMatch) {
       throw new Error('Invalid FIGlet font header');
     }
@@ -75,9 +76,8 @@ class FigletParser {
     this.height = parseInt(headerMatch[1], 10);
     this.baseline = parseInt(headerMatch[2], 10);
     
-    // 解析头部：flf2a$ height baseline maxLength oldLayout commentLines ...
-    // commentLines 是注释行数，需要跳过
-    const commentLines = parseInt(headerMatch[6], 10) || 0;
+    // commentLines 是第5个数字，需要跳过这些注释行
+    const commentLines = parseInt(headerMatch[5], 10) || 0;
     let lineIndex = 1 + commentLines; // 跳过注释行
     
     // 简化的解析逻辑：每个字符 height 行，每行以 @ 结尾，字符结束标记是 @@
