@@ -139,6 +139,16 @@ export default {
           category: 'image'
         },
         {
+          id: 'avatar',
+          path: '/tools/avatar',
+          name: '像素头像生成',
+          description: '随机生成对称像素头像,可自定义网格和颜色',
+          status: 'new',
+          statusText: '新工具', statusColor: '#00ff00',
+          features: '生成 / 下载',
+          category: 'image'
+        },
+        {
           id: 4,
           path: '/tools/timestamp',
           name: '时间戳转换',
@@ -197,6 +207,16 @@ export default {
           statusText: '正常', statusColor: '#9dff6b',
           features: 'TTF / OTF → WOFF2',
           category: 'format'
+        },
+        {
+          id: 10,
+          path: '/tools/avatar',
+          name: '像素头像生成器',
+          description: '生成对称的像素风格随机头像，可调整网格和色调',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: '生成 / 下载',
+          category: 'image'
         }
       ]
     }
