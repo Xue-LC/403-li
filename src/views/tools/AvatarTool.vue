@@ -6,7 +6,7 @@
     <!-- 工具主体 -->
     <section class="pane">
       <div class="pane-head">
-        <span>像素头像生成</span>
+        <span>像素头像生成器</span>
         <span>在线工具</span>
       </div>
       <div class="pane-body">
@@ -81,7 +81,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <span>403.li // 像素头像生成</span>
+      <span>403.li // 像素头像生成器</span>
       <span>纯前端处理 · 数据不会上传</span>
     </footer>
   </div>
@@ -352,14 +352,6 @@ canvas {
   border: 1px solid var(--line);
   background: rgba(255,255,255,0.02);
   padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--dim);
-  text-transform: uppercase;
 }
 
 @media (max-width: 640px) {

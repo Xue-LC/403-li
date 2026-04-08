@@ -201,7 +201,7 @@ export default {
         {
           id: 10,
           path: '/tools/avatar',
-          name: '像素头像生成',
+          name: '像素头像生成器',
           description: '生成对称的像素风格随机头像，可调整网格和色调',
           status: 'normal',
           statusText: '正常', statusColor: '#9dff6b',
