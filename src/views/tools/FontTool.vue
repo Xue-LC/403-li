@@ -36,13 +36,17 @@
           <!-- 文件列表 -->
           <div v-if="files.length > 0" class="file-list">
             <div class="file-list-header">
-              <span>待转换文件 ({{ files.length }})</span>
+              <span>转换文件 ({{ files.length }})</span>
               <button class="clear-btn" @click="clearAll">清空</button>
             </div>
             <div v-for="(file, index) in files" :key="file.id" class="file-item">
               <div class="file-info">
-                <span class="file-name">{{ file.name }}</span>
-                <span class="file-size">{{ formatSize(file.size) }}</span>
+                <span class="file-name">{{ file.status === 'done' ? file.outputName : file.name }}</span>
+                <span v-if="file.status === 'done' && file.convertedSize" class="file-size">
+                  {{ formatSize(file.convertedSize) }}
+                  <span class="file-size-original">(原 {{ formatSize(file.size) }})</span>
+                </span>
+                <span v-else class="file-size">{{ formatSize(file.size) }}</span>
               </div>
               <div class="file-actions">
                 <span v-if="file.status === 'pending'" class="file-status">待转换</span>
@@ -552,6 +556,13 @@ export default {
   color: var(--muted);
   font-size: 11px;
   font-family: var(--mono);
+}
+
+.file-size-original {
+  color: var(--muted);
+  text-decoration: line-through;
+  opacity: 0.6;
+  margin-left: 4px;
 }
 
 .file-actions {
