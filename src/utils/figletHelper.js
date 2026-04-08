@@ -181,8 +181,6 @@ class FigletParser {
   }
 
   render(text) {
-    console.log('[Figlet Debug] Rendering text:', text, 'with oldLayout:', this.oldLayout);
-    
     // 根据布局模式决定字符间距
     // oldLayout = -1: 全宽模式，字符间无重叠
     // oldLayout = 0: 仅 kerning，无 smush
@@ -198,16 +196,15 @@ class FigletParser {
       
       if (charLines) {
         for (let i = 0; i < this.height; i++) {
-          // 将每行追加到结果
+          // 将每行追加到结果，不做 trimEnd 以保持对齐
           result[i] += charLines[i] || '';
-          // 字符之间添加间距（全宽模式不加）
+          // 每个字符后都添加间距（保持对齐）
           if (spacing > 0) {
             result[i] += ' ';
           }
         }
       } else {
         // 对于未定义的字符，使用空格替代
-        console.warn('[Figlet Debug] Character not found:', char, '(code:', charCode + ')');
         const spaceWidth = this.characters.get(32) ? this.characters.get(32)[0]?.length || 4 : 4;
         for (let i = 0; i < this.height; i++) {
           result[i] += ' '.repeat(spaceWidth + spacing);
@@ -215,10 +212,8 @@ class FigletParser {
       }
     }
     
-    // 去除每行末尾的空白（只去除末尾，不影响字符内部）
-    const output = result.map(line => line.trimEnd()).join('\n');
-    console.log('[Figlet Debug] Rendered output length:', output.length);
-    return output;
+    // 去除每行末尾的空白
+    return result.map(line => line.trimEnd()).join('\n');
   }
 }
 
