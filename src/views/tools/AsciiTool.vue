@@ -325,12 +325,18 @@ export default {
 .ascii-pre {
   margin: 0;
   padding: 0;
-  font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
+  /* 强制使用等宽字体，确保 ASCII 艺术对齐 */
+  font-family: 'Courier New', Courier, 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
   font-size: 14px;
   line-height: 1.2;
   color: var(--green);
   white-space: pre;
   overflow-x: auto;
+  /* 禁用连字和字间距调整 */
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+  letter-spacing: 0;
+  word-spacing: 0;
 }
 
 .copy-btn {

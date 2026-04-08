@@ -16,20 +16,13 @@ import BubbleFont from '../assets/fonts/figlet/Bubble.flf?raw';
 import DigitalFont from '../assets/fonts/figlet/Digital.flf?raw';
 import ScriptFont from '../assets/fonts/figlet/Script.flf?raw';
 import GraffitiFont from '../assets/fonts/figlet/Graffiti.flf?raw';
-import Isometric1Font from '../assets/fonts/figlet/Isometric1.flf?raw';
-import ThreeDFont from '../assets/fonts/figlet/3-D.flf?raw';
-import ThreeX5Font from '../assets/fonts/figlet/3x5.flf?raw';
-import FiveLineObliqueFont from '../assets/fonts/figlet/5lineoblique.flf?raw';
+// 5lineoblique.flf 已移除（字体文件不可用）
+// 以下字体已移除（oldLayout=-1，全宽模式不兼容）:
+// Isometric1, 3-D, 3x5, Alphabet, Banner3, Banner4, Barbwire, Basic, Bell
 import AcrobaticFont from '../assets/fonts/figlet/Acrobatic.flf?raw';
 import AlligatorFont from '../assets/fonts/figlet/Alligator.flf?raw';
-import AlphabetFont from '../assets/fonts/figlet/Alphabet.flf?raw';
 import ANSIShadowFont from '../assets/fonts/figlet/ANSI Shadow.flf?raw';
 import AvatarFont from '../assets/fonts/figlet/Avatar.flf?raw';
-import Banner3Font from '../assets/fonts/figlet/Banner3.flf?raw';
-import Banner4Font from '../assets/fonts/figlet/Banner4.flf?raw';
-import BarbwireFont from '../assets/fonts/figlet/Barbwire.flf?raw';
-import BasicFont from '../assets/fonts/figlet/Basic.flf?raw';
-import BellFont from '../assets/fonts/figlet/Bell.flf?raw';
 
 // 字体映射表
 const FONT_MAP = {
@@ -44,20 +37,13 @@ const FONT_MAP = {
   Digital: DigitalFont,
   Script: ScriptFont,
   Graffiti: GraffitiFont,
-  Isometric1: Isometric1Font,
-  '3-D': ThreeDFont,
-  '3x5': ThreeX5Font,
-  '5lineoblique': FiveLineObliqueFont,
+  // 以下字体已移除（oldLayout=-1，全宽模式不兼容）:
+  // Isometric1, 3-D, 3x5, Alphabet, Banner3, Banner4, Barbwire, Basic, Bell
+  // '5lineoblique' 已移除
   Acrobatic: AcrobaticFont,
   Alligator: AlligatorFont,
-  Alphabet: AlphabetFont,
   'ANSI Shadow': ANSIShadowFont,
-  Avatar: AvatarFont,
-  Banner3: Banner3Font,
-  Banner4: Banner4Font,
-  Barbwire: BarbwireFont,
-  Basic: BasicFont,
-  Bell: BellFont
+  Avatar: AvatarFont
 };
 
 // 支持的字体列表
@@ -76,7 +62,7 @@ export const AVAILABLE_FONTS = [
   { name: 'Isometric1', label: 'Isometric1 - 等距', description: '3D 等距投影' },
   { name: '3-D', label: '3-D - 立体', description: '3D 立体效果' },
   { name: '3x5', label: '3x5 - 点阵', description: '3x5 点阵字体' },
-  { name: '5lineoblique', label: '5lineoblique - 斜线', description: '五线斜体风格' },
+  // 5lineoblique 已移除（字体文件不可用）
   { name: 'Acrobatic', label: 'Acrobatic - 杂技', description: '杂技表演风格' },
   { name: 'Alligator', label: 'Alligator - 鳄鱼', description: '鳄鱼纹理风格' },
   { name: 'Alphabet', label: 'Alphabet - 字母', description: '纯字母风格' },
