@@ -2,11 +2,34 @@
 // 使用内嵌字体文件，避免 CORS 问题
 
 // 直接导入本地字体文件（作为文本）
+// 已有字体
 import StandardFont from '../assets/fonts/figlet/Standard.flf?raw';
 import SlantFont from '../assets/fonts/figlet/Slant.flf?raw';
 import BannerFont from '../assets/fonts/figlet/Banner.flf?raw';
 import BlockFont from '../assets/fonts/figlet/Block.flf?raw';
 import BigFont from '../assets/fonts/figlet/Big.flf?raw';
+
+// 新添加字体
+import SmallFont from '../assets/fonts/figlet/Small.flf?raw';
+import ShadowFont from '../assets/fonts/figlet/Shadow.flf?raw';
+import BubbleFont from '../assets/fonts/figlet/Bubble.flf?raw';
+import DigitalFont from '../assets/fonts/figlet/Digital.flf?raw';
+import ScriptFont from '../assets/fonts/figlet/Script.flf?raw';
+import GraffitiFont from '../assets/fonts/figlet/Graffiti.flf?raw';
+import Isometric1Font from '../assets/fonts/figlet/Isometric1.flf?raw';
+import ThreeDFont from '../assets/fonts/figlet/3-D.flf?raw';
+import ThreeX5Font from '../assets/fonts/figlet/3x5.flf?raw';
+import FiveLineObliqueFont from '../assets/fonts/figlet/5lineoblique.flf?raw';
+import AcrobaticFont from '../assets/fonts/figlet/Acrobatic.flf?raw';
+import AlligatorFont from '../assets/fonts/figlet/Alligator.flf?raw';
+import AlphabetFont from '../assets/fonts/figlet/Alphabet.flf?raw';
+import ANSIShadowFont from '../assets/fonts/figlet/ANSI Shadow.flf?raw';
+import AvatarFont from '../assets/fonts/figlet/Avatar.flf?raw';
+import Banner3Font from '../assets/fonts/figlet/Banner3.flf?raw';
+import Banner4Font from '../assets/fonts/figlet/Banner4.flf?raw';
+import BarbwireFont from '../assets/fonts/figlet/Barbwire.flf?raw';
+import BasicFont from '../assets/fonts/figlet/Basic.flf?raw';
+import BellFont from '../assets/fonts/figlet/Bell.flf?raw';
 
 // 字体映射表
 const FONT_MAP = {
@@ -14,7 +37,27 @@ const FONT_MAP = {
   Slant: SlantFont,
   Banner: BannerFont,
   Block: BlockFont,
-  Big: BigFont
+  Big: BigFont,
+  Small: SmallFont,
+  Shadow: ShadowFont,
+  Bubble: BubbleFont,
+  Digital: DigitalFont,
+  Script: ScriptFont,
+  Graffiti: GraffitiFont,
+  Isometric1: Isometric1Font,
+  '3-D': ThreeDFont,
+  '3x5': ThreeX5Font,
+  '5lineoblique': FiveLineObliqueFont,
+  Acrobatic: AcrobaticFont,
+  Alligator: AlligatorFont,
+  Alphabet: AlphabetFont,
+  'ANSI Shadow': ANSIShadowFont,
+  Avatar: AvatarFont,
+  Banner3: Banner3Font,
+  Banner4: Banner4Font,
+  Barbwire: BarbwireFont,
+  Basic: BasicFont,
+  Bell: BellFont
 };
 
 // 支持的字体列表
@@ -23,7 +66,27 @@ export const AVAILABLE_FONTS = [
   { name: 'Slant', label: 'Slant - 斜体', description: '优雅斜体风格' },
   { name: 'Banner', label: 'Banner - 横幅', description: '大横幅风格' },
   { name: 'Block', label: 'Block - 方块', description: '方块填充风格' },
-  { name: 'Big', label: 'Big - 大号', description: '超大号字体' }
+  { name: 'Big', label: 'Big - 大号', description: '超大号字体' },
+  { name: 'Small', label: 'Small - 小号', description: '紧凑小字体' },
+  { name: 'Shadow', label: 'Shadow - 阴影', description: '带阴影效果' },
+  { name: 'Bubble', label: 'Bubble - 泡泡', description: '泡泡环绕风格' },
+  { name: 'Digital', label: 'Digital - 数码', description: 'LED 数码管风格' },
+  { name: 'Script', label: 'Script - 手写', description: '手写体风格' },
+  { name: 'Graffiti', label: 'Graffiti - 涂鸦', description: '街头涂鸦风格' },
+  { name: 'Isometric1', label: 'Isometric1 - 等距', description: '3D 等距投影' },
+  { name: '3-D', label: '3-D - 立体', description: '3D 立体效果' },
+  { name: '3x5', label: '3x5 - 点阵', description: '3x5 点阵字体' },
+  { name: '5lineoblique', label: '5lineoblique - 斜线', description: '五线斜体风格' },
+  { name: 'Acrobatic', label: 'Acrobatic - 杂技', description: '杂技表演风格' },
+  { name: 'Alligator', label: 'Alligator - 鳄鱼', description: '鳄鱼纹理风格' },
+  { name: 'Alphabet', label: 'Alphabet - 字母', description: '纯字母风格' },
+  { name: 'ANSI Shadow', label: 'ANSI Shadow - ANSI阴影', description: 'ANSI 阴影效果' },
+  { name: 'Avatar', label: 'Avatar - 头像', description: '阿凡达风格' },
+  { name: 'Banner3', label: 'Banner3 - 横幅3', description: '横幅风格变种3' },
+  { name: 'Banner4', label: 'Banner4 - 横幅4', description: '横幅风格变种4' },
+  { name: 'Barbwire', label: 'Barbwire - 铁丝网', description: '带刺铁丝网风格' },
+  { name: 'Basic', label: 'Basic - 基础', description: '基础简洁风格' },
+  { name: 'Bell', label: 'Bell - 铃铛', description: '铃铛形状风格' }
 ];
 
 // 缓存已加载的字体
@@ -145,8 +208,7 @@ class FigletParser {
 export async function generateAsciiArt(text, fontName = 'Standard') {
   console.log('[Figlet Debug] generateAsciiArt called with text:', text, 'font:', fontName);
   
-  if (!text || text.trim() === '') {
-    console.log('[Figlet Debug] Empty text, returning empty string');
+    if (!text || text.trim() === '') {
     return '';
   }
 
@@ -157,11 +219,8 @@ export async function generateAsciiArt(text, fontName = 'Standard') {
     // 使用自定义解析器
     const parser = new FigletParser(fontData);
     const result = parser.render(text);
-    console.log('[Figlet Debug] Generated ASCII art successfully');
     return result;
   } catch (error) {
-    console.error('[Figlet Debug] Error generating ASCII art:', error);
-    console.error('[Figlet Debug] Error stack:', error.stack);
     throw new Error(`无法生成 ASCII 艺术: ${error.message}`);
   }
 }
