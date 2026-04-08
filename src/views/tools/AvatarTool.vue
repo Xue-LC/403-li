@@ -32,7 +32,7 @@
                 min="4" 
                 max="20" 
                 class="range-input"
-                @input="generateAvatar"
+                @input="generatePattern"
               />
               <span class="range-value">{{ gridSize }}</span>
             </div>
@@ -58,7 +58,7 @@
                 min="0" 
                 max="360" 
                 class="range-input hue-input"
-                @input="generateAvatar"
+                @input="renderAvatar"
               />
               <div class="hue-preview" :style="{ backgroundColor: `hsl(${hue}, 80%, 60%)` }"></div>
             </div>
@@ -66,7 +66,7 @@
 
           <!-- 按钮组 -->
           <div class="button-group button-group-2">
-            <button class="tool-button primary" @click="generateAvatar">
+            <button class="tool-button primary" @click="generatePattern">
               [ 生成 / GENERATE ]
             </button>
             <button class="tool-button" @click="downloadAvatar">
@@ -102,7 +102,8 @@ export default {
       bgColor: '#1a1a1a',
       hue: Math.floor(Math.random() * 360),
       status: '',
-      bgColors: ['#000000', '#1a1a1a', '#2d2d2d', '#0a0a0a', '#1e1e2e']
+      bgColors: ['#000000', '#1a1a1a', '#2d2d2d', '#0a0a0a', '#1e1e2e'],
+      pattern: [] // 保存每个格子的状态 [x][y] = true/false
     }
   },
   computed: {
@@ -111,14 +112,30 @@ export default {
     }
   },
   mounted() {
-    this.generateAvatar()
+    this.generatePattern()
   },
   methods: {
     setBgColor(color) {
       this.bgColor = color
-      this.generateAvatar()
+      this.renderAvatar()
     },
-    generateAvatar() {
+    generatePattern() {
+      // 生成新的随机图案数据
+      this.pattern = []
+      const halfGrid = Math.ceil(this.gridSize / 2)
+      
+      for (let x = 0; x < halfGrid; x++) {
+        this.pattern[x] = []
+        for (let y = 0; y < this.gridSize; y++) {
+          // 50% 概率该格子被填充
+          this.pattern[x][y] = Math.random() > 0.5
+        }
+      }
+      
+      // 重新渲染
+      this.renderAvatar()
+    },
+    renderAvatar() {
       const canvas = this.$refs.avatarCanvas
       if (!canvas) return
       
@@ -135,11 +152,11 @@ export default {
       const pixelSize = this.pixelSize
       const halfGrid = Math.ceil(this.gridSize / 2)
       
-      // 生成左半边并镜像到右半边
+      // 根据保存的 pattern 数据绘制
       for (let x = 0; x < halfGrid; x++) {
         for (let y = 0; y < this.gridSize; y++) {
-          // 50% 概率绘制该像素块
-          if (Math.random() > 0.5) {
+          // 如果格子被填充
+          if (this.pattern[x] && this.pattern[x][y]) {
             // 使用整数坐标避免亚像素缝隙
             const x1 = Math.floor(x * pixelSize)
             const y1 = Math.floor(y * pixelSize)
@@ -253,29 +270,69 @@ canvas {
   margin-bottom: 1rem;
 }
 
-.range-slider {
-  flex: 1;
-  height: 8px;
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  outline: none;
+/* === Range Input (统一样式) === */
+.range-input {
+  width: 100%;
+  margin: 10px 0;
   -webkit-appearance: none;
   appearance: none;
+  background: transparent;
 }
 
-.range-slider::-webkit-slider-thumb {
+.range-input:focus {
+  outline: 0;
+}
+
+.range-input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 18px; height: 18px;
+  appearance: none;
+  width: 18px;
+  height: 18px;
   background: var(--green);
-  border: 2px solid var(--text);
+  border: none;
+  border-radius: 0;
   cursor: pointer;
+  margin-top: -7px;
+  box-shadow: 0 0 10px var(--green-glow);
 }
 
-.range-slider::-moz-range-thumb {
-  width: 18px; height: 18px;
+.range-input::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.range-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
   background: var(--green);
-  border: 2px solid var(--text);
+  border: none;
+  border-radius: 0;
   cursor: pointer;
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+/* 色相滑动条特殊背景 */
+.hue-input::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, 
+    #ff0000, #ffff00, #00ff00, 
+    #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+.hue-input::-moz-range-track {
+  background: linear-gradient(to right, 
+    #ff0000, #ffff00, #00ff00, 
+    #00ffff, #0000ff, #ff00ff, #ff0000);
 }
 
 .range-value {
@@ -313,38 +370,6 @@ canvas {
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.hue-range {
-  flex: 1;
-  height: 12px;
-  background: linear-gradient(to right, 
-    #ff0000, #ffff00, #00ff00, 
-    #00ffff, #0000ff, #ff00ff, #ff0000);
-  border: 1px solid var(--line);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  cursor: pointer;
-}
-
-.hue-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 20px; height: 20px;
-  background: #fff;
-  border: 2px solid #000;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(0,0,0,0.5);
-}
-
-.hue-range::-moz-range-thumb {
-  width: 20px; height: 20px;
-  background: #fff;
-  border: 2px solid #000;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 4px rgba(0,0,0,0.5);
 }
 
 .hue-preview {
