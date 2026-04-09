@@ -233,10 +233,12 @@ export default {
       // 按搜索词筛选
       if (this.searchQuery.trim()) {
         const query = this.searchQuery.toLowerCase()
+        const queryNum = parseInt(this.searchQuery)
         result = result.filter(tool =>
           tool.name.toLowerCase().includes(query) ||
           tool.description.toLowerCase().includes(query) ||
-          tool.features.toLowerCase().includes(query)
+          tool.features.toLowerCase().includes(query) ||
+          tool.id === queryNum
         )
       }
 

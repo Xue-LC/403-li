@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from './views/Home.vue'
-import Tools from './views/Tools.vue'
 import JsonTool from './views/tools/JsonTool.vue'
 import Base64Tool from './views/tools/Base64Tool.vue'
 import QrCodeTool from './views/tools/QrCodeTool.vue'
@@ -21,11 +20,7 @@ const routes = [
     name: 'Home',
     component: Home
   },
-  {
-    path: '/tools',
-    name: 'Tools',
-    component: Tools
-  },
+  // /tools 路由已删除，使用主页作为工具列表入口
   {
     path: '/tools/json',
     name: 'JsonTool',
