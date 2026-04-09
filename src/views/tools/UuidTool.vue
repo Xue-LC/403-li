@@ -388,7 +388,7 @@ export default {
 
 /* Custom Radio - Square (no border-radius) */
 /* Outer box: 18px with 1px border = 16px inner area */
-/* Inner square: 8px, needs 4px margin to center = offset 5px (1px border + 4px) */
+/* Inner square: using box-shadow inset for perfect centering */
 .radio-label::before {
   content: "";
   width: 18px;
@@ -403,24 +403,15 @@ export default {
 .radio-label:has(input[type="radio"]:checked)::before {
   border-color: var(--green);
   background: var(--green-soft);
-  box-shadow: 0 0 10px var(--green-glow);
+  /* Inner 8px square centered via box-shadow inset */
+  box-shadow:
+    inset 0 0 0 4px var(--green),
+    0 0 10px var(--green-glow);
 }
 
+/* Remove unused ::after */
 .radio-label::after {
-  content: "";
-  position: absolute;
-  top: 5px;  /* 1px border + 4px to center 8px in 16px */
-  left: 5px;
-  width: 8px;
-  height: 8px;
-  background: var(--green);
-  transform: scale(0);
-  transition: transform 0.2s ease;
-  box-shadow: 0 0 8px var(--green-glow);
-}
-
-.radio-label:has(input[type="radio"]:checked)::after {
-  transform: scale(1);
+  display: none;
 }
 
 /* Custom Checkbox - Square (no border-radius) */
@@ -438,24 +429,15 @@ export default {
 .checkbox-label:has(input[type="checkbox"]:checked)::before {
   border-color: var(--green);
   background: var(--green-soft);
-  box-shadow: 0 0 10px var(--green-glow);
+  /* Inner 8px square centered via box-shadow inset */
+  box-shadow:
+    inset 0 0 0 4px var(--green),
+    0 0 10px var(--green-glow);
 }
 
+/* Remove unused ::after */
 .checkbox-label::after {
-  content: "";
-  position: absolute;
-  top: 5px;  /* 1px border + 4px to center 8px in 16px */
-  left: 5px;
-  width: 8px;
-  height: 8px;
-  background: var(--green);
-  transform: scale(0);
-  transition: transform 0.2s ease;
-  box-shadow: 0 0 8px var(--green-glow);
-}
-
-.checkbox-label:has(input[type="checkbox"]:checked)::after {
-  transform: scale(1);
+  display: none;
 }
 
 /* Hover states */
@@ -687,12 +669,12 @@ export default {
     height: 16px;
   }
 
-  .radio-label::after,
-  .checkbox-label::after {
-    width: 6px;
-    height: 6px;
-    top: 5px;  /* 1px border + 4px to center 6px in 14px */
-    left: 5px;
+  /* Inner square scales proportionally via box-shadow inset */
+  .radio-label:has(input[type="radio"]:checked)::before,
+  .checkbox-label:has(input[type="checkbox"]:checked)::before {
+    box-shadow:
+      inset 0 0 0 3px var(--green),
+      0 0 8px var(--green-glow);
   }
 
   .stats {
