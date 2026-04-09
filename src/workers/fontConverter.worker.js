@@ -18,27 +18,31 @@ function sendStep(id, fileName, stepId, stepName, status, detail = '') {
   })
 }
 
-// Initialize from main thread
-async function initFromMainThread() {
+// Initialize WASM immediately on worker startup (don't wait for init message)
+(async function initWasm() {
   try {
     // Dynamic import of woff2-encoder
     const woff2 = await import('woff2-encoder');
     compress = woff2.compress;
     wasmReady = true;
+    // Notify main thread that worker is ready
     self.postMessage({ type: 'ready' });
   } catch (error) {
     console.error('Failed to initialize woff2-encoder:', error);
-    self.postMessage({ type: 'error', error: error.message });
+    self.postMessage({ type: 'init-error', error: error.message });
   }
-}
+})();
 
 // Worker message handler
 self.onmessage = async function(e) {
   const { type, id, fileData, fileName, fileIndex, totalFiles } = e.data
   
-  // Handle initialization
+  // Handle initialization check (optional, for compatibility)
   if (type === 'init') {
-    await initFromMainThread();
+    // Just acknowledge if already ready, otherwise the initWasm above handles it
+    if (wasmReady) {
+      self.postMessage({ type: 'ready' });
+    }
     return;
   }
   
@@ -48,7 +52,7 @@ self.onmessage = async function(e) {
       type: 'error',
       id,
       fileName,
-      error: 'WASM module not initialized. Call init first.'
+      error: 'WASM module not initialized. Please wait for initialization.'
     });
     return;
   }

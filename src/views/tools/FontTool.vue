@@ -11,13 +11,20 @@
       </div>
       <div class="pane-body">
         <div class="tool-body">
+          <!-- 初始化状态提示 -->
+          <div v-if="!workerReady" class="init-status">
+            <span class="init-spinner">⏳</span>
+            <span class="init-text">初始化中...</span>
+            <span class="init-hint">正在加载字体压缩引擎</span>
+          </div>
+
           <!-- 文件上传区域 -->
           <div class="upload-area" 
                @dragover.prevent="dragOver = true"
                @dragleave.prevent="dragOver = false"
                @drop.prevent="handleDrop"
-               :class="{ 'drag-over': dragOver }"
-               @click="$refs.fileInput.click()">
+               :class="{ 'drag-over': dragOver, 'disabled': !workerReady }"
+               @click="workerReady && $refs.fileInput.click()">
             <input 
               ref="fileInput"
               type="file" 
@@ -25,10 +32,11 @@
               multiple
               @change="handleFileSelect"
               style="display: none"
+              :disabled="!workerReady"
             />
             <div class="upload-content">
               <span class="upload-icon">📁</span>
-              <span class="upload-text">点击或拖拽上传字体文件</span>
+              <span class="upload-text">{{ workerReady ? '点击或拖拽上传字体文件' : '请等待初始化完成...' }}</span>
               <span class="upload-hint">支持 TTF, OTF, WOFF 格式</span>
             </div>
           </div>
@@ -93,8 +101,9 @@
 
           <!-- 转换按钮 -->
           <div v-if="hasPendingFiles" class="convert-section">
-            <button class="convert-btn" @click="convertAll" :disabled="converting">
-              <span v-if="converting">转换中...</span>
+            <button class="convert-btn" @click="convertAll" :disabled="converting || !workerReady">
+              <span v-if="!workerReady">等待初始化...</span>
+              <span v-else-if="converting">转换中...</span>
               <span v-else>开始转换 ({{ pendingCount }}个文件)</span>
             </button>
           </div>
@@ -160,7 +169,15 @@ export default {
       totalCountCurrent: 0,
       worker: null,
       conversionSteps: [],
-      currentFileId: null
+      currentFileId: null,
+      // Queue management for sequential processing
+      fileQueue: [],
+      isProcessing: false,
+      // Timeout tracking
+      timeoutIds: new Map(),
+      FILE_TIMEOUT: 60000, // 60 seconds timeout per file
+      // Worker initialization state
+      workerReady: false
     }
   },
   mounted() {
@@ -173,6 +190,11 @@ export default {
       this.worker.terminate()
       this.worker = null
     }
+    // Clear all timeouts
+    this.timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId))
+    this.timeoutIds.clear()
+    this.fileQueue = []
+    this.isProcessing = false
   },
   computed: {
     hasPendingFiles() {
@@ -300,13 +322,23 @@ export default {
         if (type === 'ready') {
           // Worker initialized and WASM loaded
           console.log('Worker ready with WASM loaded')
+          this.workerReady = true
+        } else if (type === 'init-error') {
+          // WASM initialization failed
+          console.error('Worker init error:', e.data.error)
+          this.error = '初始化失败: ' + e.data.error
         } else if (type === 'step') {
-          // Update step status
-          this.updateStep(stepId, stepStatus, detail)
+          // Update step status - only update if this is the current file
+          if (id === this.currentFileId) {
+            this.updateStep(stepId, stepStatus, detail)
+          }
         } else if (type === 'start') {
           fileInfo.status = 'converting'
           this.progressText = `正在转换 (${fileIndex + 1}/${totalFiles}): ${fileName}`
         } else if (type === 'success') {
+          // Clear timeout for this file
+          this.clearFileTimeout(id)
+          
           // result is already a Uint8Array (sliced copy from worker)
           fileInfo.result = result instanceof Uint8Array ? result : new Uint8Array(result)
           fileInfo.convertedSize = compressedSize
@@ -328,19 +360,28 @@ export default {
             }
           }, 1000)
           
-          // Check if all files completed
+          // Check if all files completed or process next in queue
           if (this.completedCountCurrent >= this.totalCountCurrent) {
             this.finishConversion()
+          } else {
+            // Process next file in queue
+            this.processNextInQueue()
           }
         } else if (type === 'error') {
+          // Clear timeout for this file
+          this.clearFileTimeout(id)
+          
           fileInfo.status = 'error'
           fileInfo.error = error || '转换失败'
           this.error = `${fileName}: ${fileInfo.error}`
           this.completedCountCurrent++
           
-          // Check if all files completed (even with errors)
+          // Check if all files completed (even with errors) or process next
           if (this.completedCountCurrent >= this.totalCountCurrent) {
             this.finishConversion()
+          } else {
+            // Process next file in queue
+            this.processNextInQueue()
           }
         }
       }
@@ -350,13 +391,101 @@ export default {
         this.error = 'Worker 发生错误: ' + err.message
         this.converting = false
         this.isAnimating = false
+        this.isProcessing = false
+        // Clear all timeouts on error
+        this.timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId))
+        this.timeoutIds.clear()
+      }
+    },
+    
+    // Set timeout for a file conversion
+    setFileTimeout(fileId, fileName) {
+      const timeoutId = setTimeout(() => {
+        console.warn(`Timeout for file: ${fileName}`)
+        const fileInfo = this.files.find(f => f.id === fileId)
+        if (fileInfo && fileInfo.status === 'converting') {
+          fileInfo.status = 'error'
+          fileInfo.error = '转换超时 (60秒)'
+          this.error = `${fileName}: 转换超时`
+          this.completedCountCurrent++
+          
+          // Clear the timeout from map
+          this.timeoutIds.delete(fileId)
+          
+          // Process next file
+          if (this.completedCountCurrent >= this.totalCountCurrent) {
+            this.finishConversion()
+          } else {
+            this.processNextInQueue()
+          }
+        }
+      }, this.FILE_TIMEOUT)
+      
+      this.timeoutIds.set(fileId, timeoutId)
+    },
+    
+    // Clear timeout for a file
+    clearFileTimeout(fileId) {
+      const timeoutId = this.timeoutIds.get(fileId)
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        this.timeoutIds.delete(fileId)
+      }
+    },
+    
+    // Process next file in queue (sequential processing)
+    async processNextInQueue() {
+      if (this.fileQueue.length === 0) {
+        this.isProcessing = false
+        return
+      }
+      
+      this.isProcessing = true
+      const fileInfo = this.fileQueue.shift()
+      
+      // Initialize steps for this file
+      this.initSteps(fileInfo.id, fileInfo.size)
+      
+      try {
+        const buffer = await fileInfo.file.arrayBuffer()
+        
+        // Set timeout for this file
+        this.setFileTimeout(fileInfo.id, fileInfo.name)
+        
+        // Send to worker
+        this.worker.postMessage({
+          id: fileInfo.id,
+          fileData: buffer,
+          fileName: fileInfo.name,
+          fileIndex: this.completedCountCurrent,
+          totalFiles: this.totalCountCurrent
+        }, [buffer]) // Transfer buffer for performance
+      } catch (err) {
+        console.error('Error sending file to worker:', err)
+        fileInfo.status = 'error'
+        fileInfo.error = err.message || '发送文件失败'
+        this.error = `${fileInfo.name}: ${fileInfo.error}`
+        this.completedCountCurrent++
+        
+        // Process next file
+        if (this.completedCountCurrent >= this.totalCountCurrent) {
+          this.finishConversion()
+        } else {
+          this.processNextInQueue()
+        }
       }
     },
     finishConversion() {
       this.converting = false
       this.isAnimating = false
+      this.isProcessing = false
+      this.fileQueue = []
       this.progress = 100
       this.progressText = '转换完成!'
+      
+      // Clear all timeouts
+      this.timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId))
+      this.timeoutIds.clear()
       
       // Clear after 1.5 seconds
       setTimeout(() => {
@@ -372,9 +501,19 @@ export default {
         return
       }
       
+      if (!this.workerReady) {
+        this.error = '请等待初始化完成'
+        return
+      }
+      
       this.converting = true
       this.error = ''
       this.completedCountCurrent = 0
+      this.isProcessing = false
+      
+      // Clear any previous timeouts
+      this.timeoutIds.forEach((timeoutId) => clearTimeout(timeoutId))
+      this.timeoutIds.clear()
       
       const pendingFiles = this.files.filter(f => f.status === 'pending')
       this.totalCountCurrent = pendingFiles.length
@@ -384,46 +523,17 @@ export default {
         return
       }
       
-      // Initialize steps for first file
-      if (pendingFiles.length > 0) {
-        this.initSteps(pendingFiles[0].id, pendingFiles[0].size)
-      }
+      // Initialize file queue for sequential processing
+      this.fileQueue = [...pendingFiles]
       
       // Start animation
       this.isAnimating = true
       this.progress = 0
       this.progressText = `准备转换 ${this.totalCountCurrent} 个文件...`
       
-      // Process all pending files through worker
-      for (let i = 0; i < pendingFiles.length; i++) {
-        const fileInfo = pendingFiles[i]
-        
-        // Initialize steps for each file
-        this.initSteps(fileInfo.id, fileInfo.size)
-        
-        try {
-          const buffer = await fileInfo.file.arrayBuffer()
-          
-          // Send to worker
-          this.worker.postMessage({
-            id: fileInfo.id,
-            fileData: buffer,
-            fileName: fileInfo.name,
-            fileIndex: i,
-            totalFiles: this.totalCountCurrent
-          }, [buffer]) // Transfer buffer for performance
-        } catch (err) {
-          console.error('Error sending file to worker:', err)
-          fileInfo.status = 'error'
-          fileInfo.error = err.message || '发送文件失败'
-          this.error = `${fileInfo.name}: ${fileInfo.error}`
-          this.completedCountCurrent++
-          
-          if (this.completedCountCurrent >= this.totalCountCurrent) {
-            this.finishConversion()
-          }
-        }
-      }
+      // Start processing first file in queue
+      // Subsequent files will be processed after each success/error
+      this.processNextInQueue()
     },
     downloadFile(fileInfo) {
       if (!fileInfo.result) return
@@ -458,6 +568,36 @@ export default {
   padding: 12px 0 20px;
 }
 
+/* === Init Status === */
+.init-status {
+  border: 1px solid var(--line);
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.init-spinner {
+  font-size: 2rem;
+  animation: spin 1s linear infinite;
+}
+
+.init-text {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.init-hint {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
 /* === Upload Area === */
 .upload-area {
   border: 2px dashed var(--line);
@@ -468,8 +608,13 @@ export default {
   background: rgba(0, 0, 0, 0.2);
 }
 
-.upload-area:hover,
-.upload-area.drag-over {
+.upload-area.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.upload-area:hover:not(.disabled),
+.upload-area.drag-over:not(.disabled) {
   border-color: var(--green);
   background: rgba(157, 255, 107, 0.05);
 }
