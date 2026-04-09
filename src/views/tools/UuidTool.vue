@@ -410,17 +410,18 @@ export default {
 .radio-label::after {
   content: "";
   position: absolute;
-  left: 5px;
+  top: 50%;
+  left: 50%;
   width: 8px;
   height: 8px;
   background: var(--green);
-  transform: scale(0);
+  transform: translate(-50%, -50%) scale(0);
   transition: transform 0.2s ease;
   box-shadow: 0 0 8px var(--green-glow);
 }
 
 .radio-label:has(input[type="radio"]:checked)::after {
-  transform: scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* Custom Checkbox - Square (no border-radius) */
@@ -447,17 +448,18 @@ export default {
 .checkbox-label::after {
   content: "";
   position: absolute;
-  left: 5px;
+  top: 50%;
+  left: 50%;
   width: 8px;
   height: 8px;
   background: var(--green);
-  transform: scale(0);
+  transform: translate(-50%, -50%) scale(0);
   transition: transform 0.2s ease;
   box-shadow: 0 0 8px var(--green-glow);
 }
 
 .checkbox-label:has(input[type="checkbox"]:checked)::after {
-  transform: scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 /* Hover states */
