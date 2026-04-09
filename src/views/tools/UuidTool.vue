@@ -370,7 +370,7 @@ export default {
   font-size: 14px;
   color: var(--text);
   font-family: var(--mono);
-  position: relative;
+  position: relative; /* Required for ::after absolute positioning */
 }
 
 /* Hide default inputs */
@@ -387,6 +387,8 @@ export default {
 }
 
 /* Custom Radio - Square (no border-radius) */
+/* Outer box: 18px with 1px border = 16px inner area */
+/* Inner square: 8px, needs 4px margin to center = offset 5px (1px border + 4px) */
 .radio-label::before {
   content: "";
   width: 18px;
@@ -394,11 +396,8 @@ export default {
   border: 1px solid var(--line);
   background: var(--panel-2);
   border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .radio-label:has(input[type="radio"]:checked)::before {
@@ -410,8 +409,8 @@ export default {
 .radio-label::after {
   content: "";
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 5px;  /* 1px border + 4px to center 8px in 16px */
+  left: 5px;
   width: 8px;
   height: 8px;
   background: var(--green);
@@ -432,11 +431,8 @@ export default {
   border: 1px solid var(--line);
   background: var(--panel-2);
   border-radius: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
   flex-shrink: 0;
+  transition: all 0.2s ease;
 }
 
 .checkbox-label:has(input[type="checkbox"]:checked)::before {
@@ -448,8 +444,8 @@ export default {
 .checkbox-label::after {
   content: "";
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 5px;  /* 1px border + 4px to center 8px in 16px */
+  left: 5px;
   width: 8px;
   height: 8px;
   background: var(--green);
@@ -695,7 +691,8 @@ export default {
   .checkbox-label::after {
     width: 6px;
     height: 6px;
-    left: 4px;
+    top: 5px;  /* 1px border + 4px to center 6px in 14px */
+    left: 5px;
   }
 
   .stats {
