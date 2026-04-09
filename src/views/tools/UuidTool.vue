@@ -408,20 +408,15 @@ export default {
 }
 
 .radio-label::after {
-  content: "✓";
+  content: "";
   position: absolute;
-  left: 0;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: var(--green);
-  font-weight: bold;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  background: var(--green);
   transform: scale(0);
   transition: transform 0.2s ease;
-  text-shadow: 0 0 8px var(--green-glow);
+  box-shadow: 0 0 8px var(--green-glow);
 }
 
 .radio-label:has(input[type="radio"]:checked)::after {
@@ -450,20 +445,15 @@ export default {
 }
 
 .checkbox-label::after {
-  content: "✓";
+  content: "";
   position: absolute;
-  left: 0;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: var(--green);
-  font-weight: bold;
+  left: 5px;
+  width: 8px;
+  height: 8px;
+  background: var(--green);
   transform: scale(0);
   transition: transform 0.2s ease;
-  text-shadow: 0 0 8px var(--green-glow);
+  box-shadow: 0 0 8px var(--green-glow);
 }
 
 .checkbox-label:has(input[type="checkbox"]:checked)::after {
@@ -701,9 +691,9 @@ export default {
 
   .radio-label::after,
   .checkbox-label::after {
-    width: 16px;
-    height: 16px;
-    font-size: 11px;
+    width: 6px;
+    height: 6px;
+    left: 4px;
   }
 
   .stats {
