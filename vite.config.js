@@ -7,6 +7,18 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['woff2-encoder']
   },
+  // Ensure WASM files are handled correctly
+  assetsInlineLimit: 0, // Don't inline assets below this size
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        entryFileNames: `assets/[name].[hash].js`,
+        chunkFileNames: `assets/[name].[hash].js`,
+        assetFileNames: `assets/[name].[hash].[ext]`
+      }
+    }
+  },
   server: {
     host: '127.0.0.1',
     port: 5173
@@ -17,16 +29,6 @@ export default defineConfig({
       output: {
         entryFileNames: 'assets/workers/[name].[hash].js',
         chunkFileNames: 'assets/workers/[name].[hash].js'
-      }
-    }
-  },
-  build: {
-    target: 'esnext',
-    rollupOptions: {
-      output: {
-        entryFileNames: `assets/[name].[hash].js`,
-        chunkFileNames: `assets/[name].[hash].js`,
-        assetFileNames: `assets/[name].[hash].[ext]`
       }
     }
   }

@@ -1,7 +1,9 @@
 // fontConverter.worker.js - Web Worker for font compression
-// Runs woff2-encoder in a separate thread to avoid blocking the main UI
+// Runs woff2 encoding in a separate thread to avoid blocking the main UI
 
-import { compress } from 'woff2-encoder'
+// Import woff2-encoder dynamically to handle WASM loading
+let compress = null;
+let wasmReady = false;
 
 // Helper to send step updates
 function sendStep(id, fileName, stepId, stepName, status, detail = '') {
@@ -16,10 +18,42 @@ function sendStep(id, fileName, stepId, stepName, status, detail = '') {
   })
 }
 
+// Initialize from main thread
+async function initFromMainThread() {
+  try {
+    // Dynamic import of woff2-encoder
+    const woff2 = await import('woff2-encoder');
+    compress = woff2.compress;
+    wasmReady = true;
+    self.postMessage({ type: 'ready' });
+  } catch (error) {
+    console.error('Failed to initialize woff2-encoder:', error);
+    self.postMessage({ type: 'error', error: error.message });
+  }
+}
+
 // Worker message handler
 self.onmessage = async function(e) {
-  const { id, fileData, fileName, fileIndex, totalFiles } = e.data
-  const fileSizeMB = (fileData.byteLength / (1024 * 1024)).toFixed(1)
+  const { type, id, fileData, fileName, fileIndex, totalFiles } = e.data
+  
+  // Handle initialization
+  if (type === 'init') {
+    await initFromMainThread();
+    return;
+  }
+  
+  // Font compression handling
+  if (!wasmReady || !compress) {
+    self.postMessage({
+      type: 'error',
+      id,
+      fileName,
+      error: 'WASM module not initialized. Call init first.'
+    });
+    return;
+  }
+  
+  const fileSizeMB = (fileData.byteLength / (1024 * 1024)).toFixed(1);
 
   try {
     // Step 1: Read file (already done in main thread, just report)
@@ -68,6 +102,3 @@ self.onmessage = async function(e) {
     })
   }
 }
-
-// Signal that worker is ready
-self.postMessage({ type: 'ready' })

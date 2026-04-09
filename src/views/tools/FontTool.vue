@@ -288,6 +288,9 @@ export default {
         { type: 'module' }
       )
       
+      // Send init message to worker to load WASM
+      this.worker.postMessage({ type: 'init' })
+      
       this.worker.onmessage = (e) => {
         const { type, id, fileName, fileIndex, totalFiles, result, compressedSize, error, message, stepId, stepName, status: stepStatus, detail } = e.data
         
@@ -295,8 +298,8 @@ export default {
         if (!fileInfo && type !== 'ready') return
         
         if (type === 'ready') {
-          // Worker initialized
-          console.log('Worker ready')
+          // Worker initialized and WASM loaded
+          console.log('Worker ready with WASM loaded')
         } else if (type === 'step') {
           // Update step status
           this.updateStep(stepId, stepStatus, detail)
