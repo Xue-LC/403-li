@@ -3,7 +3,10 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  assetsInclude: ['**/*.flf'],
+  assetsInclude: ['**/*.flf', '**/*.wasm'],
+  optimizeDeps: {
+    exclude: ['woff2-encoder']
+  },
   server: {
     host: '127.0.0.1',
     port: 5173
@@ -18,6 +21,7 @@ export default defineConfig({
     }
   },
   build: {
+    target: 'esnext',
     rollupOptions: {
       output: {
         entryFileNames: `assets/[name].[hash].js`,
