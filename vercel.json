@@ -23,6 +23,9 @@
       ]
     }
   ],
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "github": {
     "silent": false
   }
