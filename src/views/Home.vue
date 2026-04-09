@@ -217,6 +217,16 @@ export default {
           statusText: '正常', statusColor: '#9dff6b',
           features: '实时生成 / 复制 / 下载',
           category: 'text'
+        },
+        {
+          id: 12,
+          path: '/tools/uuid',
+          name: 'UUID / ULID 生成器',
+          description: '生成 UUID v4、v7 和 ULID，支持批量生成和格式自定义',
+          status: 'normal',
+          statusText: '正常', statusColor: '#9dff6b',
+          features: 'UUID v4/v7 / ULID / 批量',
+          category: 'dev'
         }
       ]
     }
