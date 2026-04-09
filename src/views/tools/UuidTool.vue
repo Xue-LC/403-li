@@ -402,11 +402,13 @@ export default {
 
 .radio-label:has(input[type="radio"]:checked)::before {
   border-color: var(--green);
-  background: var(--green-soft);
-  /* Inner 8px square centered via box-shadow inset */
-  box-shadow:
-    inset 0 0 0 4px var(--green),
-    0 0 10px var(--green-glow);
+  background: var(--panel-2);
+  /* Inner 8px square centered via background-image */
+  background-image: linear-gradient(var(--green), var(--green));
+  background-size: 8px 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px var(--green-glow);
 }
 
 /* Remove unused ::after */
@@ -428,11 +430,13 @@ export default {
 
 .checkbox-label:has(input[type="checkbox"]:checked)::before {
   border-color: var(--green);
-  background: var(--green-soft);
-  /* Inner 8px square centered via box-shadow inset */
-  box-shadow:
-    inset 0 0 0 4px var(--green),
-    0 0 10px var(--green-glow);
+  background: var(--panel-2);
+  /* Inner 8px square centered via background-image */
+  background-image: linear-gradient(var(--green), var(--green));
+  background-size: 8px 8px;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 10px var(--green-glow);
 }
 
 /* Remove unused ::after */
@@ -450,7 +454,11 @@ export default {
 .radio-label:hover:has(input[type="radio"]:checked)::before,
 .checkbox-label:hover:has(input[type="checkbox"]:checked)::before {
   border-color: var(--green);
-  background: rgba(157,255,107,0.15);
+  background: var(--panel-2);
+  background-image: linear-gradient(var(--green), var(--green));
+  background-size: 8px 8px;
+  background-position: center;
+  background-repeat: no-repeat;
   box-shadow: 0 0 15px var(--green-glow);
 }
 
@@ -669,12 +677,11 @@ export default {
     height: 16px;
   }
 
-  /* Inner square scales proportionally via box-shadow inset */
+  /* Inner square scales proportionally via background-image */
   .radio-label:has(input[type="radio"]:checked)::before,
   .checkbox-label:has(input[type="checkbox"]:checked)::before {
-    box-shadow:
-      inset 0 0 0 3px var(--green),
-      0 0 8px var(--green-glow);
+    background-size: 6px 6px;
+    box-shadow: 0 0 8px var(--green-glow);
   }
 
   .stats {
