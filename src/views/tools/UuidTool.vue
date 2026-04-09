@@ -410,8 +410,8 @@ export default {
 .radio-label::after {
   content: "";
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 4px;
+  left: 4px;
   width: 8px;
   height: 8px;
   background: var(--green);
@@ -448,8 +448,8 @@ export default {
 .checkbox-label::after {
   content: "";
   position: absolute;
-  top: 5px;
-  left: 5px;
+  top: 4px;
+  left: 4px;
   width: 8px;
   height: 8px;
   background: var(--green);
