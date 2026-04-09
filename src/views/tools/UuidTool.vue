@@ -355,7 +355,7 @@ export default {
   color: var(--dim);
 }
 
-/* === Radio & Checkbox - Custom Terminal Style === */
+/* === Radio & Checkbox - Custom Terminal Style (Square) === */
 .radio-group, .checkbox-group {
   display: flex;
   gap: 16px;
@@ -386,14 +386,14 @@ export default {
   cursor: pointer;
 }
 
-/* Custom Radio - Circle */
+/* Custom Radio - Square (no border-radius) */
 .radio-label::before {
   content: "";
   width: 18px;
   height: 18px;
   border: 1px solid var(--line);
   background: var(--panel-2);
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -408,30 +408,34 @@ export default {
 }
 
 .radio-label::after {
-  content: "";
+  content: "✓";
   position: absolute;
-  left: 5px;
-  width: 8px;
-  height: 8px;
-  background: var(--green);
-  border-radius: 50%;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: bold;
   transform: scale(0);
   transition: transform 0.2s ease;
-  box-shadow: 0 0 8px var(--green);
+  text-shadow: 0 0 8px var(--green-glow);
 }
 
 .radio-label:has(input[type="radio"]:checked)::after {
   transform: scale(1);
 }
 
-/* Custom Checkbox - Square */
+/* Custom Checkbox - Square (no border-radius) */
 .checkbox-label::before {
   content: "";
   width: 18px;
   height: 18px;
   border: 1px solid var(--line);
   background: var(--panel-2);
-  border-radius: 2px;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -448,7 +452,12 @@ export default {
 .checkbox-label::after {
   content: "✓";
   position: absolute;
-  left: 4px;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 12px;
   color: var(--green);
   font-weight: bold;
@@ -690,14 +699,10 @@ export default {
     height: 16px;
   }
 
-  .radio-label::after {
-    left: 4px;
-    width: 7px;
-    height: 7px;
-  }
-
+  .radio-label::after,
   .checkbox-label::after {
-    left: 3px;
+    width: 16px;
+    height: 16px;
     font-size: 11px;
   }
 
