@@ -39,7 +39,6 @@
                 min="1"
                 max="100"
                 class="code-input-sm"
-                style="width: 80px"
               />
               <span class="hint">(1-100)</span>
             </div>
@@ -65,7 +64,7 @@
               🎲 生成
             </button>
             <button class="button" @click="copyOutput" :disabled="!output.trim()">
-              📋 复制全部
+              📋 复制
             </button>
             <button class="button danger" @click="clear">
               🗑️ 清空
@@ -99,7 +98,7 @@
     <!-- Footer -->
     <footer class="footer">
       <span>403.li // UUID 工具</span>
-      <span>纯前端处理 · 数据不会上传</span>
+      <span>纯前端 · 无追踪 · 开源</span>
     </footer>
   </div>
 </template>
@@ -270,6 +269,9 @@ export default {
 </script>
 
 <style scoped>
+@import '../../assets/styles/index.css';
+@import '../../assets/styles/tools.css';
+
 .uuid-tool {
   width: min(var(--max), calc(100vw - 16px));
   margin: 0 auto;
@@ -307,11 +309,15 @@ export default {
   font-size: 13px;
   color: var(--muted);
   text-transform: uppercase;
-  background: rgba(255,255,255,0.02);
+  background: rgba(18,22,27,0.94);
 }
 
 .pane-body {
-  padding: 16px;
+  padding: 12px;
+}
+
+.tool-body {
+  margin-top: 1rem;
 }
 
 /* === Config Section === */
@@ -335,11 +341,12 @@ export default {
 }
 
 .input-label {
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.5rem;
   font-family: var(--mono);
   font-size: 13px;
-  color: var(--muted);
-  white-space: nowrap;
-  min-width: 80px;
+  text-transform: uppercase;
 }
 
 .hint {
@@ -370,42 +377,35 @@ export default {
 
 /* === Button Group === */
 .button-group {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+  margin: 1rem 0;
 }
 
 .button {
-  padding: 10px 20px;
   border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.02);
   color: var(--text);
   font-family: var(--mono);
   font-size: 13px;
+  padding: 0;
   cursor: pointer;
   transition: all 0.2s;
+  text-transform: uppercase;
+  border-radius: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 
-.button:hover {
-  border-color: var(--line);
-  background: rgba(255,255,255,0.06);
-}
-
-.button.primary {
-  border-color: rgba(157,255,107,0.4);
+.button:hover:not(:disabled) {
+  border-color: var(--green);
   background: var(--green-soft);
   color: var(--green);
-}
-
-.button.primary:hover {
   box-shadow: 0 0 15px var(--green-glow);
-}
-
-.button.danger {
-  border-color: rgba(255,107,125,0.4);
-  background: rgba(255,107,125,0.1);
-  color: #ff8a8a;
 }
 
 .button:disabled {
@@ -413,41 +413,76 @@ export default {
   cursor: not-allowed;
 }
 
+.button.primary {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.button.primary:hover:not(:disabled) {
+  background: rgba(157,255,107,0.2);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.button.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: rgba(255,107,125,0.1);
+  box-shadow: 0 0 15px rgba(255,107,125,0.3);
+}
+
 /* === Code Input === */
 .code-input {
   width: 100%;
-  padding: 12px;
+  max-width: 100%;
   border: 1px solid var(--line);
-  background: var(--panel-2);
+  background: rgba(18,22,27,0.94);
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px;
-  line-height: 1.6;
+  padding: 12px;
   resize: vertical;
+  transition: all 0.2s;
+  border-radius: 0;
   box-sizing: border-box;
+  min-height: 200px;
 }
 
 .code-input:focus {
-  outline: none;
-  border-color: var(--green);
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input::placeholder {
+  color: var(--dim);
 }
 
 .code-input.output {
-  background: rgba(0,0,0,0.2);
+  background: rgba(157,255,107,0.03);
+  border-color: rgba(157,255,107,0.2);
 }
 
 .code-input-sm {
-  padding: 8px 12px;
+  width: 100px;
   border: 1px solid var(--line);
-  background: var(--panel-2);
+  background: rgba(18,22,27,0.94);
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px;
+  padding: 8px 12px;
+  transition: all 0.2s;
+  border-radius: 0;
+  box-sizing: border-box;
 }
 
 .code-input-sm:focus {
-  outline: none;
-  border-color: var(--green);
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
 }
 
 /* === Stats === */
@@ -462,13 +497,13 @@ export default {
 
 /* === Status Messages === */
 .status-success {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border: 1px solid rgba(157,255,107,0.4);
-  background: rgba(157,255,107,0.1);
   color: var(--green);
+  margin-top: 1rem;
   font-family: var(--mono);
   font-size: 13px;
+  padding: 10px 12px;
+  border: 1px solid rgba(157,255,107,0.3);
+  background: var(--green-soft);
 }
 
 /* === Footer === */
@@ -499,6 +534,28 @@ export default {
     padding: 12px;
   }
 
+  .code-input {
+    font-size: 14px;
+    padding: 10px;
+    min-height: 180px;
+  }
+
+  .button-group {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 0.75rem 0;
+  }
+
+  .button {
+    height: 48px;
+    font-size: 13px;
+  }
+
+  .input-label {
+    font-size: 12px;
+    margin-bottom: 0.4rem;
+  }
+
   .config-row {
     flex-direction: column;
     align-items: flex-start;
@@ -510,12 +567,44 @@ export default {
     gap: 8px;
   }
 
-  .button-group {
-    flex-direction: column;
+  .stats {
+    font-size: 11px;
+  }
+
+  .status-success {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin-top: 0.75rem;
+  }
+
+  .footer {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
+
+/* 超小屏幕 */
+@media (max-width: 375px) {
+  .uuid-tool {
+    padding: 6px 0 14px;
+  }
+
+  .pane-body {
+    padding: 8px;
+  }
+
+  .code-input {
+    font-size: 14px;
+    padding: 8px;
   }
 
   .button {
-    width: 100%;
+    height: 48px;
+    font-size: 12px;
+  }
+
+  .footer {
+    font-size: 11px;
   }
 }
 </style>
