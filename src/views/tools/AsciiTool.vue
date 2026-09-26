@@ -1,0 +1,569 @@
+<template>
+
+    <!-- 工具主体 -->
+    <section class="tool-pane">
+      <div class="tool-pane-head">
+        <span>🎨 ASCII 艺术</span>
+        <span>在线工具</span>
+      </div>
+      <div class="tool-pane-body">
+        <div class="tool-body">
+          <div class="tool-two-col">
+            <div class="tool-col">
+              <label class="tool-label">输入文本：</label>
+              <input
+                type="text"
+                v-model="inputText"
+                placeholder="输入要转换的文本，例如：hello"
+                class="text-input"
+                maxlength="20"
+              />
+              <div class="char-count">
+                <span>{{ inputText.length }} / 20</span>
+              </div>
+              <div class="action-buttons">
+                <button class="tool-button primary" @click="copyToClipboard" :disabled="!asciiArt">
+                  📋 复制
+                </button>
+                <button class="tool-button" @click="downloadArt" :disabled="!asciiArt">
+                  💾 下载
+                </button>
+              </div>
+            </div>
+            <div class="tool-col">
+              <label class="tool-label">预览：</label>
+              <div class="ascii-output" v-if="asciiArt">
+                <pre class="ascii-pre">{{ asciiArt }}</pre>
+              </div>
+              <div v-else class="empty-state">
+                <span class="empty-icon">📝</span>
+                <p>输入文字，生成 ASCII 艺术</p>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="error" class="status-error">
+            ❌ 错误：{{ error }}
+          </div>
+          <div v-if="success" class="status-success">
+            ✅ {{ success }}
+          </div>
+
+          <!-- 字体列表 -->
+          <div class="font-list-section">
+            <div class="font-list-head">
+              <label class="tool-label">所有字体：</label>
+              <input 
+                type="text" 
+                v-model="fontSearch" 
+                placeholder="🔍 搜索字体..."
+                class="font-search"
+              />
+            </div>
+            <div class="font-list">
+              <button 
+                v-for="font in filteredFonts" 
+                :key="font.name"
+                :class="['font-item', { active: selectedFont === font.name }]"
+                @click="selectedFont = font.name"
+              >
+                {{ font.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+</template>
+
+<script>
+import { copyText } from '../../utils/clipboard'
+import { AVAILABLE_FONTS, generateAsciiArt } from '../../utils/figletHelper.js'
+
+export default {
+  name: 'AsciiTool',
+  components: {},
+  data() {
+    return {
+      inputText: 'HELLO',
+      selectedFont: 'Standard',
+      asciiArt: '',
+      error: '',
+      success: '',
+      isGenerating: false,
+      fontOptions: AVAILABLE_FONTS,
+      fontSearch: ''
+    }
+  },
+  computed: {
+    currentFontInfo() {
+      return this.fontOptions.find(f => f.name === this.selectedFont) || this.fontOptions[0]
+    },
+    filteredFonts() {
+      if (!this.fontSearch.trim()) {
+        return this.fontOptions
+      }
+      const query = this.fontSearch.toLowerCase()
+      return this.fontOptions.filter(font => 
+        font.label.toLowerCase().includes(query) ||
+        font.name.toLowerCase().includes(query)
+      )
+    }
+  },
+  watch: {
+    inputText() {
+      this.generateAscii()
+    },
+    selectedFont() {
+      this.generateAscii()
+    }
+  },
+  mounted() {
+    this.generateAscii()
+  },
+  methods: {
+    async generateAscii() {
+      this.error = ''
+      this.success = ''
+      
+      if (!this.inputText.trim()) {
+        this.asciiArt = ''
+        return
+      }
+      
+      this.isGenerating = true
+      
+      try {
+        // 使用 figletHelper 从 CDN 加载字体并生成 ASCII 艺术
+        const result = await generateAsciiArt(this.inputText, this.selectedFont)
+        this.asciiArt = result
+      } catch (err) {
+        this.error = '生成失败，请尝试其他文本或字体'
+        console.error('ASCII error:', err)
+        this.asciiArt = ''
+      } finally {
+        this.isGenerating = false
+      }
+    },
+    async copyToClipboard() {
+      if (!this.asciiArt) return
+      
+      if (await copyText(this.asciiArt)) {
+        this.success = '复制成功！'
+        setTimeout(() => { this.success = '' }, 2000)
+      }
+    },
+    downloadArt() {
+      if (!this.asciiArt) return
+      
+      const blob = new Blob([this.asciiArt], { type: 'text/plain' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `ascii-art-${this.inputText}-${this.selectedFont}.txt`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      this.success = '下载成功！'
+      setTimeout(() => {
+        this.success = ''
+      }, 2000)
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+.ascii-tool {
+  width: min(var(--max), calc(100vw - 16px));
+  margin: 0 auto;
+  padding: 12px 0 20px;
+}
+
+/* === Pane === */
+.pane {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+.pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
+.pane-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: var(--panel);
+}
+
+.pane-body {
+  padding: 12px;
+}
+
+.tool-body {
+  margin-top: 1.5rem;
+}
+
+/* === Input Label === */
+.input-label {
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* === Text Input === */
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+.text-input::placeholder {
+  color: var(--muted);
+}
+
+.char-count {
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+  margin-bottom: 0.5rem;
+}
+
+/* === Select Wrapper === */
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper::after {
+  content: '▼';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--green);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.font-select {
+  width: 100%;
+  padding: 12px 14px;
+  padding-right: 35px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.2s;
+}
+
+.font-select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+.font-select option {
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+.font-note {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* === Font List Section === */
+.font-list-section {
+  margin-top: 1.5rem;
+}
+
+.font-list-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.font-list-head .input-label {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.font-search {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.font-search:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+.font-search::placeholder {
+  color: var(--muted);
+}
+
+.font-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.font-item {
+  padding: 10px 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-item:hover {
+  border-color: var(--green);
+  background: var(--panel-3);
+}
+
+.font-item.active {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+@media (max-width: 640px) {
+  .font-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+  
+  .font-list-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* === ASCII Output === */
+.ascii-output {
+  position: relative;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  padding: 28px;
+  margin: 1.5rem 0 1rem;
+  border-radius: 0;
+  overflow-x: auto;
+}
+
+.ascii-pre {
+  margin: 0;
+  padding: 0;
+  /* 强制使用等宽字体，确保 ASCII 艺术对齐 */
+  font-family: 'Courier New', Courier, 'Monaco', 'Consolas', 'Liberation Mono', monospace !important;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--green);
+  white-space: pre;
+  overflow-x: auto;
+  /* 禁用连字和字间距调整 */
+  font-variant-ligatures: none;
+  font-feature-settings: 'liga' 0, 'calt' 0;
+  letter-spacing: 0;
+  word-spacing: 0;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+}
+
+/* === Empty State === */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  margin: 1.5rem 0;
+  border: 1px dashed var(--line);
+  background: rgba(255,255,255,0.02);
+}
+
+.empty-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+/* === Action Buttons === */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.tool-button {
+  padding: 10px 24px;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  border-radius: 0;
+}
+
+.tool-button:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
+  color: var(--green);
+}
+
+.tool-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-button.primary {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.tool-button.primary:hover:not(:disabled) {
+  background: #9dff6b33;
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+/* === Status Messages === */
+.status-error {
+  color: var(--red);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,107,125,.3);
+  background: #ff6b7d0d;
+  border-radius: 0;
+}
+
+.status-success {
+  color: var(--green);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(157,255,107,.3);
+  background: var(--green-soft);
+  border-radius: 0;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .ascii-tool {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+  
+  .pane-body {
+    padding: 10px;
+  }
+  
+  .ascii-output {
+    padding: 15px 12px;
+  }
+  
+  .ascii-pre {
+    font-size: 12px;
+  }
+  
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .tool-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .ascii-pre {
+    font-size: 10px;
+  }
+}
+</style>

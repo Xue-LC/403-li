@@ -1,0 +1,670 @@
+/* 403.li - 工具通用样式 (Tool Common Styles) */
+/* 所有工具组件共享的样式规范 */
+
+/* === 工具容器 === */
+.tool-wrapper {
+  width: min(var(--max), calc(100vw - 16px));
+  margin: 0 auto;
+  padding: 12px 0 20px;
+}
+
+@media (max-width: 640px) {
+  .tool-wrapper {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 0 16px;
+  }
+}
+
+@media (max-width: 375px) {
+  .tool-wrapper {
+    padding: 6px 0 14px;
+  }
+}
+
+/* === Pane 通用样式 === */
+.tool-pane {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  background: var(--card-bg-gradient), var(--card-bg);
+  box-shadow: var(--card-shadow);
+  position: relative;
+}
+
+.tool-pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--card-top-line);
+  opacity: 0.5;
+}
+
+.tool-pane-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  background: var(--panel);
+}
+
+.tool-pane-body {
+  padding: 12px;
+}
+
+@media (max-width: 640px) {
+  .tool-pane-body {
+    padding: 10px;
+  }
+}
+
+/* === 工具主体 === */
+.tool-body {
+  margin-top: 1.5rem;
+}
+
+/* === 桌面端双栏布局 === */
+.tool-two-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .tool-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: stretch;
+  }
+  /* 双栏内 textarea 自适应高度 */
+  .tool-two-col .code-input {
+    min-height: 200px;
+    height: 100%;
+  }
+}
+
+/* 双栏下方按钮/状态间距 */
+.tool-two-col + .button-group,
+.tool-two-col + .button-row,
+.tool-two-col + .tool-button {
+  margin-top: 12px;
+}
+
+.tool-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tool-col .tool-label:first-child {
+  margin-top: 0;
+}
+
+/* 跨两栏的按钮行 */
+.tool-two-col .tool-col--full {
+  grid-column: 1 / -1;
+}
+
+/* === 输入框标签 === */
+.tool-label {
+  color: var(--green);
+  display: block;
+  margin-bottom: 0.75rem;
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .tool-label {
+    font-size: 12px;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* === 代码输入框 === */
+.code-input {
+  width: 100%;
+  max-width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  padding: 12px;
+  resize: vertical;
+  border-radius: 0;
+  box-sizing: border-box;
+  transition: all 0.2s;
+  min-height: 200px;
+}
+
+.code-input:focus {
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input::placeholder {
+  color: var(--dim);
+}
+
+.code-input.output {
+  background: rgba(157,255,107,0.03);
+  border-color: rgba(157,255,107,0.2);
+}
+
+@media (max-width: 640px) {
+  .code-input {
+    font-size: 14px;
+    padding: 10px;
+    min-height: 180px;
+  }
+}
+
+/* === 小代码输入框 (单行) === */
+.code-input-sm {
+  width: 100%;
+  max-width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 44px 0 12px;
+  resize: none;
+  border-radius: 0;
+  box-sizing: border-box;
+  transition: all 0.2s;
+}
+
+.code-input-sm:focus {
+  outline: 0;
+  border-color: var(--line-strong);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.code-input-sm::placeholder {
+  color: var(--dim);
+}
+
+@media (max-width: 640px) {
+  .code-input-sm {
+    font-size: 14px;
+    padding: 0 40px 0 10px;
+    height: 38px;
+    line-height: 38px;
+  }
+}
+
+@media (max-width: 375px) {
+  .code-input {
+    padding: 8px;
+  }
+}
+
+/* === 按钮通用样式 === */
+.tool-button {
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 13px;
+  text-transform: uppercase;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  color: var(--accent);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  border-radius: 0;
+}
+
+.tool-button:hover:not(:disabled) {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: 0 0 20px var(--green-glow);
+  color: var(--green);
+}
+
+.tool-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tool-button.primary {
+  background: var(--green-soft);
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.tool-button.primary:hover:not(:disabled) {
+  background: rgba(157,255,107,0.2);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.tool-button.danger {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.tool-button.danger:hover:not(:disabled) {
+  background: rgba(255,107,125,0.1);
+  box-shadow: 0 0 15px rgba(255,107,125,0.3);
+}
+
+.tool-button.full-width {
+  width: 100%;
+  grid-column: 1 / -1;
+}
+
+/* === 按钮组 (Grid) === */
+.button-group {
+  display: grid;
+  gap: 10px;
+  margin: 1rem 0;
+}
+
+.button-group-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.button-group-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.button-group-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 640px) {
+  .button-group-4,
+  .button-group-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .button-group {
+    margin: 0.75rem 0;
+  }
+  
+  .tool-button {
+    height: 48px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 375px) {
+  .button-group-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-button {
+    height: 48px;
+    font-size: 12px;
+  }
+}
+
+/* === 按钮行 (Flex) === */
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin: 1rem 0;
+}
+
+@media (max-width: 640px) {
+  .button-row {
+    flex-direction: column;
+  }
+}
+
+/* === 状态消息 === */
+.status-error {
+  color: var(--red);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255,107,125,0.3);
+  background: rgba(255,107,125,0.05);
+  border-radius: 0;
+}
+
+.status-success {
+  color: var(--green);
+  margin-top: 1.25rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 12px 14px;
+  border: 1px solid rgba(157,255,107,0.3);
+  background: var(--green-soft);
+  border-radius: 0;
+}
+
+@media (max-width: 640px) {
+  .status-error,
+  .status-success {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin-top: 0.75rem;
+  }
+}
+
+/* === 结果显示区 === */
+.result-display {
+  position: relative;
+  background: var(--green-soft);
+  border: 1px solid var(--green);
+  padding: 12px 14px;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--green);
+  word-break: break-all;
+  border-radius: 0;
+}
+
+/* === 复制按钮 === */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--green);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  transition: all 0.2s;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  transform: scale(1.1);
+}
+
+/* === 输入框带复制按钮 === */
+.input-with-copy {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-copy .code-input {
+  padding-right: 50px;
+}
+
+/* === Radio & Checkbox Groups === */
+.radio-group, .checkbox-group {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.radio-label, .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  font-family: var(--mono);
+  position: relative;
+  user-select: none;
+}
+
+/* Hide default inputs */
+.radio-label input[type="radio"],
+.checkbox-label input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ============================================ */
+/* Custom Radio - Square with inner dot */
+/* ============================================ */
+
+/* Radio outer box */
+.radio-label::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  border-radius: 0;
+  flex-shrink: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Radio inner dot (hidden by default) */
+.radio-label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Radio inner dot - using box-shadow for the dot */
+.radio-label:has(input[type="radio"]:checked)::before {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 0 0 0 2px var(--green), 0 0 12px var(--green-glow);
+}
+
+/* ============================================ */
+/* Custom Checkbox - Square with green border */
+/* ============================================ */
+
+/* Checkbox outer box */
+.checkbox-label::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+  border-radius: 0;
+  flex-shrink: 0;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Checkbox checked state - green border */
+.checkbox-label:has(input[type="checkbox"]:checked)::before {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 0 0 0 2px var(--green), 0 0 12px var(--green-glow);
+}
+
+/* ============================================ */
+/* Hover states */
+/* ============================================ */
+
+/* Unchecked hover */
+.radio-label:hover::before,
+.checkbox-label:hover::before {
+  border-color: var(--line-strong);
+  background: rgba(255,255,255,0.05);
+}
+
+/* Checked hover - keep checked state styling */
+.radio-label:hover:has(input[type="radio"]:checked)::before {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 0 0 0 2px var(--green), 0 0 18px var(--green-glow);
+}
+
+.checkbox-label:hover:has(input[type="checkbox"]:checked)::before {
+  border-color: var(--green);
+  background: var(--green-soft);
+  box-shadow: inset 0 0 0 2px var(--green), 0 0 18px var(--green-glow);
+}
+
+/* ============================================ */
+/* Active (press) states */
+/* ============================================ */
+
+.radio-label:active::before,
+.checkbox-label:active::before {
+  transform: scale(0.92);
+}
+
+/* ============================================ */
+/* Focus states for accessibility */
+/* ============================================ */
+
+.radio-label input[type="radio"]:focus-visible + span,
+.checkbox-label input[type="checkbox"]:focus-visible + span {
+  outline: none;
+}
+
+.radio-label:has(input[type="radio"]:focus-visible)::before,
+.checkbox-label:has(input[type="checkbox"]:focus-visible)::before {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* ============================================ */
+/* Responsive for radio/checkbox */
+/* ============================================ */
+
+@media (max-width: 640px) {
+  .radio-group, .checkbox-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .radio-label, .checkbox-label {
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .radio-label::before,
+  .checkbox-label::before {
+    width: 16px;
+    height: 16px;
+  }
+
+  .radio-label::after,
+  .checkbox-label::after {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Smaller for mobile */
+  .radio-label:has(input[type="radio"]:checked)::before {
+    box-shadow: inset 0 0 0 2px var(--green), 0 0 10px var(--green-glow);
+  }
+
+  /* Smaller for mobile */
+  .checkbox-label:has(input[type="checkbox"]:checked)::before {
+    box-shadow: inset 0 0 0 2px var(--green), 0 0 10px var(--green-glow);
+  }
+}
+
+/* === Range Input (Slider) === */
+.range-input {
+  width: 100%;
+  margin: 10px 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.range-input:focus {
+  outline: 0;
+}
+
+.range-input::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--green);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  margin-top: -7px;
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+.range-input::-moz-range-track {
+  width: 100%;
+  height: 6px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 0;
+}
+
+.range-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: var(--green);
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  box-shadow: 0 0 10px var(--green-glow);
+}
+
+/* === Config Section === */
+.config-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-2);
+}
+
+.config-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.config-row:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .config-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+
+@media (max-width: 640px) {
+}
+
+@media (max-width: 375px) {
+}
