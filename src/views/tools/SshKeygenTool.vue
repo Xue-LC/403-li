@@ -256,8 +256,9 @@ function buildOpenSshPrivateKey(keyType, publicKeyWire, privateSectionBody, comm
   const numKeys = uint32BE(1)
   const pubKeyBlob = sshString(publicKeyWire)
 
-  const paddedKeyType = concatUint8(new TextEncoder().encode(keyType), new Uint8Array([0]))
-  const privateBody = concatUint8(paddedKeyType, privateSectionBody, sshRawString(comment || ''))
+  // keytype 是 wire string（4 字节长度前缀），不是 NUL 结尾裸串
+  const keyTypeStr = sshString(new TextEncoder().encode(keyType))
+  const privateBody = concatUint8(keyTypeStr, privateSectionBody, sshRawString(comment || ''))
 
   const blockSize = 8
   let padLen = blockSize - (privateBody.length % blockSize)
@@ -265,8 +266,10 @@ function buildOpenSshPrivateKey(keyType, publicKeyWire, privateSectionBody, comm
   const padding = new Uint8Array(padLen)
   for (let i = 0; i < padLen; i++) padding[i] = i + 1
 
-  const checkBytes = new Uint8Array(8)
-  crypto.getRandomValues(checkBytes)
+  // 两个相同的 checkint（uint32），不同会被识别为损坏/口令错误
+  const checkInt = new Uint8Array(4)
+  crypto.getRandomValues(checkInt)
+  const checkBytes = concatUint8(checkInt, checkInt)
 
   const privateSectionInner = concatUint8(checkBytes, privateBody, padding)
   const privateSection = sshString(privateSectionInner)
@@ -399,8 +402,9 @@ function buildEcdsaPrivateKey(privKeyBytes, pubKeyBytes, curveId, comment) {
   const sshName = ECDSA_CURVES_BY_ID[curveId].sshName
   const wire = buildEcdsaPublicKeyWire(pubKeyBytes, curveId)
   const privateBody = concatUint8(
+    sshString(new TextEncoder().encode(curveId)), // 私钥段里要重复曲线名
     sshString(pubKeyBytes),
-    sshString(privKeyBytes)
+    sshMpint(privKeyBytes) // 标量 d 是 mpint
   )
   return buildOpenSshPrivateKey(sshName, wire, privateBody, comment || '403-li-generated')
 }
@@ -532,9 +536,10 @@ export default {
     async generateEcdsa(comment) {
       const curveInfo = ECDSA_CURVES[this.keyType]
       const curve = curveInfo.curve
-      const { secretKey, publicKey } = curve.keygen()
+      const { secretKey } = curve.keygen()
       const privKeyBytes = secretKey
-      const pubKeyBytes = publicKey
+      // SSH 要求非压缩点（0x04||X||Y），keygen() 默认给压缩点
+      const pubKeyBytes = curve.getPublicKey(secretKey, false)
 
       this.publicKey = buildEcdsaPublicKey(pubKeyBytes, curveInfo.curveId, comment)
       this.privateKey = buildEcdsaPrivateKey(privKeyBytes, pubKeyBytes, curveInfo.curveId, comment)

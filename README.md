@@ -144,6 +144,25 @@
 | 时间线生成器 | /tools/timeline | 粘贴"日期 | 标题 | 说明"事件数据，Canvas 渲染垂直/水平可视化时间线，支持排序、5 套配色主题、4 种节点样式、交替标签与间距/字号调节，可复制图片或导出 2x 高清 PNG |
 | 代码行数统计器 | /tools/loc-counter | 粘贴代码或批量上传源码，按 40+ 语言注释语法统计总行数/代码行/注释行/空行并输出分布图表，支持自动语言识别，纯前端实现 |
 | 打字速度测试 | /tools/typing-test | 浏览器内打字速度测试，实时显示 WPM/准确率/正确错误字符数，15/30/60/120 秒四档可选，逐字符高亮正确/错误/光标并自动滚动跟随，每秒采样绘制 WPM 曲线，结束生成统计报告并记录历史最佳 |
+| Git Commit 信息生成器 | /tools/git-commit | 可视化生成 Conventional Commits 规范的提交信息，11 种类型、作用域、破坏性变更、实时校验提示，一键复制提交信息和 git 命令 |
+| 图片取色器 | /tools/color-picker-img | 上传图片后在画布上悬停/点击取色，放大镜精准定位，显示 HEX/RGB/HSL 值，取色历史调色板，导出 PNG |
+| 白噪声生成器 | /tools/white-noise | 纯前端 Web Audio API 实时合成白/粉/棕噪声，内置雨声、海浪、篝火、风声、助眠等 8 组环境音预设，支持滤波、LFO 起伏、睡眠定时、Canvas 频谱 |
+| SQL WHERE 条件构造器 | /tools/sql-where | 可视化构造 SQL WHERE 条件，支持字段/运算符/值编辑、AND/OR 组合、括号分组、IN/BETWEEN/LIKE 等操作符，实时生成 SQL 片段 |
+| 图片色调调整器 | /tools/img-color-adjust | 上传图片实时调节色相/饱和度/亮度/对比度/棕褐/灰度/反相/模糊，支持前后对比拖拽滑块与导出 PNG |
+| 正则速查表 | /tools/regex-cheatsheet | 正则语法分类速查（字符类/锚点/量词/分组/断言/转义/常用模式），支持搜索过滤与实时高亮测试，一键复制 |
+| Unicode 码点查看器 | /tools/unicode-inspect | 逐字符展示 Unicode 码点、名称、类别与 UTF-8/16/32 编码字节，高亮不可见/格式字符 |
+| CSS 选择器测试器 | /tools/css-selector-test | 输入 HTML 片段和 CSS 选择器，实时高亮匹配 DOM 元素，显示匹配数量和元素详情 |
+| JSON Patch 生成器 | /tools/json-patch | 对比两段 JSON 自动生成 RFC 6902 Patch，支持数组比对模式、反向 patch、dry-run 验证 |
+| 波形音频可视化器 | /tools/waveform-viz | 上传音频或麦克风输入，实时渲染波形/频谱/柱状图，可调 FFT/增益/配色，支持导出 PNG |
+| 图片 EXIF 查看器 | /tools/exif-viewer | 读取图片 EXIF 元数据，含相机参数与 GPS 定位，支持分栏复制与导出 JSON |
+| HTML Meta 标签生成器 | /tools/html-meta | 可视化生成 SEO/OG/Twitter Card meta 标签，实时预览搜索结果与社交卡片 |
+| Base91 编解码 | /tools/base91 | Base91 编码解码，效率比 Base64 更高，支持文本与 Hex 输入 |
+| Favicon 生成器 | /tools/favicon | 文字/Emoji 生成多尺寸 Favicon，支持自定义配色、形状，导出 ico 与 PNG |
+| 日期差计算器 | /tools/date-diff | 计算两个日期精确差值，支持排除周末节假日、工作日统计与日期推算 |
+| 文本翻转器 | /tools/text-reverse | 逐字符/逐行/逐词翻转，支持上下颠倒与镜像文字，实时预览 |
+| PWA Manifest 生成器 | /tools/pwa-manifest | 可视化生成 PWA manifest.json，配置应用信息、图标、主题色、显示模式等，实时预览并一键复制下载 |
+| CSS Clamp 计算器 | /tools/css-clamp | 可视化生成 CSS clamp() 函数，流体自适应/手填双模式，iframe 实时预览缩放，断点解析值一览 |
+| 文本转语音 | /tools/text-to-speech | 浏览器内文本转语音，可选语言语音并调节语速音调音量，纯本地合成 |
 
 ## 开发
 
