@@ -1826,6 +1826,102 @@ export const tools = [
     features: '多语言语音 / 语速音调 / 实时进度 / 纯本地合成',
     aliases: ['text-to-speech', 'tts', '文本转语音', '语音合成', '朗读', '文字转语音', 'speech synthesis', 'speak', '念出来', '语音朗读'],
     category: 'text'
+  },
+  {
+    id: 155,
+    path: '/tools/css-named-colors',
+    name: 'CSS 命名颜色浏览器',
+    footerName: 'CSS 命名颜色浏览器',
+    description: '浏览全部 148 个 CSS 命名颜色，搜索过滤并一键复制 HEX/RGB/HSL',
+    status: 'normal',
+    statusText: '正常',
+    features: '148 色全览 / 搜索过滤 / 对比度检测 / 一键复制',
+    aliases: ['css-named-colors', '命名颜色', 'css颜色', '颜色名称', 'named colors', '颜色浏览器', '颜色对照表', '148色', '颜色速查', 'css color names'],
+    category: 'css'
+  },
+  {
+    id: 156,
+    path: '/tools/img-compare',
+    name: '图片对比滑块',
+    footerName: '图片对比滑块',
+    description: '上传两张图片，拖拽滑块对比差异，支持水平垂直分割和并排叠加',
+    status: 'normal',
+    statusText: '正常',
+    features: '滑块对比 / 并排叠加 / 水平垂直 / 导出 PNG',
+    aliases: ['img-compare', '图片对比', '对比滑块', '图片比较', 'image compare', '前后对比', '差异对比', '并排对比', '叠加对比', 'before after'],
+    category: 'image'
+  },
+  {
+    id: 157,
+    path: '/tools/json-transpose',
+    name: 'JSON 行列转置器',
+    footerName: 'JSON 行列转置器',
+    description: 'JSON 行转列与列转行，支持嵌套字段展开和表格预览',
+    status: 'normal',
+    statusText: '正常',
+    features: '行转列 / 列转行 / 嵌套展开 / 表格预览',
+    aliases: ['json-transpose', 'json', '转置', '行列转置', '行转列', '列转行', 'transpose', '矩阵转置', '表格转换', 'json transpose', '对象转数组'],
+    category: 'format'
+  },
+  {
+    id: 158,
+    path: '/tools/debounce-throttle',
+    name: 'Debounce/Throttle 生成器',
+    footerName: 'Debounce/Throttle 生成器',
+    description: '可视化生成防抖/节流函数，实时测试触发合并效果',
+    status: 'normal',
+    statusText: '正常',
+    features: '防抖 / 节流 / leading-trailing / 实时测试',
+    aliases: ['debounce-throttle', 'debounce', 'throttle', '防抖', '节流', '防抖节流', '函数生成', '限流', '触发频率', 'debounce throttle', '频率控制'],
+    category: 'dev'
+  },
+  {
+    id: 159,
+    path: '/tools/css-scroll-snap',
+    name: 'CSS Scroll Snap 可视化器',
+    footerName: 'CSS Scroll Snap 可视化器',
+    description: '可视化配置滚动吸附属性，实时预览并生成 CSS 代码',
+    status: 'normal',
+    statusText: '正常',
+    features: '吸附方向 / 对齐停靠 / 实时预览 / 复制 CSS',
+    aliases: ['css-scroll-snap', 'scroll snap', 'scroll-snap', '滚动吸附', '吸附滚动', 'css 吸附', 'snap', 'scroll-snap-type', 'scroll-snap-align', '轮播吸附', '横向滚动'],
+    category: 'css'
+  },
+  {
+    id: 160,
+    path: '/tools/json-count',
+    name: 'JSON 数组计数器',
+    footerName: 'JSON 数组计数器',
+    description: '统计 JSON 数组元素数量、字段分布与类型占比',
+    status: 'normal',
+    statusText: '正常',
+    features: '元素计数 / 字段覆盖 / 类型占比 / 嵌套深度',
+    aliases: ['json-count', 'json', '数组计数', '数组统计', 'json 统计', '元素数量', '字段统计', '字段分布', '类型占比', 'json count', 'count', '数据统计'],
+    category: 'format'
+  },
+  {
+    id: 161,
+    path: '/tools/json-to-sql',
+    name: 'JSON 转 SQL 生成器',
+    footerName: 'JSON 转 SQL 生成器',
+    description: 'JSON 数组一键生成 INSERT 语句，支持建表与多方言',
+    status: 'normal',
+    statusText: '正常',
+    features: '字段筛选 / 三种方言 / 批量插入 / 建表语句',
+    aliases: ['json-to-sql', 'json to sql', 'json2sql', 'json 转 sql', 'json 转sql', '生成 sql', 'insert 语句', 'insert', '建表语句', 'sql 生成', 'mysql', 'postgresql', 'sqlite'],
+    category: 'dev'
+  },
+  {
+    id: 162,
+    path: '/tools/md-link-extractor',
+    name: 'Markdown 链接提取器',
+    footerName: 'Markdown 链接提取器',
+    description: '从 Markdown 文本提取全部链接，表格展示并可搜索',
+    status: 'normal',
+    statusText: '正常',
+    features: '内联/引用/自动链接 / 表格搜索 / 四种导出 / 一键复制',
+    aliases: ['md-link-extractor', 'markdown 链接', '链接提取', '提取链接', 'markdown 链接提取', 'md link', 'markdown link extractor', '链接抓取', 'url 提取', '提取 url'],
+    category: 'text'
   }
 ]
 

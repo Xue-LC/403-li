@@ -163,6 +163,15 @@
 | PWA Manifest 生成器 | /tools/pwa-manifest | 可视化生成 PWA manifest.json，配置应用信息、图标、主题色、显示模式等，实时预览并一键复制下载 |
 | CSS Clamp 计算器 | /tools/css-clamp | 可视化生成 CSS clamp() 函数，流体自适应/手填双模式，iframe 实时预览缩放，断点解析值一览 |
 | 文本转语音 | /tools/text-to-speech | 浏览器内文本转语音，可选语言语音并调节语速音调音量，纯本地合成 |
+| CSS 命名颜色浏览器 | /tools/css-named-colors | 浏览全部 148 个 CSS 命名颜色，搜索过滤、对比度检测、一键复制 HEX/RGB/HSL |
+| 图片对比滑块 | /tools/img-compare | 上传两张图片，拖拽滑块对比差异，支持水平垂直分割和并排叠加 |
+| JSON 行列转置器 | /tools/json-transpose | JSON 行转列与列转行，支持嵌套字段展开和表格预览 |
+| Debounce/Throttle 生成器 | /tools/debounce-throttle | 可视化生成防抖/节流函数，支持 leading/trailing 选项与实时触发测试 |
+| CSS Scroll Snap 可视化器 | /tools/css-scroll-snap | 可视化配置滚动吸附属性，实时预览并生成 CSS 代码 |
+| JSON 数组计数器 | /tools/json-count | 统计 JSON 数组元素数量、字段分布、类型占比、嵌套深度，一键复制报告 |
+| AI 图片检测 | /tools/ai-image-check | 解析图片元数据（EXIF/XMP/C2PA），检测图片是否由 AI 生成，支持关键词线索与复制报告 |
+| JSON 转 SQL 生成器 | /tools/json-to-sql | JSON 数组一键生成 CREATE TABLE + INSERT INTO 语句，支持 MySQL/PostgreSQL/SQLite 三方言、字段筛选与批量插入 |
+| Markdown 链接提取器 | /tools/md-link-extractor | 从 Markdown 提取全部链接（内联/图片/引用/自动/裸链/HTML），表格展示类型与行号，支持搜索去重与四种格式导出 |
 
 ## 开发
 
